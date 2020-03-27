@@ -5,6 +5,7 @@ Combine data into states.rds
       - [Master statelist](#master-statelist)
       - [P\&T coups](#pt-coups)
       - [Make lead DV versions](#make-lead-dv-versions)
+  - [G\&W state age](#gw-state-age)
   - [Summarize and write output](#summarize-and-write-output)
       - [Variables in data](#variables-in-data)
       - [Missing values by column](#missing-values-by-column)
@@ -138,6 +139,27 @@ states <- left_join(states, dv_full)
 
     ## Joining, by = c("gwcode", "year")
 
+## G\&W state age
+
+Years since independence
+
+``` r
+age <- read_csv("input/gwstate-age.csv") %>%
+  mutate(ln_state_age = log(state_age)) %>%
+  select(-state_age)
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   gwcode = col_double(),
+    ##   year = col_double(),
+    ##   state_age = col_double()
+    ## )
+
+``` r
+states <- left_join(states, age, by = c("gwcode", "year"))
+```
+
 ## Summarize and write output
 
 ``` r
@@ -200,7 +222,7 @@ var_summary <- states %>%
   group_by(variable) %>%
   summarize(missing = sum(is.na(value)),
             sd = sd(value, na.rm = TRUE),
-            integer = all.equal(value, as.integer(value)),
+            integer = isTRUE(all.equal(value, as.integer(value))),
             unique_val_ratio = length(unique(value))/length(value))
 
 write_csv(var_summary, "output/variables.csv")
@@ -211,6 +233,7 @@ knitr::kable(var_summary, digits = 2)
 | variable                        | missing |     sd | integer | unique\_val\_ratio |
 | :------------------------------ | ------: | -----: | :------ | -----------------: |
 | gwcode                          |       0 | 262.08 | TRUE    |               0.02 |
+| ln\_state\_age                  |       0 |   1.15 | FALSE   |               0.02 |
 | pt\_attempt                     |       0 |   0.19 | TRUE    |               0.00 |
 | pt\_attempt\_lead1              |     197 |   0.19 | TRUE    |               0.00 |
 | pt\_attempt\_lead2              |     394 |   0.19 | TRUE    |               0.00 |

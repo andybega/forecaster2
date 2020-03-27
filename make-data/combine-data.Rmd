@@ -92,8 +92,17 @@ dv_full <- left_join(states, dv) %>%
 states <- left_join(states, dv_full)
 ```
 
+## G&W state age
 
+Years since independence
 
+```{r}
+age <- read_csv("input/gwstate-age.csv") %>%
+  mutate(ln_state_age = log(state_age)) %>%
+  select(-state_age)
+
+states <- left_join(states, age, by = c("gwcode", "year"))
+```
 
 ## Summarize and write output
 
@@ -154,7 +163,7 @@ var_summary <- states %>%
   group_by(variable) %>%
   summarize(missing = sum(is.na(value)),
             sd = sd(value, na.rm = TRUE),
-            integer = all.equal(value, as.integer(value)),
+            integer = isTRUE(all.equal(value, as.integer(value))),
             unique_val_ratio = length(unique(value))/length(value))
 
 write_csv(var_summary, "output/variables.csv")
