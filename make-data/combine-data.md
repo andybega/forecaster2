@@ -4,7 +4,9 @@ Combine data into states.rds
   - [Pieces](#pieces)
       - [Master statelist](#master-statelist)
       - [P\&T coups](#pt-coups)
+      - [Make lead DV versions](#make-lead-dv-versions)
   - [Summarize and write output](#summarize-and-write-output)
+      - [Variables in data](#variables-in-data)
       - [Missing values by column](#missing-values-by-column)
 
 ## Pieces
@@ -65,7 +67,7 @@ plotmiss(ptcoups)
 states <- left_join(states, ptcoups, by = c("gwcode", "year"))
 ```
 
-#### Make lead DV versions
+### Make lead DV versions
 
 ``` r
 dv_vars <- ptcoups %>%
@@ -83,11 +85,12 @@ dv <- full_join(lead1, lead2)
 
     ## Joining, by = c("gwcode", "year")
 
-Cuba had a in 1952, check data are correct for this:
+Cuba had an attempt in 1952, check data are correct for this:
 
 ``` r
 cuba <- dv %>%
   filter(gwcode==40 & year < 1953) %>%
+  arrange(year) %>%
   select(gwcode, year, pt_coup_lead1, pt_coup_lead2)
 
 cuba
@@ -96,19 +99,41 @@ cuba
     ## # A tibble: 5 x 4
     ##   gwcode  year pt_coup_lead1 pt_coup_lead2
     ##    <dbl> <dbl>         <dbl>         <dbl>
-    ## 1     40  1949             0             0
-    ## 2     40  1950             0             1
-    ## 3     40  1951             1             0
-    ## 4     40  1952             0             0
-    ## 5     40  1948            NA             0
+    ## 1     40  1948            NA             0
+    ## 2     40  1949             0             0
+    ## 3     40  1950             0             1
+    ## 4     40  1951             1             0
+    ## 5     40  1952             0             0
 
 ``` r
 stopifnot(cuba$pt_coup_lead1[cuba$year==1951] == 1,
           cuba$pt_coup_lead2[cuba$year==1950] == 1)
 ```
 
+#### Impute for last 2 years in state existence
+
+Several states drop out during the data period. Set the DV vars to 0 in
+those instances.
+
 ``` r
-states <- left_join(states, dv)
+last2 <- function(x, yy, ly) {
+  ifelse(is.na(x) & yy >= ly - 1, 0L, x)
+}
+
+dv_full <- left_join(states, dv) %>%
+  select(gwcode, year, contains("lead")) %>%
+  group_by(gwcode) %>%
+  mutate(last_year = max(year),
+         # states with last year in 2019 still exist
+         last_year = ifelse(last_year==max(states$year), 9999L, last_year)) %>%
+  mutate_at(.vars = vars(contains("lead")), ~last2(., year, last_year)) %>%
+  select(-last_year)
+```
+
+    ## Joining, by = c("gwcode", "year")
+
+``` r
+states <- left_join(states, dv_full)
 ```
 
     ## Joining, by = c("gwcode", "year")
@@ -134,7 +159,12 @@ format_years <- function(x) {
 
 incomplete_cases <- states %>%
   gather(var, value, -gwcode, -year) %>%
-  filter(is.na(value)) %>%
+  mutate(dv_var = str_detect(var, "lead[0-9]{1}")) %>%
+  filter( 
+    # for non-DV vars, take any missing values
+    (!dv_var & is.na(value)) | 
+      # for DV vars, last 2 years are missing by design
+      (dv_var & is.na(value) & year < max(states$year) - 1)) %>%
   group_by(gwcode, year, var) %>%
   summarize() %>%
   # summarize which vars are missing
@@ -159,8 +189,53 @@ if (nrow(incomplete_cases) > 0) {
 }
 
   
-write_csv(incomplete_cases, "output/incomplete.cases.csv")
+write_csv(incomplete_cases, "output/incomplete-cases.csv")
 ```
+
+### Variables in data
+
+``` r
+var_summary <- states %>%
+  pivot_longer(everything(), names_to = "variable") %>%
+  group_by(variable) %>%
+  summarize(missing = sum(is.na(value)),
+            sd = sd(value, na.rm = TRUE),
+            integer = all.equal(value, as.integer(value)),
+            unique_val_ratio = length(unique(value))/length(value))
+
+write_csv(var_summary, "output/variables.csv")
+
+knitr::kable(var_summary, digits = 2)
+```
+
+| variable                        | missing |     sd | integer | unique\_val\_ratio |
+| :------------------------------ | ------: | -----: | :------ | -----------------: |
+| gwcode                          |       0 | 262.08 | TRUE    |               0.02 |
+| pt\_attempt                     |       0 |   0.19 | TRUE    |               0.00 |
+| pt\_attempt\_lead1              |     197 |   0.19 | TRUE    |               0.00 |
+| pt\_attempt\_lead2              |     394 |   0.19 | TRUE    |               0.00 |
+| pt\_attempt\_num                |       0 |   0.23 | TRUE    |               0.00 |
+| pt\_attempt\_num10yrs           |       0 |   1.06 | TRUE    |               0.00 |
+| pt\_attempt\_num5yrs            |       0 |   0.65 | TRUE    |               0.00 |
+| pt\_attempt\_total              |       0 |   1.70 | TRUE    |               0.00 |
+| pt\_coup                        |       0 |   0.14 | TRUE    |               0.00 |
+| pt\_coup\_lead1                 |     197 |   0.14 | TRUE    |               0.00 |
+| pt\_coup\_lead2                 |     394 |   0.14 | TRUE    |               0.00 |
+| pt\_coup\_num                   |       0 |   0.15 | TRUE    |               0.00 |
+| pt\_coup\_num10yrs              |       0 |   0.60 | TRUE    |               0.00 |
+| pt\_coup\_num5yrs               |       0 |   0.39 | TRUE    |               0.00 |
+| pt\_coup\_total                 |       0 |   1.70 | TRUE    |               0.00 |
+| pt\_failed                      |       0 |   0.14 | TRUE    |               0.00 |
+| pt\_failed\_lead1               |     197 |   0.14 | TRUE    |               0.00 |
+| pt\_failed\_lead2               |     394 |   0.14 | TRUE    |               0.00 |
+| pt\_failed\_num                 |       0 |   0.16 | TRUE    |               0.00 |
+| pt\_failed\_num10yrs            |       0 |   0.66 | TRUE    |               0.00 |
+| pt\_failed\_num5yrs             |       0 |   0.43 | TRUE    |               0.00 |
+| pt\_failed\_total               |       0 |   1.87 | TRUE    |               0.00 |
+| year                            |       0 |  19.09 | TRUE    |               0.01 |
+| years\_since\_last\_pt\_attempt |       0 |  18.07 | TRUE    |               0.01 |
+| years\_since\_last\_pt\_coup    |       0 |  18.32 | TRUE    |               0.01 |
+| years\_since\_last\_pt\_failed  |       0 |  18.14 | TRUE    |               0.01 |
 
 ### Missing values by column
 
@@ -175,12 +250,12 @@ sapply(states, function(x) sum(is.na(x))) %>%
 
 | Variable           | Missing |
 | :----------------- | ------: |
-| pt\_attempt\_lead1 |     204 |
-| pt\_coup\_lead1    |     204 |
-| pt\_failed\_lead1  |     204 |
-| pt\_attempt\_lead2 |     407 |
-| pt\_coup\_lead2    |     407 |
-| pt\_failed\_lead2  |     407 |
+| pt\_attempt\_lead1 |     197 |
+| pt\_coup\_lead1    |     197 |
+| pt\_failed\_lead1  |     197 |
+| pt\_attempt\_lead2 |     394 |
+| pt\_coup\_lead2    |     394 |
+| pt\_failed\_lead2  |     394 |
 
 ``` r
 write_rds(states, "output/states.rds")

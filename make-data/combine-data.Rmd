@@ -39,7 +39,7 @@ plotmiss(ptcoups)
 states <- left_join(states, ptcoups, by = c("gwcode", "year"))
 ```
 
-#### Make lead DV versions
+### Make lead DV versions
 
 ```{r}
 dv_vars <- ptcoups %>%
@@ -55,11 +55,12 @@ lead2 <- dv_vars %>%
 dv <- full_join(lead1, lead2)
 ```
 
-Cuba had a in 1952, check data are correct for this:
+Cuba had an attempt in 1952, check data are correct for this:
 
 ```{r}
 cuba <- dv %>%
   filter(gwcode==40 & year < 1953) %>%
+  arrange(year) %>%
   select(gwcode, year, pt_coup_lead1, pt_coup_lead2)
 
 cuba
@@ -68,9 +69,30 @@ stopifnot(cuba$pt_coup_lead1[cuba$year==1951] == 1,
           cuba$pt_coup_lead2[cuba$year==1950] == 1)
 ```
 
+#### Impute for last 2 years in state existence
+
+Several states drop out during the data period. Set the DV vars to 0 in those instances.
+
 ```{r}
-states <- left_join(states, dv)
+last2 <- function(x, yy, ly) {
+  ifelse(is.na(x) & yy >= ly - 1, 0L, x)
+}
+
+dv_full <- left_join(states, dv) %>%
+  select(gwcode, year, contains("lead")) %>%
+  group_by(gwcode) %>%
+  mutate(last_year = max(year),
+         # states with last year in 2019 still exist
+         last_year = ifelse(last_year==max(states$year), 9999L, last_year)) %>%
+  mutate_at(.vars = vars(contains("lead")), ~last2(., year, last_year)) %>%
+  select(-last_year)
 ```
+
+```{r}
+states <- left_join(states, dv_full)
+```
+
+
 
 
 ## Summarize and write output
@@ -91,7 +113,12 @@ format_years <- function(x) {
 
 incomplete_cases <- states %>%
   gather(var, value, -gwcode, -year) %>%
-  filter(is.na(value)) %>%
+  mutate(dv_var = str_detect(var, "lead[0-9]{1}")) %>%
+  filter( 
+    # for non-DV vars, take any missing values
+    (!dv_var & is.na(value)) | 
+      # for DV vars, last 2 years are missing by design
+      (dv_var & is.na(value) & year < max(states$year) - 1)) %>%
   group_by(gwcode, year, var) %>%
   summarize() %>%
   # summarize which vars are missing
@@ -116,7 +143,23 @@ if (nrow(incomplete_cases) > 0) {
 }
 
   
-write_csv(incomplete_cases, "output/incomplete.cases.csv")
+write_csv(incomplete_cases, "output/incomplete-cases.csv")
+```
+
+### Variables in data
+
+```{r variables}
+var_summary <- states %>%
+  pivot_longer(everything(), names_to = "variable") %>%
+  group_by(variable) %>%
+  summarize(missing = sum(is.na(value)),
+            sd = sd(value, na.rm = TRUE),
+            integer = all.equal(value, as.integer(value)),
+            unique_val_ratio = length(unique(value))/length(value))
+
+write_csv(var_summary, "output/variables.csv")
+
+knitr::kable(var_summary, digits = 2)
 ```
 
 

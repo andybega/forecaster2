@@ -1,14 +1,1 @@
-gwcode,years,missing_values_in
-711,1950,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
-511,1963,"pt_attempt_lead2, pt_coup_lead2, pt_failed_lead2"
-511,1964,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
-817,1974,"pt_attempt_lead2, pt_coup_lead2, pt_failed_lead2"
-817,1975,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
-265,1989,"pt_attempt_lead2, pt_coup_lead2, pt_failed_lead2"
-680,1989,"pt_attempt_lead2, pt_coup_lead2, pt_failed_lead2"
-265,1990,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
-680,1990,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
-315,1991,"pt_attempt_lead2, pt_coup_lead2, pt_failed_lead2"
-315,1992,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
-345,2005,"pt_attempt_lead2, pt_coup_lead2, pt_failed_lead2"
-345,2006,"pt_attempt_lead1, pt_attempt_lead2, pt_coup_lead1, pt_coup_lead2, pt_failed_lead1, pt_failed_lead2"
+gwcode,year,missing_values_in
