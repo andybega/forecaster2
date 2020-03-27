@@ -42,3 +42,5 @@ out$p <- fcast$prob[, 1]
 
 write_csv(out, "output/fcast.csv")
 
+## TPR vs FPR / Sensitivity vs (1 - Specificity)
+#ggplot2::autoplot(pred, type = "roc")
