@@ -6,9 +6,12 @@ Combine data into states.rds
       - [P\&T coups](#pt-coups)
       - [Make lead DV versions](#make-lead-dv-versions)
   - [G\&W state age](#gw-state-age)
+  - [EPR](#epr)
   - [Summarize and write output](#summarize-and-write-output)
       - [Variables in data](#variables-in-data)
       - [Missing values by column](#missing-values-by-column)
+  - [Take out incomplete rows and
+    save](#take-out-incomplete-rows-and-save)
 
 ## Pieces
 
@@ -160,6 +163,83 @@ age <- read_csv("input/gwstate-age.csv") %>%
 states <- left_join(states, age, by = c("gwcode", "year"))
 ```
 
+## EPR
+
+Ethnic Power Relations data on ethnic groups in countries.
+
+``` r
+epr <- read_csv("input/epr.csv") %>%
+  setNames(c("gwcode", "year", paste0("epr_", names(.)[3:ncol(.)])))
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   gwcode = col_double(),
+    ##   year = col_double(),
+    ##   groups = col_double(),
+    ##   elf = col_double(),
+    ##   excluded_groups_count = col_double(),
+    ##   excluded_group_pop = col_double(),
+    ##   inpower_groups_count = col_double(),
+    ##   inpower_groups_pop = col_double(),
+    ##   regaut_groups_count = col_double(),
+    ##   regaut_group_pop = col_double()
+    ## )
+
+``` r
+glimpse(epr)
+```
+
+    ## Observations: 11,128
+    ## Variables: 10
+    ## $ gwcode                    <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
+    ## $ year                      <dbl> 1946, 1947, 1948, 1949, 1950, 1951, 19…
+    ## $ epr_groups                <dbl> 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,…
+    ## $ epr_elf                   <dbl> 0.5098565, 0.5098565, 0.5098565, 0.509…
+    ## $ epr_excluded_groups_count <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
+    ## $ epr_excluded_group_pop    <dbl> 0.1318, 0.1318, 0.1318, 0.1318, 0.1318…
+    ## $ epr_inpower_groups_count  <dbl> 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,…
+    ## $ epr_inpower_groups_pop    <dbl> 0.8562, 0.8562, 0.8562, 0.8562, 0.8562…
+    ## $ epr_regaut_groups_count   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_regaut_group_pop      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+
+Add year-to-year difference of these variables. Changes could be
+significant.
+
+``` r
+TODO
+```
+
+EPR only ranges to 2017 right now. Lag and carry-back, or don’t lag but
+do carry-forward from 2017 on?
+
+``` r
+ggplot(epr, aes(x = year, y = epr_excluded_group_pop, group = gwcode)) +
+  geom_line()
+```
+
+    ## Warning: Removed 986 rows containing missing values (geom_path).
+
+![](combine-data_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+There are quite frequent changes, as the plot above shows. Since I care
+more about recent cases, and since it seems fair to assume that the
+power structures pre-independence were similar to those at independence,
+lag and carry back for first two years in state’s existence, for states
+that enter after 1950.
+
+``` r
+epr_lagged <- epr %>%
+  mutate(year = year + 2) %>%
+  arrange(gwcode, year) %>%
+  group_by(gwcode) %>%
+  tidyr::fill(-gwcode, -year, .direction = "up")
+```
+
+``` r
+states <- left_join(states, epr_lagged, by = c("gwcode", "year"))
+```
+
 ## Summarize and write output
 
 ``` r
@@ -232,6 +312,14 @@ knitr::kable(var_summary, digits = 2)
 
 | variable                        | missing |     sd | integer | unique\_val\_ratio |
 | :------------------------------ | ------: | -----: | :------ | -----------------: |
+| epr\_elf                        |    1218 |   0.30 | FALSE   |               0.02 |
+| epr\_excluded\_group\_pop       |    1218 |   0.22 | FALSE   |               0.02 |
+| epr\_excluded\_groups\_count    |    1218 |   5.10 | TRUE    |               0.00 |
+| epr\_groups                     |    1218 |   5.84 | TRUE    |               0.00 |
+| epr\_inpower\_groups\_count     |    1218 |   2.25 | TRUE    |               0.00 |
+| epr\_inpower\_groups\_pop       |    1218 |   0.25 | FALSE   |               0.03 |
+| epr\_regaut\_group\_pop         |    1218 |   0.00 | TRUE    |               0.00 |
+| epr\_regaut\_groups\_count      |    1218 |   0.00 | TRUE    |               0.00 |
 | gwcode                          |       0 | 262.08 | TRUE    |               0.02 |
 | ln\_state\_age                  |       0 |   1.15 | FALSE   |               0.02 |
 | pt\_attempt                     |       0 |   0.19 | TRUE    |               0.00 |
@@ -271,15 +359,27 @@ sapply(states, function(x) sum(is.na(x))) %>%
   knitr::kable()
 ```
 
-| Variable           | Missing |
-| :----------------- | ------: |
-| pt\_attempt\_lead1 |     197 |
-| pt\_coup\_lead1    |     197 |
-| pt\_failed\_lead1  |     197 |
-| pt\_attempt\_lead2 |     394 |
-| pt\_coup\_lead2    |     394 |
-| pt\_failed\_lead2  |     394 |
+| Variable                     | Missing |
+| :--------------------------- | ------: |
+| pt\_attempt\_lead1           |     197 |
+| pt\_coup\_lead1              |     197 |
+| pt\_failed\_lead1            |     197 |
+| pt\_attempt\_lead2           |     394 |
+| pt\_coup\_lead2              |     394 |
+| pt\_failed\_lead2            |     394 |
+| epr\_groups                  |    1218 |
+| epr\_elf                     |    1218 |
+| epr\_excluded\_groups\_count |    1218 |
+| epr\_excluded\_group\_pop    |    1218 |
+| epr\_inpower\_groups\_count  |    1218 |
+| epr\_inpower\_groups\_pop    |    1218 |
+| epr\_regaut\_groups\_count   |    1218 |
+| epr\_regaut\_group\_pop      |    1218 |
+
+## Take out incomplete rows and save
 
 ``` r
-write_rds(states, "output/states.rds")
+states_clean <- states %>%
+  filter(!is.na(epr_groups))
+write_rds(states_clean, "output/states.rds")
 ```
