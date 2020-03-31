@@ -11,8 +11,7 @@ library(readr)
 setwd(here::here("models"))
 
 states <- readRDS("input/states.rds") %>%
-  as_tibble() %>%
-  select(-starts_with("reign_"))
+  as_tibble() 
 
 # mlr3 needs DV to be factors
 states <- states %>%
