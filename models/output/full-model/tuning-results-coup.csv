@@ -1,0 +1,3 @@
+task_id,learner_id,resampling_id,iters,classif.auc,num.trees,mtry,min.node.size
+coup,classif.ranger,repeated_cv,8,0.7778898963154512,2721,9,347
+coup,classif.ranger,repeated_cv,8,0.7788218239710304,2504,6,251

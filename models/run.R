@@ -1,3 +1,6 @@
+#
+#   Run the test and live forecasts
+#
 
 
 library(mlr3)
@@ -10,8 +13,13 @@ library(dplyr)
 library(stringr)
 library(lgr)
 library(readr)
+library(future)
+library(doFuture)
 
 setwd(here::here("models"))
+
+registerDoFuture()
+plan(multisession(workers = availableCores()))
 
 states <- readRDS("input/states.rds") %>%
   as_tibble() 
@@ -49,7 +57,7 @@ tune_ps = ParamSet$new(list(
   ParamInt$new("mtry", lower = 3, upper = 15),
   ParamInt$new("min.node.size", lower = 1, upper = 400)
 ))
-tune_terminator = term("evals", n_evals = 2)
+tune_terminator = term("evals", n_evals = 20)
 tuner = mlr3tuning::tnr("random_search")
 
 auto_rf = AutoTuner$new(
@@ -61,46 +69,62 @@ auto_rf = AutoTuner$new(
   tuner = tuner
 )
 
-# Iterate through test and live forecast years
-years <- 2010:2019
-fcasts <- list()
-for (i in seq_along(years)) {
-  yy <- years[i]
+# Construct the grid of models we will run
+# For each year, 3 models for the 3 outcomes
+model_grid <- expand.grid(year = 2010:2019, outcome = names(tasks), 
+                          stringsAsFactors = FALSE)
+
+r <- foreach(
+  i = 1:nrow(model_grid),
+  .export = c("model_grid", "states", "auto_rf", "tasks", "non_feat_cols"),
+  .packages = c("mlr3", "mlr3learners", "mlr3measures", "mlr3tuning", "paradox",
+                "readr")
+) %dopar% {
+  
+  t0 <- proc.time()
+  yy <- model_grid$year[[i]]
+  outcome_i <- model_grid$outcome[[i]]
+  
+  lgr$info("Year: %d, Outcome: %s", yy, outcome_i)
+  
+  task_i     <- tasks[[outcome_i]]
+  fcast_i_fn <- sprintf("output/chunks/forecast/%s-%d.rds", outcome_i, yy)             
+  tune_i_fn  <- sprintf("output/chunks/tuning/%s-%d.csv", outcome_i, yy)
   
   train_rows <- which(states$year < yy)
   pred_rows  <- which(states$year==yy)
   
-  # Iterate through the 3 different outcomes
-  fcasts_yy <- list()
-  for (outcome_i in names(tasks)) {
-    
-    lgr$info("Year: %d, Outcome: %s", yy, outcome_i)
-    
-    task_i <- tasks[[outcome_i]]
-    
-    auto_rf$train(task_i, row_ids = train_rows)
-    fcast_i <- auto_rf$predict(task_i, row_ids = pred_rows)
-    
-    # This portion is related to optimizing the tuning process
-    tr <- auto_rf$tuning_instance$archive(unnest = "params") %>%
-      select(task_id, learner_id, resampling_id, iters, classif.auc, num.trees,
-             mtry, min.node.size)
-    fn <- sprintf("output/tuning/%s-%d.csv", outcome_i, yy)
-    write_csv(tr, path = fn)
-    ## End tuning section
-    
-    out_i <- states[pred_rows, c("gwcode", "year")]
-    out_i$for_year <- unique(out_i$year) + 1L
-    out_i$outcome  <- outcome_i
-    out_i$observed <- states[pred_rows, ][[task_i$col_roles$target]]
-    out_i$p <- fcast_i$prob[, 1]
-    
-    fcasts_yy[[outcome_i]] <- out_i
-  }
-  fcasts_yy <- bind_rows(fcasts_yy)
-  fcasts[[i]] <- fcasts_yy
+  auto_rf$train(task_i, row_ids = train_rows)
+  fcast_i <- auto_rf$predict(task_i, row_ids = pred_rows)
+  
+  # This portion is related to optimizing the tuning process
+  tr <- auto_rf$tuning_instance$archive(unnest = "params") %>%
+    select(task_id, learner_id, resampling_id, iters, classif.auc, num.trees,
+           mtry, min.node.size)
+  write_csv(tr, path = tune_i_fn)
+  ## End tuning section
+  
+  out_i <- states[pred_rows, c("gwcode", "year")]
+  out_i$for_year <- unique(out_i$year) + 1L
+  out_i$outcome  <- outcome_i
+  out_i$observed <- states[pred_rows, ][[task_i$col_roles$target]]
+  out_i$p <- fcast_i$prob[, 1]
+  
+  write_rds(out_i, path = fcast_i_fn)
+  
+  invisible(NULL)
 }
-fcasts <- bind_rows(fcasts)
+
+# Combine tune chunks
+chunk_files <- dir("output/chunks/tuning", full.names = TRUE)
+chunks <- lapply(chunk_files, readr::read_csv)
+tr <- bind_rows(chunks)
+write_csv(tr, "output/tuning-results.csv")
+
+# Combine forecast chunks
+chunk_files <- dir("output/chunks/forecast", full.names = TRUE)
+chunks <- lapply(chunk_files, readr::read_rds)
+fcasts <- bind_rows(chunks)
 
 # Fix data types
 fcasts <- fcasts %>%
@@ -124,5 +148,14 @@ write_rds(fcasts, "output/fcasts.rds")
 
 ## TPR vs FPR / Sensitivity vs (1 - Specificity)
 #ggplot2::autoplot(pred, type = "roc")
+
+warn <- warnings()
+if (length(warn) > 1) {
+  call <- as.character(warn)
+  msg  <- names(warn)
+  warn_strings <- paste0("In ", call, " : ", msg)
+  lgr$warn("There were R warnings, printing below:")
+  for (x in warn_strings) lgr$warn(x)
+}
 
 source("score.R")

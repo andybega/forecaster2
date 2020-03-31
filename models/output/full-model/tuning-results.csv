@@ -1,0 +1,7 @@
+task_id,learner_id,resampling_id,iters,classif.auc,num.trees,mtry,min.node.size
+attempt,classif.ranger,repeated_cv,8,0.8130247379649006,1753,7,14
+attempt,classif.ranger,repeated_cv,8,0.806562027758605,2522,10,289
+coup,classif.ranger,repeated_cv,8,0.7778898963154512,2721,9,347
+coup,classif.ranger,repeated_cv,8,0.7788218239710304,2504,6,251
+failed,classif.ranger,repeated_cv,8,0.8246499825138096,1520,6,295
+failed,classif.ranger,repeated_cv,8,0.8213409261154698,1245,13,207
