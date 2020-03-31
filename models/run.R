@@ -16,6 +16,8 @@ library(readr)
 library(future)
 library(doFuture)
 
+lgr$info("Start forecast models")
+
 setwd(here::here("models"))
 
 registerDoFuture()
@@ -47,15 +49,15 @@ tasks <- sapply(tasks, function(x) {
 })
 
 
-learner         = mlr3::lrn("classif.ranger", predict_types = "prob")
-learner$predict_type = "prob"
+learner         = mlr3::lrn("classif.ranger", 
+                            predict_type = "prob",
+                            num.trees = 1200,
+                            mtry = 4)
 tune_resampling = rsmp("repeated_cv")
-tune_resampling$param_set$values = list(repeats = 1, folds = 5)
+tune_resampling$param_set$values = list(repeats = 2, folds = 8)
 tune_measures   = msr("classif.auc")
 tune_ps = ParamSet$new(list(
-  ParamInt$new("num.trees", lower = 500, upper = 3000),
-  ParamInt$new("mtry", lower = 3, upper = 15),
-  ParamInt$new("min.node.size", lower = 1, upper = 400)
+  ParamInt$new("min.node.size", lower = 1, upper = 200)
 ))
 tune_terminator = term("evals", n_evals = 20)
 tuner = mlr3tuning::tnr("random_search")
