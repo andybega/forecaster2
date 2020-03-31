@@ -267,7 +267,7 @@ sapply(states, function(x) sum(is.na(x))) %>%
 
 ```{r}
 states_clean <- states %>%
-  filter(!is.na(epr_groups))
+  filter(!is.na(epr_groups), !is.na(reign_elected))
 write_rds(states_clean, "output/states.rds")
 ```
 
