@@ -1,3 +1,11 @@
 task_id,learner_id,resampling_id,iters,classif.auc,num.trees,mtry,min.node.size
-failed,classif.ranger,repeated_cv,8,0.8246499825138096,1520,6,295
-failed,classif.ranger,repeated_cv,8,0.8213409261154698,1245,13,207
+failed,classif.ranger,repeated_cv,8,0.8206992006479097,2559,10,255
+failed,classif.ranger,repeated_cv,8,0.8182441892403285,982,12,147
+failed,classif.ranger,repeated_cv,8,0.8211761523614528,796,8,119
+failed,classif.ranger,repeated_cv,8,0.8278189778647014,2922,3,139
+failed,classif.ranger,repeated_cv,8,0.8183809007577743,1459,13,275
+failed,classif.ranger,repeated_cv,8,0.8276042151818622,1167,6,7
+failed,classif.ranger,repeated_cv,8,0.8282731405799546,1994,3,56
+failed,classif.ranger,repeated_cv,8,0.8209626568123181,1586,10,309
+failed,classif.ranger,repeated_cv,8,0.8186515559113392,1788,11,167
+failed,classif.ranger,repeated_cv,8,0.8229446784754547,2079,7,115
