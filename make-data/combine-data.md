@@ -7,6 +7,7 @@ Combine data into states.rds
       - [Make lead DV versions](#make-lead-dv-versions)
   - [G\&W state age](#gw-state-age)
   - [EPR](#epr)
+  - [REIGN data](#reign-data)
   - [Summarize and write output](#summarize-and-write-output)
       - [Variables in data](#variables-in-data)
       - [Missing values by column](#missing-values-by-column)
@@ -240,6 +241,138 @@ epr_lagged <- epr %>%
 states <- left_join(states, epr_lagged, by = c("gwcode", "year"))
 ```
 
+## REIGN data
+
+``` r
+reign <- read_csv("input/reign-cy.csv") %>%
+  setNames(., c("gwcode", "year", paste0("reign_", names(.)[3:ncol(.)])))
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_double(),
+    ##   government = col_character()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+``` r
+glimpse(reign)
+```
+
+    ## Observations: 11,031
+    ## Variables: 30
+    ## $ gwcode                <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, …
+    ## $ year                  <dbl> 1950, 1951, 1952, 1953, 1954, 1955, 1956, …
+    ## $ reign_elected         <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, …
+    ## $ reign_age             <dbl> 66, 67, 68, 63, 64, 65, 66, 67, 68, 69, 70…
+    ## $ reign_male            <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ reign_militarycareer  <dbl> 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, …
+    ## $ reign_tenure_months   <dbl> 69, 81, 93, 12, 24, 36, 48, 60, 72, 84, 96…
+    ## $ reign_government      <chr> "Presidential Democracy", "Presidential De…
+    ## $ reign_anticipation    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_ref_ant         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_leg_ant         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_exec_ant        <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_irreg_lead_ant  <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_election_now    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_election_recent <dbl> 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, …
+    ## $ reign_leg_recent      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_exec_recent     <dbl> 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, …
+    ## $ reign_lead_recent     <dbl> 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, …
+    ## $ reign_ref_recent      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_direct_recent   <dbl> 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, …
+    ## $ reign_indirect_recent <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_victory_recent  <dbl> 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_defeat_recent   <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, …
+    ## $ reign_change_recent   <dbl> 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, …
+    ## $ reign_nochange_recent <dbl> 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_delayed         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+    ## $ reign_lastelection    <dbl> 3.2188759, 3.6109178, 0.6931472, 2.6390574…
+    ## $ reign_loss            <dbl> 5.3798971, 5.4337220, 0.6931472, 2.6390574…
+    ## $ reign_irregular       <dbl> 7.571474, 7.577634, 7.583756, 7.589842, 7.…
+    ## $ reign_prev_conflict   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+
+``` r
+# Simplify the government coding
+table(reign$reign_government) %>% sort() %>% rev()
+```
+
+    ## 
+    ##        Parliamentary Democracy         Presidential Democracy 
+    ##                           3371                           1806 
+    ##                 Dominant Party          Personal Dictatorship 
+    ##                           1655                           1458 
+    ##                       Monarchy                 Party-Personal 
+    ##                            977                            437 
+    ##                       Military              Military-Personal 
+    ##                            308                            284 
+    ## Party-Personal-Military Hybrid               Foreign/Occupied 
+    ##                            191                            147 
+    ##                 Party-Military         Provisional - Civilian 
+    ##                            144                             74 
+    ##                      Oligarchy                     Warlordism 
+    ##                             67                             45 
+    ##              Indirect Military         Provisional - Military 
+    ##                             41                             26
+
+``` r
+check <- left_join(states, reign)
+```
+
+    ## Joining, by = c("gwcode", "year")
+
+``` r
+check %>% 
+  mutate(pt_attempt_lead1 = as.integer(as.character(pt_attempt_lead1)),
+         pt_coup_lead1 = as.integer(as.character(pt_coup_lead1))) %>%
+  group_by(reign_government) %>% 
+  summarize(n = n(), 
+            attempts = sum(pt_attempt_lead1, na.rm = TRUE), 
+            attempt_rate = mean(pt_attempt_lead1, na.rm = TRUE), 
+            coup = sum(pt_coup_lead1, na.rm = TRUE), 
+            coup_rate = mean(pt_coup_lead1, na.rm = TRUE)) %>% 
+  arrange(desc(attempt_rate))
+```
+
+    ## # A tibble: 17 x 6
+    ##    reign_government                 n attempts attempt_rate  coup coup_rate
+    ##    <chr>                        <int>    <int>        <dbl> <int>     <dbl>
+    ##  1 Indirect Military               41       10      0.244       5   0.122  
+    ##  2 Provisional - Military          26        6      0.231       4   0.154  
+    ##  3 Provisional - Civilian          74       13      0.186       7   0.1    
+    ##  4 Military                       308       42      0.137      32   0.104  
+    ##  5 Military-Personal              284       34      0.121      13   0.0461 
+    ##  6 Warlordism                      45        5      0.116       1   0.0233 
+    ##  7 Party-Military                 144       12      0.0845      6   0.0423 
+    ##  8 Personal Dictatorship         1458      100      0.0694     46   0.0319 
+    ##  9 Party-Personal-Military Hyb…   191        8      0.0421      6   0.0316 
+    ## 10 Presidential Democracy        1806       56      0.0319     28   0.0160 
+    ## 11 Oligarchy                       67        2      0.0299      2   0.0299 
+    ## 12 Party-Personal                 437       12      0.0279      6   0.0140 
+    ## 13 Foreign/Occupied               147        4      0.0276      4   0.0276 
+    ## 14 Monarchy                       977       23      0.0239     12   0.0124 
+    ## 15 Dominant Party                1655       37      0.0225     21   0.0128 
+    ## 16 Parliamentary Democracy       3371       40      0.0121     24   0.00728
+    ## 17 <NA>                           171        1      0.00595     1   0.00595
+
+``` r
+reign <- reign %>%
+  mutate(
+    reign_gov_pres = as.integer(reign_government=="Presidential Democracy"),
+    reign_gov_parl = as.integer(reign_government=="Parliamentary Democracy"),
+    reign_gov_personal = as.integer(reign_government %in% c("Personal Dictatorship", "Monarchy")),
+    reign_gov_party = as.integer(reign_government %in% c("Dominant Party", "Party-Personal", "Party-Personal-Military Hybrid", "Party-Military")),
+    reign_gov_provisional = as.integer(str_detect(reign_government, "Provisional")),
+    reign_gov_military = as.integer(reign_government %in% c("Indirect Military", "Military", "Warlordism", "Military-Personal"))
+  ) %>%
+  select(-reign_government)
+
+states <- left_join(states, reign)
+```
+
+    ## Joining, by = c("gwcode", "year")
+
 ## Summarize and write output
 
 ``` r
@@ -343,6 +476,39 @@ knitr::kable(var_summary, digits = 2)
 | pt\_failed\_num10yrs            |       0 |   0.66 | TRUE    |               0.00 |
 | pt\_failed\_num5yrs             |       0 |   0.43 | TRUE    |               0.00 |
 | pt\_failed\_total               |       0 |   1.87 | TRUE    |               0.00 |
+| reign\_age                      |     171 |  11.21 | TRUE    |               0.01 |
+| reign\_anticipation             |     171 |   0.31 | TRUE    |               0.00 |
+| reign\_change\_recent           |     171 |   0.20 | TRUE    |               0.00 |
+| reign\_defeat\_recent           |     171 |   0.18 | TRUE    |               0.00 |
+| reign\_delayed                  |     171 |   0.09 | TRUE    |               0.00 |
+| reign\_direct\_recent           |     171 |   0.30 | TRUE    |               0.00 |
+| reign\_elected                  |     171 |   0.47 | TRUE    |               0.00 |
+| reign\_election\_now            |     171 |   0.15 | TRUE    |               0.00 |
+| reign\_election\_recent         |     171 |   0.31 | TRUE    |               0.00 |
+| reign\_exec\_ant                |     171 |   0.23 | TRUE    |               0.00 |
+| reign\_exec\_recent             |     171 |   0.21 | TRUE    |               0.00 |
+| reign\_gov\_military            |     171 |   0.24 | TRUE    |               0.00 |
+| reign\_gov\_parl                |     171 |   0.46 | TRUE    |               0.00 |
+| reign\_gov\_party               |     171 |   0.41 | TRUE    |               0.00 |
+| reign\_gov\_personal            |     171 |   0.41 | TRUE    |               0.00 |
+| reign\_gov\_pres                |     171 |   0.37 | TRUE    |               0.00 |
+| reign\_gov\_provisional         |     171 |   0.09 | TRUE    |               0.00 |
+| reign\_indirect\_recent         |     171 |   0.09 | TRUE    |               0.00 |
+| reign\_irreg\_lead\_ant         |     171 |   0.13 | TRUE    |               0.00 |
+| reign\_irregular                |     171 |   1.47 | FALSE   |               0.11 |
+| reign\_lastelection             |     171 |   1.33 | FALSE   |               0.07 |
+| reign\_lead\_recent             |     171 |   0.30 | TRUE    |               0.00 |
+| reign\_leg\_ant                 |     171 |   0.20 | TRUE    |               0.00 |
+| reign\_leg\_recent              |     171 |   0.22 | TRUE    |               0.00 |
+| reign\_loss                     |     171 |   1.38 | FALSE   |               0.09 |
+| reign\_male                     |     171 |   0.17 | TRUE    |               0.00 |
+| reign\_militarycareer           |     171 |   0.40 | TRUE    |               0.00 |
+| reign\_nochange\_recent         |     171 |   0.24 | TRUE    |               0.00 |
+| reign\_prev\_conflict           |     171 |   0.60 | TRUE    |               0.00 |
+| reign\_ref\_ant                 |     171 |   0.10 | TRUE    |               0.00 |
+| reign\_ref\_recent              |     171 |   0.11 | TRUE    |               0.00 |
+| reign\_tenure\_months           |     171 |  96.34 | TRUE    |               0.05 |
+| reign\_victory\_recent          |     171 |   0.25 | TRUE    |               0.00 |
 | year                            |       0 |  19.09 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_attempt |       0 |  18.07 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_coup    |       0 |  18.32 | TRUE    |               0.01 |
@@ -375,6 +541,39 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | epr\_inpower\_groups\_pop    |    1218 |
 | epr\_regaut\_groups\_count   |    1218 |
 | epr\_regaut\_group\_pop      |    1218 |
+| reign\_elected               |     171 |
+| reign\_age                   |     171 |
+| reign\_male                  |     171 |
+| reign\_militarycareer        |     171 |
+| reign\_tenure\_months        |     171 |
+| reign\_anticipation          |     171 |
+| reign\_ref\_ant              |     171 |
+| reign\_leg\_ant              |     171 |
+| reign\_exec\_ant             |     171 |
+| reign\_irreg\_lead\_ant      |     171 |
+| reign\_election\_now         |     171 |
+| reign\_election\_recent      |     171 |
+| reign\_leg\_recent           |     171 |
+| reign\_exec\_recent          |     171 |
+| reign\_lead\_recent          |     171 |
+| reign\_ref\_recent           |     171 |
+| reign\_direct\_recent        |     171 |
+| reign\_indirect\_recent      |     171 |
+| reign\_victory\_recent       |     171 |
+| reign\_defeat\_recent        |     171 |
+| reign\_change\_recent        |     171 |
+| reign\_nochange\_recent      |     171 |
+| reign\_delayed               |     171 |
+| reign\_lastelection          |     171 |
+| reign\_loss                  |     171 |
+| reign\_irregular             |     171 |
+| reign\_prev\_conflict        |     171 |
+| reign\_gov\_pres             |     171 |
+| reign\_gov\_parl             |     171 |
+| reign\_gov\_personal         |     171 |
+| reign\_gov\_party            |     171 |
+| reign\_gov\_provisional      |     171 |
+| reign\_gov\_military         |     171 |
 
 ## Take out incomplete rows and save
 

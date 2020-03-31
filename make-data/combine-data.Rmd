@@ -143,6 +143,46 @@ epr_lagged <- epr %>%
 states <- left_join(states, epr_lagged, by = c("gwcode", "year"))
 ```
 
+## REIGN data
+
+```{r}
+reign <- read_csv("input/reign-cy.csv") %>%
+  setNames(., c("gwcode", "year", paste0("reign_", names(.)[3:ncol(.)])))
+
+glimpse(reign)
+
+# Simplify the government coding
+table(reign$reign_government) %>% sort() %>% rev()
+```
+```{r}
+check <- left_join(states, reign)
+check %>% 
+  mutate(pt_attempt_lead1 = as.integer(as.character(pt_attempt_lead1)),
+         pt_coup_lead1 = as.integer(as.character(pt_coup_lead1))) %>%
+  group_by(reign_government) %>% 
+  summarize(n = n(), 
+            attempts = sum(pt_attempt_lead1, na.rm = TRUE), 
+            attempt_rate = mean(pt_attempt_lead1, na.rm = TRUE), 
+            coup = sum(pt_coup_lead1, na.rm = TRUE), 
+            coup_rate = mean(pt_coup_lead1, na.rm = TRUE)) %>% 
+  arrange(desc(attempt_rate))
+```
+
+```{r}
+reign <- reign %>%
+  mutate(
+    reign_gov_pres = as.integer(reign_government=="Presidential Democracy"),
+    reign_gov_parl = as.integer(reign_government=="Parliamentary Democracy"),
+    reign_gov_personal = as.integer(reign_government %in% c("Personal Dictatorship", "Monarchy")),
+    reign_gov_party = as.integer(reign_government %in% c("Dominant Party", "Party-Personal", "Party-Personal-Military Hybrid", "Party-Military")),
+    reign_gov_provisional = as.integer(str_detect(reign_government, "Provisional")),
+    reign_gov_military = as.integer(reign_government %in% c("Indirect Military", "Military", "Warlordism", "Military-Personal"))
+  ) %>%
+  select(-reign_government)
+
+states <- left_join(states, reign)
+```
+
 
 ## Summarize and write output
 
