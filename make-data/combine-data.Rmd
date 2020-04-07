@@ -187,8 +187,15 @@ states <- left_join(states, reign)
 ## V-Dem
 
 ```{r, eval = FALSE}
-vdem <- read_csv("input/v-dem.csv") %>%
-  select(-country_name)
+vdem <- read_csv("input/v-dem.csv",
+                 col_types = cols(
+                   .default = col_double(),
+                   country_name = col_character(),
+                   year = col_integer()
+                 )) %>%
+  select(-country_name) %>%
+  filter(!is.na(gwcode)) %>%
+  setNames(c("gwcode", "year", paste0("vdem_", names(.)[2:ncol(.)])))
 
 states <- left_join(states, vdem)
 ```
@@ -247,7 +254,7 @@ incomplete_cases <- incomplete_cases_by_var %>%
             N = n()) %>%
   # re-order so it is easier to read
   arrange(gwcode, spell_id) %>%
-  select(gwcode, spell_id, years, data_sources, N)
+  select(gwcode, spell_id, years, N, data_sources)
   
 write_csv(incomplete_cases, "output/incomplete-cases.csv")
 ```
