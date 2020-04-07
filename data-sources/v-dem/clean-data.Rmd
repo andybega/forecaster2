@@ -1,0 +1,60 @@
+---
+title: "V-Dem"
+output: 
+  github_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(states)
+library(dplyr)
+
+raw = read_csv("input/v10/V-Dem-CY-Core-v10.csv")
+
+v2x = raw %>%
+  select(country_name, COWcode, year, starts_with("v2x_")) %>%
+  select(-ends_with("codehigh"), -ends_with("codelow"), -ends_with("sd"),
+         -ends_with("osp")) %>%
+  # take out the discrete regime variable, it will get treated as integer
+  # and i don't want to deal with dummying it out
+  select(-starts_with("v2x_regime")) %>%
+  # G&W doesn't start until 1816, so take out earlier
+  filter(year > 1815)
+
+# Change from COW codes to G&W codes
+v2x = v2x %>%
+  rename(gwcode = COWcode) %>%
+  mutate(gwcode = case_when(
+    gwcode == 255 ~ 260,
+    gwcode == 679 ~ 678,
+    TRUE ~ gwcode))
+
+# How many missing values are there for each variable?
+sapply(v2x, function(x) sum(is.na(x))) %>%
+  tibble::enframe(name = "variable", value = "missing") %>%
+  arrange(desc(missing)) %>%
+  knitr::kable()
+
+#
+#   Add variable transformations ----
+#   ___________________________ 
+
+# first we need to identify country-spells, to make sure gaps don't accidentally
+# cross over into what are supposed to be year to year changes
+v2x = v2x %>%
+  group_by(country_name) %>%
+  arrange(year) %>%
+  mutate(spell_id = id_date_sequence(year))
+
+v2x_feats = v2x %>%
+  group_by(country_name) %>%
+  mutate_at(vars(starts_with("v2x_")), list(diff = ~c(0, diff(.))))
+
+write_csv(v2x, "output/v-dem.csv")
+```
+

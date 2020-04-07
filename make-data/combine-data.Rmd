@@ -186,7 +186,7 @@ states <- left_join(states, reign)
 
 ## V-Dem
 
-```{r, eval = FALSE}
+```{r}
 vdem <- read_csv("input/v-dem.csv",
                  col_types = cols(
                    .default = col_double(),
