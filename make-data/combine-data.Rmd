@@ -9,8 +9,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 
 suppressPackageStartupMessages({
-  library("tidyverse")
-  library("states")
+  library(tidyverse)
+  library(states)
+  library(yaml)
 })
 
 # shortcut for plotting missing values when no date column is available
@@ -183,6 +184,15 @@ reign <- reign %>%
 states <- left_join(states, reign)
 ```
 
+## V-Dem
+
+```{r, eval = FALSE}
+vdem <- read_csv("input/v-dem.csv") %>%
+  select(-country_name)
+
+states <- left_join(states, vdem)
+```
+
 
 ## Summarize and write output
 
@@ -200,7 +210,7 @@ format_years <- function(x) {
   as.character(x)
 }
 
-incomplete_cases <- states %>%
+incomplete_cases_by_var <- states %>%
   gather(var, value, -gwcode, -year) %>%
   mutate(dv_var = str_detect(var, "lead[0-9]{1}")) %>%
   filter( 
@@ -209,28 +219,35 @@ incomplete_cases <- states %>%
       # for DV vars, last 2 years are missing by design
       (dv_var & is.na(value) & year < max(states$year) - 1)) %>%
   group_by(gwcode, year, var) %>%
+  summarize() 
+
+# the by_var version above is big and inefficient; change it so that we 
+# collapse over year ranges, and so that instead of tracking each specific 
+# variable, we only identify the data source responsible
+incomplete_cases <- incomplete_cases_by_var %>%
+  # collapse vars to data source, using the prefix
+  mutate(var = str_replace(var, "^([a-z]+)\\_[a-zA-Z0-9\\_]+$", "\\1")) %>%
+  group_by(gwcode, year, var) %>%
   summarize() %>%
-  # summarize which vars are missing
+  # Before we can collapse over year ranges, we need to get the dataset 
+  # so that there are no repeated years for a country, otherwise we can't 
+  # ID correct [country, missing sources] sets. 
+  # Thus, collapse the missing data source info
   group_by(gwcode, year) %>%
-  summarize(missing_values_in = paste0(var, collapse = ", ")) 
-
-# if there are no missing cases, stop; otherwise 
-# add in year sequences ID so we can collapse adjacent years with same 
-# missing var
-if (nrow(incomplete_cases) > 0) {
-  incomplete_cases <- incomplete_cases %>%
-    group_by(gwcode) %>%
-    arrange(year) %>%
-    mutate(date = as.Date(paste0(year, "-01-01")),
-           yr_id = id_date_sequence(date, "year")) %>%
-    group_by(gwcode, yr_id, missing_values_in) %>%
-    summarize(years = format_years(year)) %>%
-    # clean up
-    ungroup() %>%
-    select(gwcode, years, missing_values_in) %>%
-    arrange(years, gwcode)
-}
-
+  summarize(data_sources = paste0(sort(unique(var)), collapse = "; ")) %>%
+  # Collapse year ranges; first we need to id successive year spells so that
+  # we don't collapse over gaps, e.g. when a country lost independence during 
+  # WW2
+  group_by(gwcode) %>%
+  arrange(year) %>%
+  mutate(spell_id = id_date_sequence(year)) %>%
+  # Now collapse over years
+  group_by(gwcode, spell_id, data_sources) %>%
+  summarize(years = format_years(year),
+            N = n()) %>%
+  # re-order so it is easier to read
+  arrange(gwcode, spell_id) %>%
+  select(gwcode, spell_id, years, data_sources, N)
   
 write_csv(incomplete_cases, "output/incomplete-cases.csv")
 ```
@@ -263,7 +280,43 @@ sapply(states, function(x) sum(is.na(x))) %>%
   knitr::kable()
 ```
 
-## Take out incomplete rows and save
+### Track overall cases and missing cases
+
+```{r}
+# The DV values for the last year or two will be missing, but those are not
+# cases we want to drop as they still serve as prediction targets. So run 
+# complete.cases on the data without DVs so we can get an index for rows to 
+# drop
+no_dv <- states %>%
+  select(-ends_with(c("lead1", "lead2")))
+drop_idx <- !complete.cases(no_dv)
+
+# Write out high-level summary stats
+tbl <- list(
+  N_before_drop = nrow(states),
+  N_after_drop  = sum(drop_idx==FALSE),
+  Years = format_years(states[!drop_idx, ][["year"]]),
+  Features = as.integer(ncol(no_dv) - 2),
+  Positive_attempt_lead1 = as.integer(
+    sum(states[!drop_idx, ][["pt_attempt_lead1"]], na.rm = TRUE)
+  ),
+  Positive_coup_lead1 = as.integer(
+    sum(states[!drop_idx, ][["pt_coup_lead1"]], na.rm = TRUE)
+  ),
+  Positive_failed_lead1 = as.integer(
+    sum(states[!drop_idx, ][["pt_failed_lead1"]], na.rm = TRUE)
+  )
+)
+
+tbl 
+
+tbl %>%
+  yaml::as.yaml() %>%
+  writeLines("output/data-summary.yml")
+```
+
+
+## Save
 
 ```{r}
 states_clean <- states %>%

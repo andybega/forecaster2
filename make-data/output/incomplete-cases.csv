@@ -1,133 +1,133 @@
-gwcode,years,missing_values_in
-260,1950,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-265,1950,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-711,1950,"reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-713,1950,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count, reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-760,1950,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count, reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-698,1950 - 1969,"reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-232,1950 - 1981,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count, reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-221,1950 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-223,1950 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-331,1950 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-760,1951,"reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-620,1951 - 1952,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-713,1951 - 2019,"reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-811,1953 - 1954,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-812,1954 - 1955,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-816,1954 - 1955,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-817,1954 - 1955,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-600,1956 - 1957,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-616,1956 - 1957,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-625,1956 - 1957,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-452,1957 - 1958,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-820,1957 - 1958,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-438,1958 - 1959,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-352,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-432,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-433,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-434,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-435,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-436,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-437,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-439,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-461,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-471,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-475,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-481,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-482,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-483,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-484,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-490,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-520,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-580,1960 - 1961,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-451,1961 - 1962,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-510,1961 - 1962,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-690,1961 - 1962,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-51,1962 - 1963,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-52,1962 - 1963,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-500,1962 - 1963,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-516,1962 - 1963,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-517,1962 - 1963,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-615,1962 - 1963,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-990,1962 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-501,1963 - 1964,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-511,1963 - 1964,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count, reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-338,1964 - 1965,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-551,1964 - 1965,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-553,1964 - 1965,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-420,1965 - 1966,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-552,1965 - 1966,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-781,1965 - 1966,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-830,1965 - 1966,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-53,1966 - 1967,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-110,1966 - 1967,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-570,1966 - 1967,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-571,1966 - 1967,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-680,1967 - 1968,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-411,1968 - 1969,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-572,1968 - 1969,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-590,1968 - 1969,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-971,1968 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-950,1970 - 1971,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-972,1970 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-692,1971 - 1972,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-694,1971 - 1972,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-696,1971 - 1972,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-771,1971 - 1972,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-31,1973 - 1974,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-404,1974 - 1975,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-55,1974 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-115,1975 - 1976,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-402,1975 - 1976,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-540,1975 - 1976,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-541,1975 - 1976,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-581,1975 - 1976,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-910,1975 - 1976,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-403,1975 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-591,1976 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-522,1977 - 1978,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-940,1978 - 1979,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-54,1978 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-973,1978 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-56,1979 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-57,1979 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-970,1979 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-935,1980 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-80,1981 - 1982,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-58,1981 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-232,1982 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-60,1983 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-835,1984 - 1985,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-983,1986 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-987,1986 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-565,1990 - 1991,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-343,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-359,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-366,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-367,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-368,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-369,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-370,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-371,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-372,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-373,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-701,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-702,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-703,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-704,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-705,1991 - 1992,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-344,1992 - 1993,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-346,1992 - 1993,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-349,1992 - 1993,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-520,1992 - 2011,"reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-316,1993 - 1994,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-317,1993 - 1994,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-531,1993 - 1994,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-986,1994 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-860,2002 - 2003,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-340,2006 - 2007,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-341,2006 - 2007,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-347,2008 - 2009,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
-396,2008 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count, reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-397,2008 - 2019,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count, reign_age, reign_anticipation, reign_change_recent, reign_defeat_recent, reign_delayed, reign_direct_recent, reign_elected, reign_election_now, reign_election_recent, reign_exec_ant, reign_exec_recent, reign_gov_military, reign_gov_parl, reign_gov_party, reign_gov_personal, reign_gov_pres, reign_gov_provisional, reign_indirect_recent, reign_irreg_lead_ant, reign_irregular, reign_lastelection, reign_lead_recent, reign_leg_ant, reign_leg_recent, reign_loss, reign_male, reign_militarycareer, reign_nochange_recent, reign_prev_conflict, reign_ref_ant, reign_ref_recent, reign_tenure_months, reign_victory_recent"
-626,2011 - 2012,"epr_elf, epr_excluded_group_pop, epr_excluded_groups_count, epr_groups, epr_inpower_groups_count, epr_inpower_groups_pop, epr_regaut_group_pop, epr_regaut_groups_count"
+gwcode,spell_id,years,data_sources,N
+31,1,1973 - 1974,epr,2
+51,1,1962 - 1963,epr,2
+52,1,1962 - 1963,epr,2
+53,1,1966 - 1967,epr,2
+54,1,1978 - 2019,epr,42
+55,1,1974 - 2019,epr,46
+56,1,1979 - 2019,epr,41
+57,1,1979 - 2019,epr,41
+58,1,1981 - 2019,epr,39
+60,1,1983 - 2019,epr,37
+80,1,1981 - 1982,epr,2
+110,1,1966 - 1967,epr,2
+115,1,1975 - 1976,epr,2
+221,1,1950 - 2019,epr,70
+223,1,1950 - 2019,epr,70
+232,1,1982 - 2019,epr,38
+232,1,1950 - 1981,epr; reign,32
+260,1,1950,epr,1
+265,1,1950,epr,1
+316,1,1993 - 1994,epr,2
+317,1,1993 - 1994,epr,2
+331,1,1950 - 2019,epr,70
+338,1,1964 - 1965,epr,2
+340,1,2006 - 2007,epr,2
+341,1,2006 - 2007,epr,2
+343,1,1991 - 1992,epr,2
+344,1,1992 - 1993,epr,2
+346,1,1992 - 1993,epr,2
+347,1,2008 - 2009,epr,2
+349,1,1992 - 1993,epr,2
+352,1,1960 - 1961,epr,2
+359,1,1991 - 1992,epr,2
+366,1,1991 - 1992,epr,2
+367,1,1991 - 1992,epr,2
+368,1,1991 - 1992,epr,2
+369,1,1991 - 1992,epr,2
+370,1,1991 - 1992,epr,2
+371,1,1991 - 1992,epr,2
+372,1,1991 - 1992,epr,2
+373,1,1991 - 1992,epr,2
+396,1,2008 - 2019,epr; reign,12
+397,1,2008 - 2019,epr; reign,12
+402,1,1975 - 1976,epr,2
+403,1,1975 - 2019,epr,45
+404,1,1974 - 1975,epr,2
+411,1,1968 - 1969,epr,2
+420,1,1965 - 1966,epr,2
+432,1,1960 - 1961,epr,2
+433,1,1960 - 1961,epr,2
+434,1,1960 - 1961,epr,2
+435,1,1960 - 1961,epr,2
+436,1,1960 - 1961,epr,2
+437,1,1960 - 1961,epr,2
+438,1,1958 - 1959,epr,2
+439,1,1960 - 1961,epr,2
+451,1,1961 - 1962,epr,2
+452,1,1957 - 1958,epr,2
+461,1,1960 - 1961,epr,2
+471,1,1960 - 1961,epr,2
+475,1,1960 - 1961,epr,2
+481,1,1960 - 1961,epr,2
+482,1,1960 - 1961,epr,2
+483,1,1960 - 1961,epr,2
+484,1,1960 - 1961,epr,2
+490,1,1960 - 1961,epr,2
+500,1,1962 - 1963,epr,2
+501,1,1963 - 1964,epr,2
+510,1,1961 - 1962,epr,2
+511,1,1963 - 1964,epr; reign,2
+516,1,1962 - 1963,epr,2
+517,1,1962 - 1963,epr,2
+520,1,1960 - 1961,epr,2
+520,2,1992 - 2011,reign,20
+522,1,1977 - 1978,epr,2
+531,1,1993 - 1994,epr,2
+540,1,1975 - 1976,epr,2
+541,1,1975 - 1976,epr,2
+551,1,1964 - 1965,epr,2
+552,1,1965 - 1966,epr,2
+553,1,1964 - 1965,epr,2
+565,1,1990 - 1991,epr,2
+570,1,1966 - 1967,epr,2
+571,1,1966 - 1967,epr,2
+572,1,1968 - 1969,epr,2
+580,1,1960 - 1961,epr,2
+581,1,1975 - 1976,epr,2
+590,1,1968 - 1969,epr,2
+591,1,1976 - 2019,epr,44
+600,1,1956 - 1957,epr,2
+615,1,1962 - 1963,epr,2
+616,1,1956 - 1957,epr,2
+620,1,1951 - 1952,epr,2
+625,1,1956 - 1957,epr,2
+626,1,2011 - 2012,epr,2
+680,1,1967 - 1968,epr,2
+690,1,1961 - 1962,epr,2
+692,1,1971 - 1972,epr,2
+694,1,1971 - 1972,epr,2
+696,1,1971 - 1972,epr,2
+698,1,1950 - 1969,reign,20
+701,1,1991 - 1992,epr,2
+702,1,1991 - 1992,epr,2
+703,1,1991 - 1992,epr,2
+704,1,1991 - 1992,epr,2
+705,1,1991 - 1992,epr,2
+711,1,1950,reign,1
+713,1,1950,epr; reign,1
+713,1,1951 - 2019,reign,69
+760,1,1950,epr; reign,1
+760,1,1951,reign,1
+771,1,1971 - 1972,epr,2
+781,1,1965 - 1966,epr,2
+811,1,1953 - 1954,epr,2
+812,1,1954 - 1955,epr,2
+816,1,1954 - 1955,epr,2
+817,1,1954 - 1955,epr,2
+820,1,1957 - 1958,epr,2
+830,1,1965 - 1966,epr,2
+835,1,1984 - 1985,epr,2
+860,1,2002 - 2003,epr,2
+910,1,1975 - 1976,epr,2
+935,1,1980 - 2019,epr,40
+940,1,1978 - 1979,epr,2
+950,1,1970 - 1971,epr,2
+970,1,1979 - 2019,epr,41
+971,1,1968 - 2019,epr,52
+972,1,1970 - 2019,epr,50
+973,1,1978 - 2019,epr,42
+983,1,1986 - 2019,epr,34
+986,1,1994 - 2019,epr,26
+987,1,1986 - 2019,epr,34
+990,1,1962 - 2019,epr,58
