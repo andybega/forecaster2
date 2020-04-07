@@ -86,7 +86,7 @@ for (outcome_i in names(tasks)) {
   lgr$info("Outcome: %s", outcome_i)
   
   task_i   <- tasks[[outcome_i]]
-  model_fn <- sprintf("output/full-model/model-.rds", outcome_i)
+  model_fn <- sprintf("output/full-model/model-%s.rds", outcome_i)
   tune_fn  <- sprintf("output/full-model/tuning-results-%s.csv", outcome_i)
   imp_fn   <- sprintf("output/full-model/variable-importance-%s.csv", outcome_i)
   
@@ -107,7 +107,8 @@ for (outcome_i in names(tasks)) {
   
   # Extract feature importance
   imp <- auto_rf$learner$importance() %>% 
-    enframe(name = "variable") %>% arrange(desc(value))
+    enframe(name = "variable") %>% arrange(desc(value)) %>%
+    mutate(outcome = outcome_i)
   write_csv(imp, path = imp_fn)
   
 }
