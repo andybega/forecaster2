@@ -326,8 +326,7 @@ tbl %>%
 ## Save
 
 ```{r}
-states_clean <- states %>%
-  filter(!is.na(epr_groups), !is.na(reign_elected))
+states_clean <- states[!drop_idx, ]
 write_rds(states_clean, "output/states.rds")
 ```
 
