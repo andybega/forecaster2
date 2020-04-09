@@ -6,7 +6,7 @@
 library(mlr3)
 library(mlr3learners)
 library(paradox)
-library(mlr3measures)
+requireNamespace("mlr3measures")
 library(mlr3tuning)
 library(here)
 library(dplyr)
@@ -15,6 +15,7 @@ library(lgr)
 library(readr)
 library(future)
 library(doFuture)
+library(ranger)
 
 lgr$info("Start forecast models")
 
