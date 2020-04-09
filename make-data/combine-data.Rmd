@@ -312,14 +312,59 @@ tbl <- list(
   ),
   Positive_failed_lead1 = as.integer(
     sum(states[!drop_idx, ][["pt_failed_lead1"]], na.rm = TRUE)
-  )
+  ),
+  N_in_forecast_sets = nrow(states[!drop_idx & states$year %in% 2010:2019, ])
 )
 
-tbl 
+tbl %>% 
+  enframe("Measure", "Value") %>% 
+  mutate(Value = as.character(Value)) %>% 
+  knitr::kable()
 
 tbl %>%
   yaml::as.yaml() %>%
   writeLines("output/data-summary.yml")
+```
+
+### Track forecast sets
+
+```{r}
+years         <- 2010:2019
+forecast_data <- states[!drop_idx & states$year %in% years, c("gwcode", "year")]
+
+gw_full <- state_panel(min(years), max(years), partial = "any")
+
+# Which countries are covered in each forecast set
+covered <- forecast_data %>%
+  # ID consecutive year sequences
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(spell = id_date_sequence(year)) %>%
+  # collapse over consecutive years
+  group_by(gwcode, spell) %>%
+  summarize(years = format_years(year)) %>%
+  # add country names
+  mutate(country = country_names(gwcode, shorten = TRUE)) %>%
+  select(gwcode, country, years)
+covered %>% 
+  knitr::kable(caption = "Countries covered by the test and live forecasts")
+write_csv(covered, "output/forecast-covered-countries.csv")
+
+# Which G&W countries are *not* covered by the forecasts
+not_covered <- anti_join(gw_full, forecast_data, by = c("gwcode", "year")) %>%
+  # ID consecutive year sequences
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(spell = id_date_sequence(year)) %>%
+  # collapse over consecutive years
+  group_by(gwcode, spell) %>%
+  summarize(years = format_years(year)) %>%
+  # add country names
+  mutate(country = country_names(gwcode, shorten = TRUE)) %>%
+  select(gwcode, country, years)
+not_covered %>%
+  knitr::kable(caption = "Countries *not* covered by the test and live forecasts")
+write_csv(not_covered, "output/forecast-not-covered-countries.csv")
 ```
 
 

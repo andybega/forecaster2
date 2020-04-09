@@ -14,6 +14,7 @@ Combine data into states.rds
       - [Missing values by column](#missing-values-by-column)
       - [Track overall cases and missing
         cases](#track-overall-cases-and-missing-cases)
+      - [Track forecast sets](#track-forecast-sets)
   - [Save](#save)
 
 ## Pieces
@@ -721,37 +722,291 @@ tbl <- list(
   ),
   Positive_failed_lead1 = as.integer(
     sum(states[!drop_idx, ][["pt_failed_lead1"]], na.rm = TRUE)
-  )
+  ),
+  N_in_forecast_sets = nrow(states[!drop_idx & states$year %in% 2010:2019, ])
 )
 
-tbl 
+tbl %>% 
+  enframe("Measure", "Value") %>% 
+  mutate(Value = as.character(Value)) %>% 
+  knitr::kable()
 ```
 
-    ## $N_before_drop
-    ## [1] 11202
-    ## 
-    ## $N_after_drop
-    ## [1] 9503
-    ## 
-    ## $Years
-    ## [1] "1950 - 2019"
-    ## 
-    ## $Features
-    ## [1] 107
-    ## 
-    ## $Positive_attempt_lead1
-    ## [1] 376
-    ## 
-    ## $Positive_coup_lead1
-    ## [1] 200
-    ## 
-    ## $Positive_failed_lead1
-    ## [1] 198
+| Measure                  | Value       |
+| :----------------------- | :---------- |
+| N\_before\_drop          | 11202       |
+| N\_after\_drop           | 9503        |
+| Years                    | 1950 - 2019 |
+| Features                 | 107         |
+| Positive\_attempt\_lead1 | 376         |
+| Positive\_coup\_lead1    | 200         |
+| Positive\_failed\_lead1  | 198         |
+| N\_in\_forecast\_sets    | 1680        |
 
 ``` r
 tbl %>%
   yaml::as.yaml() %>%
   writeLines("output/data-summary.yml")
+```
+
+### Track forecast sets
+
+``` r
+years         <- 2010:2019
+forecast_data <- states[!drop_idx & states$year %in% years, c("gwcode", "year")]
+
+gw_full <- state_panel(min(years), max(years), partial = "any")
+
+# Which countries are covered in each forecast set
+covered <- forecast_data %>%
+  # ID consecutive year sequences
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(spell = id_date_sequence(year)) %>%
+  # collapse over consecutive years
+  group_by(gwcode, spell) %>%
+  summarize(years = format_years(year)) %>%
+  # add country names
+  mutate(country = country_names(gwcode, shorten = TRUE)) %>%
+  select(gwcode, country, years)
+covered %>% 
+  knitr::kable(caption = "Countries covered by the test and live forecasts")
+```
+
+| gwcode | country                  | years       |
+| -----: | :----------------------- | :---------- |
+|      2 | United States of America | 2010 - 2019 |
+|     20 | Canada                   | 2010 - 2019 |
+|     40 | Cuba                     | 2010 - 2019 |
+|     41 | Haiti                    | 2010 - 2019 |
+|     42 | Dominican Republic       | 2010 - 2019 |
+|     51 | Jamaica                  | 2010 - 2019 |
+|     52 | Trinidad and Tobago      | 2010 - 2019 |
+|     53 | Barbados                 | 2010 - 2019 |
+|     70 | Mexico                   | 2010 - 2019 |
+|     90 | Guatemala                | 2010 - 2019 |
+|     91 | Honduras                 | 2010 - 2019 |
+|     92 | El Salvador              | 2010 - 2019 |
+|     93 | Nicaragua                | 2010 - 2019 |
+|     94 | Costa Rica               | 2010 - 2019 |
+|     95 | Panama                   | 2010 - 2019 |
+|    100 | Colombia                 | 2010 - 2019 |
+|    101 | Venezuela                | 2010 - 2019 |
+|    110 | Guyana                   | 2010 - 2019 |
+|    115 | Surinam                  | 2010 - 2019 |
+|    130 | Ecuador                  | 2010 - 2019 |
+|    135 | Peru                     | 2010 - 2019 |
+|    140 | Brazil                   | 2010 - 2019 |
+|    145 | Bolivia                  | 2010 - 2019 |
+|    150 | Paraguay                 | 2010 - 2019 |
+|    155 | Chile                    | 2010 - 2019 |
+|    160 | Argentina                | 2010 - 2019 |
+|    165 | Uruguay                  | 2010 - 2019 |
+|    200 | United Kingdom           | 2010 - 2019 |
+|    205 | Ireland                  | 2010 - 2019 |
+|    210 | Netherlands              | 2010 - 2019 |
+|    211 | Belgium                  | 2010 - 2019 |
+|    212 | Luxembourg               | 2010 - 2019 |
+|    220 | France                   | 2010 - 2019 |
+|    225 | Switzerland              | 2010 - 2019 |
+|    230 | Spain                    | 2010 - 2019 |
+|    235 | Portugal                 | 2010 - 2019 |
+|    260 | German Federal Republic  | 2010 - 2019 |
+|    290 | Poland                   | 2010 - 2019 |
+|    305 | Austria                  | 2010 - 2019 |
+|    310 | Hungary                  | 2010 - 2019 |
+|    316 | Czech Republic           | 2010 - 2019 |
+|    317 | Slovakia                 | 2010 - 2019 |
+|    325 | Italy/Sardinia           | 2010 - 2019 |
+|    338 | Malta                    | 2010 - 2019 |
+|    339 | Albania                  | 2010 - 2019 |
+|    341 | Montenegro               | 2010 - 2019 |
+|    343 | North Macedonia          | 2010 - 2019 |
+|    344 | Croatia                  | 2010 - 2019 |
+|    346 | Bosnia-Herzegovina       | 2010 - 2019 |
+|    347 | Kosovo                   | 2013 - 2015 |
+|    347 | Kosovo                   | 2017 - 2019 |
+|    349 | Slovenia                 | 2010 - 2019 |
+|    350 | Greece                   | 2010 - 2019 |
+|    352 | Cyprus                   | 2010 - 2019 |
+|    355 | Bulgaria                 | 2010 - 2019 |
+|    359 | Moldova                  | 2010 - 2019 |
+|    360 | Rumania                  | 2010 - 2019 |
+|    365 | Russia (Soviet Union)    | 2010 - 2019 |
+|    366 | Estonia                  | 2010 - 2019 |
+|    367 | Latvia                   | 2010 - 2019 |
+|    368 | Lithuania                | 2010 - 2019 |
+|    369 | Ukraine                  | 2010 - 2019 |
+|    370 | Belarus (Byelorussia)    | 2010 - 2019 |
+|    371 | Armenia                  | 2010 - 2019 |
+|    372 | Georgia                  | 2010 - 2019 |
+|    373 | Azerbaijan               | 2010 - 2019 |
+|    375 | Finland                  | 2010 - 2019 |
+|    380 | Sweden                   | 2010 - 2019 |
+|    385 | Norway                   | 2010 - 2019 |
+|    390 | Denmark                  | 2010 - 2019 |
+|    395 | Iceland                  | 2010 - 2019 |
+|    402 | Cape Verde               | 2010 - 2019 |
+|    404 | Guinea-Bissau            | 2010 - 2019 |
+|    411 | Equatorial Guinea        | 2010 - 2019 |
+|    420 | Gambia                   | 2010 - 2019 |
+|    432 | Mali                     | 2010 - 2019 |
+|    433 | Senegal                  | 2010 - 2019 |
+|    434 | Benin                    | 2010 - 2019 |
+|    435 | Mauritania               | 2010 - 2019 |
+|    436 | Niger                    | 2010 - 2019 |
+|    437 | Cote D’Ivoire            | 2010 - 2019 |
+|    438 | Guinea                   | 2010 - 2019 |
+|    439 | Burkina Faso             | 2010 - 2019 |
+|    450 | Liberia                  | 2010 - 2019 |
+|    451 | Sierra Leone             | 2010 - 2019 |
+|    452 | Ghana                    | 2010 - 2019 |
+|    461 | Togo                     | 2010 - 2019 |
+|    471 | Cameroon                 | 2010 - 2019 |
+|    475 | Nigeria                  | 2010 - 2019 |
+|    481 | Gabon                    | 2010 - 2019 |
+|    482 | CAR                      | 2010 - 2019 |
+|    483 | Chad                     | 2010 - 2019 |
+|    484 | Congo                    | 2010 - 2019 |
+|    490 | DR Congo                 | 2010 - 2019 |
+|    500 | Uganda                   | 2010 - 2019 |
+|    501 | Kenya                    | 2010 - 2019 |
+|    510 | Tanzania                 | 2010 - 2019 |
+|    516 | Burundi                  | 2010 - 2019 |
+|    517 | Rwanda                   | 2010 - 2019 |
+|    520 | Somalia                  | 2012 - 2019 |
+|    522 | Djibouti                 | 2010 - 2019 |
+|    530 | Ethiopia                 | 2010 - 2019 |
+|    531 | Eritrea                  | 2010 - 2019 |
+|    540 | Angola                   | 2010 - 2019 |
+|    541 | Mozambique               | 2010 - 2019 |
+|    551 | Zambia                   | 2010 - 2019 |
+|    552 | Zimbabwe (Rhodesia)      | 2010 - 2019 |
+|    553 | Malawi                   | 2010 - 2019 |
+|    560 | South Africa             | 2010 - 2019 |
+|    565 | Namibia                  | 2010 - 2019 |
+|    570 | Lesotho                  | 2010 - 2019 |
+|    571 | Botswana                 | 2010 - 2019 |
+|    572 | Swaziland                | 2010 - 2019 |
+|    580 | Madagascar               | 2010 - 2019 |
+|    581 | Comoros                  | 2010 - 2019 |
+|    590 | Mauritius                | 2010 - 2019 |
+|    600 | Morocco                  | 2010 - 2019 |
+|    615 | Algeria                  | 2010 - 2019 |
+|    616 | Tunisia                  | 2010 - 2019 |
+|    620 | Libya                    | 2010 - 2019 |
+|    625 | Sudan                    | 2010 - 2019 |
+|    626 | South Sudan              | 2013 - 2019 |
+|    630 | Iran                     | 2010 - 2019 |
+|    640 | Turkey                   | 2010 - 2019 |
+|    645 | Iraq                     | 2010 - 2019 |
+|    651 | Egypt                    | 2010 - 2019 |
+|    652 | Syria                    | 2010 - 2019 |
+|    660 | Lebanon                  | 2010 - 2019 |
+|    663 | Jordan                   | 2010 - 2019 |
+|    666 | Israel                   | 2010 - 2019 |
+|    670 | Saudi Arabia             | 2010 - 2019 |
+|    678 | Yemen                    | 2010 - 2019 |
+|    690 | Kuwait                   | 2010 - 2019 |
+|    692 | Bahrain                  | 2010 - 2019 |
+|    694 | Qatar                    | 2010 - 2019 |
+|    696 | United Arab Emirates     | 2010 - 2019 |
+|    698 | Oman                     | 2010 - 2019 |
+|    700 | Afghanistan              | 2010 - 2019 |
+|    701 | Turkmenistan             | 2010 - 2019 |
+|    702 | Tajikistan               | 2010 - 2019 |
+|    703 | Kyrgyz Republic          | 2010 - 2019 |
+|    704 | Uzbekistan               | 2010 - 2019 |
+|    705 | Kazakhstan               | 2010 - 2019 |
+|    710 | China                    | 2010 - 2019 |
+|    712 | Mongolia                 | 2010 - 2019 |
+|    731 | North Korea              | 2010 - 2019 |
+|    732 | South Korea              | 2010 - 2019 |
+|    740 | Japan                    | 2010 - 2019 |
+|    750 | India                    | 2010 - 2019 |
+|    760 | Bhutan                   | 2010 - 2019 |
+|    770 | Pakistan                 | 2010 - 2019 |
+|    771 | Bangladesh               | 2010 - 2019 |
+|    775 | Myanmar                  | 2010 - 2019 |
+|    780 | Sri Lanka                | 2010 - 2019 |
+|    781 | Maldives                 | 2010 - 2019 |
+|    790 | Nepal                    | 2010 - 2019 |
+|    800 | Thailand                 | 2010 - 2019 |
+|    811 | Cambodia (Kampuchea)     | 2010 - 2019 |
+|    812 | Laos                     | 2010 - 2019 |
+|    816 | Vietnam                  | 2010 - 2019 |
+|    820 | Malaysia                 | 2010 - 2019 |
+|    830 | Singapore                | 2010 - 2018 |
+|    840 | Philippines              | 2010 - 2019 |
+|    850 | Indonesia                | 2010 - 2019 |
+|    860 | East Timor               | 2010 - 2019 |
+|    900 | Australia                | 2010 - 2019 |
+|    910 | Papua New Guinea         | 2010 - 2019 |
+|    920 | New Zealand              | 2010 - 2019 |
+|    940 | Solomon Islands          | 2010 - 2019 |
+|    950 | Fiji                     | 2010 - 2019 |
+
+Countries covered by the test and live forecasts
+
+``` r
+write_csv(covered, "output/forecast-covered-countries.csv")
+
+# Which G&W countries are *not* covered by the forecasts
+not_covered <- anti_join(gw_full, forecast_data, by = c("gwcode", "year")) %>%
+  # ID consecutive year sequences
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(spell = id_date_sequence(year)) %>%
+  # collapse over consecutive years
+  group_by(gwcode, spell) %>%
+  summarize(years = format_years(year)) %>%
+  # add country names
+  mutate(country = country_names(gwcode, shorten = TRUE)) %>%
+  select(gwcode, country, years)
+not_covered %>%
+  knitr::kable(caption = "Countries *not* covered by the test and live forecasts")
+```
+
+| gwcode | country               | years       |
+| -----: | :-------------------- | :---------- |
+|     31 | Bahamas               | 2010 - 2019 |
+|     54 | Dominica              | 2010 - 2019 |
+|     55 | Grenada               | 2010 - 2019 |
+|     56 | Saint Lucia           | 2010 - 2019 |
+|     57 | Saint Vincent         | 2010 - 2019 |
+|     58 | Antigua & Barbuda     | 2010 - 2019 |
+|     60 | Saint Kitts and Nevis | 2010 - 2019 |
+|     80 | Belize                | 2010 - 2019 |
+|    221 | Monaco                | 2010 - 2019 |
+|    223 | Liechtenstein         | 2010 - 2019 |
+|    232 | Andorra               | 2010 - 2019 |
+|    331 | San Marino            | 2010 - 2019 |
+|    340 | Serbia                | 2010 - 2019 |
+|    347 | Kosovo                | 2010 - 2012 |
+|    347 | Kosovo                | 2016        |
+|    396 | Abkhazia              | 2010 - 2019 |
+|    397 | South Ossetia         | 2010 - 2019 |
+|    403 | Sao Tome and Principe | 2010 - 2019 |
+|    520 | Somalia               | 2010 - 2011 |
+|    591 | Seychelles            | 2010 - 2019 |
+|    626 | South Sudan           | 2011 - 2012 |
+|    713 | Taiwan                | 2010 - 2019 |
+|    830 | Singapore             | 2019        |
+|    835 | Brunei                | 2010 - 2019 |
+|    935 | Vanuatu               | 2010 - 2019 |
+|    970 | Kiribati              | 2010 - 2019 |
+|    971 | Nauru                 | 2010 - 2019 |
+|    972 | Tonga                 | 2010 - 2019 |
+|    973 | Tuvalu                | 2010 - 2019 |
+|    983 | Marshall Islands      | 2010 - 2019 |
+|    986 | Palau                 | 2010 - 2019 |
+|    987 | Micronesia            | 2010 - 2019 |
+|    990 | Samoa/Western Samoa   | 2010 - 2019 |
+
+Countries *not* covered by the test and live forecasts
+
+``` r
+write_csv(not_covered, "output/forecast-not-covered-countries.csv")
 ```
 
 ## Save
