@@ -22,7 +22,7 @@ lgr$info("Start forecast models")
 setwd(here::here("models"))
 
 registerDoFuture()
-plan(multisession(workers = availableCores()))
+plan(multiprocess(workers = availableCores()))
 
 states <- readRDS("input/states.rds") %>%
   as_tibble() 
@@ -77,12 +77,10 @@ auto_rf = AutoTuner$new(
 model_grid <- expand.grid(year = 2010:2019, outcome = names(tasks), 
                           stringsAsFactors = FALSE)
 
-r <- foreach(
-  i = 1:nrow(model_grid),
-  .export = c("model_grid", "states", "auto_rf", "tasks", "non_feat_cols"),
-  .packages = c("mlr3", "mlr3learners", "mlr3measures", "mlr3tuning", "paradox",
-                "readr")
-) %dopar% {
+# mlr will recognize and use the parallel backend for each model. So rather 
+# than running [available workers] model_grid rows at the same time, each single
+# model_grid row will end up being run in parallel.
+for (i in 1:nrow(model_grid)) {
   
   t0 <- proc.time()
   yy <- model_grid$year[[i]]
@@ -114,8 +112,6 @@ r <- foreach(
   out_i$p <- fcast_i$prob[, 1]
   
   write_rds(out_i, path = fcast_i_fn)
-  
-  invisible(NULL)
 }
 
 # Combine tune chunks
