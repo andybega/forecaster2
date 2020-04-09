@@ -16,6 +16,7 @@ library(readr)
 library(future)
 library(doFuture)
 library(ranger)
+library(future.apply)
 
 lgr$info("Start forecast models")
 
