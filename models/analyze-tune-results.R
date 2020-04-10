@@ -4,6 +4,7 @@
 
 library(ggplot2)
 library(dplyr)
+library(tidyr)
 
 tr <- read_csv("output/full-model/tuning-results.csv")
 

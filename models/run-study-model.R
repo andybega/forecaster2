@@ -21,6 +21,7 @@ library(lgr)
 library(readr)
 library(future)
 library(doFuture)
+library(tibble)
 
 lgr$info("Start study models")
 
