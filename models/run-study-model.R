@@ -7,7 +7,7 @@
 
 CV_FOLDS   = 16
 CV_REPEATS = 2
-TUNE_N     = 20
+TUNE_N     = 50
 
 library(mlr3)
 library(mlr3learners)
@@ -24,6 +24,7 @@ library(doFuture)
 library(tibble)
 
 lgr$info("Start study models")
+t0 <- proc.time()
 
 setwd(here::here("models"))
 
@@ -63,8 +64,8 @@ tune_resampling = rsmp("repeated_cv")
 tune_resampling$param_set$values = list(repeats = CV_REPEATS, folds = CV_FOLDS)
 tune_measures   = msr("classif.auc")
 tune_ps = ParamSet$new(list(
-  ParamInt$new("num.trees", lower = 500, upper = 2000),
-  ParamInt$new("mtry", lower = 1, upper = 15),
+  ParamInt$new("num.trees", lower = 500, upper = 2500),
+  ParamInt$new("mtry", lower = 1, upper = 25),
   ParamInt$new("min.node.size", lower = 1, upper = 400)
 ))
 tune_terminator = term("evals", n_evals = TUNE_N)
@@ -126,6 +127,6 @@ chunks <- lapply(chunk_files, readr::read_csv)
 imp <- bind_rows(chunks)
 write_csv(imp, "output/full-model/variable-importance.csv")
 
-lgr$info("Study models finished")
+lgr$info("Study models finished, total time: %ss", round((proc.time() - t0)["elapsed"]))
 
-source("../analyse-tune-results.R")
+source("analyze-tune-results.R")
