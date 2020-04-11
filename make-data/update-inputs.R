@@ -12,4 +12,9 @@ file.copy(
   to = "input/v-dem.csv"
 )
 
+file.copy(
+  from = "../data-sources/wdi-infmort/output/wdi-infmort.csv",
+  to = "input/wdi-infmort.csv"
+)
+
 setwd(oldwd)

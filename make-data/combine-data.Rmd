@@ -195,11 +195,25 @@ vdem <- read_csv("input/v-dem.csv",
                  )) %>%
   select(-country_name) %>%
   filter(!is.na(gwcode)) %>%
-  setNames(c("gwcode", "year", paste0("vdem_", names(.)[2:ncol(.)])))
+  setNames(c("gwcode", "year", paste0("vdem_", names(.)[3:ncol(.)])))
 
 states <- left_join(states, vdem)
 ```
 
+## Infant mortality
+
+```{r}
+wdi <- read_csv("input/wdi-infmort.csv",
+                 col_types = cols(
+                   .default = col_double(),
+                   year = col_integer(),
+                   infmort_imputed = col_logical()
+                 )) %>%
+  mutate(infmort_imputed = as.integer(infmort_imputed)) %>%
+  setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
+
+states <- left_join(states, vdem)
+```
 
 ## Summarize and write output
 

@@ -9,6 +9,7 @@ Combine data into states.rds
   - [EPR](#epr)
   - [REIGN data](#reign-data)
   - [V-Dem](#v-dem)
+  - [Infant mortality](#infant-mortality)
   - [Summarize and write output](#summarize-and-write-output)
       - [Variables in data](#variables-in-data)
       - [Missing values by column](#missing-values-by-column)
@@ -387,12 +388,29 @@ vdem <- read_csv("input/v-dem.csv",
                  )) %>%
   select(-country_name) %>%
   filter(!is.na(gwcode)) %>%
-  setNames(c("gwcode", "year", paste0("vdem_", names(.)[2:ncol(.)])))
+  setNames(c("gwcode", "year", paste0("vdem_", names(.)[3:ncol(.)])))
 
 states <- left_join(states, vdem)
 ```
 
     ## Joining, by = c("gwcode", "year")
+
+## Infant mortality
+
+``` r
+wdi <- read_csv("input/wdi-infmort.csv",
+                 col_types = cols(
+                   .default = col_double(),
+                   year = col_integer(),
+                   infmort_imputed = col_logical()
+                 )) %>%
+  mutate(infmort_imputed = as.integer(infmort_imputed)) %>%
+  setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
+
+states <- left_join(states, vdem)
+```
+
+    ## Joining, by = c("gwcode", "year", "vdem_v2x_polyarchy", "vdem_v2x_libdem", "vdem_v2x_partipdem", "vdem_v2x_delibdem", "vdem_v2x_egaldem", "vdem_v2x_api", "vdem_v2x_mpi", "vdem_v2x_freexp_altinf", "vdem_v2x_frassoc_thick", "vdem_v2x_suffr", "vdem_v2x_elecoff", "vdem_v2x_liberal", "vdem_v2x_jucon", "vdem_v2x_partip", "vdem_v2x_cspart", "vdem_v2x_egal", "vdem_v2x_accountability", "vdem_v2x_veracc", "vdem_v2x_diagacc", "vdem_v2x_horacc", "vdem_v2x_ex_confidence", "vdem_v2x_ex_direlect", "vdem_v2x_ex_hereditary", "vdem_v2x_ex_military", "vdem_v2x_ex_party", "vdem_v2x_neopat", "vdem_v2x_civlib", "vdem_v2x_clphy", "vdem_v2x_clpol", "vdem_v2x_clpriv", "vdem_v2x_corr", "vdem_v2x_execorr", "vdem_v2x_pubcorr", "vdem_v2x_gender", "vdem_v2x_gencl", "vdem_v2x_gencs", "vdem_v2x_genpp", "vdem_v2x_rule", "vdem_v2x_elecreg", "vdem_v2x_EDcomp_thick", "vdem_v2x_freexp", "vdem_v2x_hosabort", "vdem_v2x_hosinter", "vdem_v2x_legabort", "vdem_v2x_divparctrl", "vdem_v2x_feduni", "vdem_spell_id")
 
 ## Summarize and write output
 
@@ -537,53 +555,53 @@ knitr::kable(var_summary, digits = 2)
 | reign\_ref\_recent              |     171 |   0.11 | TRUE    |               0.00 |
 | reign\_tenure\_months           |     171 |  96.34 | TRUE    |               0.05 |
 | reign\_victory\_recent          |     171 |   0.25 | TRUE    |               0.00 |
-| vdem\_v2x\_accountability       |    1025 |   0.87 | FALSE   |               0.25 |
-| vdem\_v2x\_api                  |    1044 |   0.31 | FALSE   |               0.08 |
-| vdem\_v2x\_civlib               |    1025 |   0.31 | FALSE   |               0.08 |
-| vdem\_v2x\_clphy                |    1025 |   0.33 | FALSE   |               0.09 |
-| vdem\_v2x\_clpol                |    1025 |   0.29 | FALSE   |               0.08 |
-| vdem\_v2x\_clpriv               |    1059 |   0.30 | FALSE   |               0.08 |
-| vdem\_v2x\_corr                 |    1025 |   0.30 | FALSE   |               0.08 |
-| vdem\_v2x\_cspart               |    1025 |   0.23 | FALSE   |               0.08 |
-| vdem\_v2x\_delibdem             |    1044 |   0.25 | FALSE   |               0.08 |
-| vdem\_v2x\_diagacc              |    1025 |   1.04 | FALSE   |               0.31 |
-| vdem\_v2x\_divparctrl           |    1026 |   0.36 | FALSE   |               0.06 |
-| vdem\_v2x\_EDcomp\_thick        |    1025 |   0.32 | FALSE   |               0.09 |
-| vdem\_v2x\_egal                 |    1025 |   1.01 | FALSE   |               0.30 |
-| vdem\_v2x\_egaldem              |    1044 |   0.28 | FALSE   |               0.08 |
-| vdem\_v2x\_elecoff              |    1058 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_elecreg              |    1044 |   0.29 | FALSE   |               0.08 |
-| vdem\_v2x\_ex\_confidence       |    1025 |   0.47 | FALSE   |               0.00 |
-| vdem\_v2x\_ex\_direlect         |    1025 |   0.16 | FALSE   |               0.01 |
-| vdem\_v2x\_ex\_hereditary       |    1025 |   0.24 | FALSE   |               0.01 |
-| vdem\_v2x\_ex\_military         |    1025 |   0.22 | FALSE   |               0.01 |
-| vdem\_v2x\_ex\_party            |    1026 |   0.31 | FALSE   |               0.09 |
+| vdem\_spell\_id                 |    1025 |   0.35 | TRUE    |               0.00 |
+| vdem\_v2x\_accountability       |    1025 |   1.01 | FALSE   |               0.30 |
+| vdem\_v2x\_api                  |    1044 |   0.28 | FALSE   |               0.08 |
+| vdem\_v2x\_civlib               |    1025 |   0.29 | FALSE   |               0.08 |
+| vdem\_v2x\_clphy                |    1025 |   0.31 | FALSE   |               0.08 |
+| vdem\_v2x\_clpol                |    1025 |   0.33 | FALSE   |               0.09 |
+| vdem\_v2x\_clpriv               |    1025 |   0.29 | FALSE   |               0.08 |
+| vdem\_v2x\_corr                 |    1059 |   0.30 | FALSE   |               0.08 |
+| vdem\_v2x\_cspart               |    1025 |   0.29 | FALSE   |               0.08 |
+| vdem\_v2x\_delibdem             |    1044 |   0.27 | FALSE   |               0.08 |
+| vdem\_v2x\_diagacc              |    1025 |   1.04 | FALSE   |               0.30 |
+| vdem\_v2x\_divparctrl           |    1063 |   0.97 | FALSE   |               0.15 |
+| vdem\_v2x\_EDcomp\_thick        |    1044 |   0.29 | FALSE   |               0.08 |
+| vdem\_v2x\_egal                 |    1025 |   0.23 | FALSE   |               0.08 |
+| vdem\_v2x\_egaldem              |    1044 |   0.25 | FALSE   |               0.08 |
+| vdem\_v2x\_elecoff              |    1025 |   0.42 | FALSE   |               0.01 |
+| vdem\_v2x\_elecreg              |    1025 |   0.36 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_confidence       |    1025 |   0.38 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_direlect         |    1025 |   0.47 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_hereditary       |    1025 |   0.16 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_military         |    1025 |   0.24 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_party            |    1025 |   0.22 | FALSE   |               0.01 |
 | vdem\_v2x\_execorr              |    1025 |   0.30 | FALSE   |               0.08 |
-| vdem\_v2x\_feduni               |    1025 |   0.35 | TRUE    |               0.00 |
-| vdem\_v2x\_frassoc\_thick       |    1025 |   0.21 | FALSE   |               0.00 |
-| vdem\_v2x\_freexp               |    1025 |   0.07 | TRUE    |               0.00 |
-| vdem\_v2x\_freexp\_altinf       |    1025 |   0.34 | FALSE   |               0.08 |
-| vdem\_v2x\_gencl                |    1025 |   0.25 | FALSE   |               0.08 |
-| vdem\_v2x\_gencs                |    1202 |   0.28 | FALSE   |               0.08 |
-| vdem\_v2x\_gender               |    1025 |   0.28 | FALSE   |               0.08 |
-| vdem\_v2x\_genpp                |    1025 |   0.31 | FALSE   |               0.09 |
-| vdem\_v2x\_horacc               |    1025 |   0.38 | FALSE   |               0.00 |
-| vdem\_v2x\_hosabort             |    1025 |   0.10 | TRUE    |               0.00 |
-| vdem\_v2x\_hosinter             |    1025 |   0.05 | TRUE    |               0.00 |
-| vdem\_v2x\_jucon                |    1025 |   0.21 | FALSE   |               0.07 |
-| vdem\_v2x\_legabort             |    1063 |   0.97 | FALSE   |               0.15 |
-| vdem\_v2x\_libdem               |    1044 |   0.21 | FALSE   |               0.07 |
-| vdem\_v2x\_liberal              |    1056 |   0.31 | FALSE   |               0.08 |
-| vdem\_v2x\_mpi                  |    1025 |   0.33 | FALSE   |               0.09 |
-| vdem\_v2x\_neopat               |    1025 |   0.29 | FALSE   |               0.08 |
-| vdem\_v2x\_partip               |    1025 |   0.29 | FALSE   |               0.08 |
-| vdem\_v2x\_partipdem            |    1044 |   0.27 | FALSE   |               0.08 |
-| vdem\_v2x\_polyarchy            |    1077 |   0.28 | FALSE   |               0.08 |
-| vdem\_v2x\_pubcorr              |    1202 |   0.23 | FALSE   |               0.08 |
-| vdem\_v2x\_rule                 |    1025 |   0.36 | TRUE    |               0.00 |
-| vdem\_v2x\_suffr                |    1025 |   0.42 | FALSE   |               0.01 |
-| vdem\_v2x\_veracc               |    1025 |   1.04 | FALSE   |               0.30 |
-| vdem\_year                      |    1044 |   0.29 | FALSE   |               0.08 |
+| vdem\_v2x\_feduni               |    1026 |   0.36 | FALSE   |               0.06 |
+| vdem\_v2x\_frassoc\_thick       |    1025 |   0.34 | FALSE   |               0.08 |
+| vdem\_v2x\_freexp               |    1025 |   0.32 | FALSE   |               0.09 |
+| vdem\_v2x\_freexp\_altinf       |    1025 |   0.33 | FALSE   |               0.09 |
+| vdem\_v2x\_gencl                |    1025 |   0.28 | FALSE   |               0.08 |
+| vdem\_v2x\_gencs                |    1025 |   0.25 | FALSE   |               0.08 |
+| vdem\_v2x\_gender               |    1202 |   0.23 | FALSE   |               0.08 |
+| vdem\_v2x\_genpp                |    1202 |   0.28 | FALSE   |               0.08 |
+| vdem\_v2x\_horacc               |    1025 |   1.04 | FALSE   |               0.31 |
+| vdem\_v2x\_hosabort             |    1025 |   0.07 | TRUE    |               0.00 |
+| vdem\_v2x\_hosinter             |    1025 |   0.10 | TRUE    |               0.00 |
+| vdem\_v2x\_jucon                |    1056 |   0.31 | FALSE   |               0.08 |
+| vdem\_v2x\_legabort             |    1025 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_libdem               |    1077 |   0.28 | FALSE   |               0.08 |
+| vdem\_v2x\_liberal              |    1058 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_mpi                  |    1044 |   0.31 | FALSE   |               0.08 |
+| vdem\_v2x\_neopat               |    1026 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_partip               |    1025 |   0.21 | FALSE   |               0.07 |
+| vdem\_v2x\_partipdem            |    1044 |   0.21 | FALSE   |               0.07 |
+| vdem\_v2x\_polyarchy            |    1044 |   0.29 | FALSE   |               0.08 |
+| vdem\_v2x\_pubcorr              |    1025 |   0.30 | FALSE   |               0.08 |
+| vdem\_v2x\_rule                 |    1025 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_suffr                |    1025 |   0.21 | FALSE   |               0.00 |
+| vdem\_v2x\_veracc               |    1025 |   0.87 | FALSE   |               0.25 |
 | year                            |       0 |  19.09 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_attempt |       0 |  18.07 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_coup    |       0 |  18.32 | TRUE    |               0.01 |
@@ -649,20 +667,19 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | reign\_gov\_party            |     171 |
 | reign\_gov\_provisional      |     171 |
 | reign\_gov\_military         |     171 |
-| vdem\_year                   |    1044 |
-| vdem\_v2x\_polyarchy         |    1077 |
-| vdem\_v2x\_libdem            |    1044 |
+| vdem\_v2x\_polyarchy         |    1044 |
+| vdem\_v2x\_libdem            |    1077 |
 | vdem\_v2x\_partipdem         |    1044 |
 | vdem\_v2x\_delibdem          |    1044 |
 | vdem\_v2x\_egaldem           |    1044 |
 | vdem\_v2x\_api               |    1044 |
-| vdem\_v2x\_mpi               |    1025 |
+| vdem\_v2x\_mpi               |    1044 |
 | vdem\_v2x\_freexp\_altinf    |    1025 |
 | vdem\_v2x\_frassoc\_thick    |    1025 |
 | vdem\_v2x\_suffr             |    1025 |
-| vdem\_v2x\_elecoff           |    1058 |
-| vdem\_v2x\_liberal           |    1056 |
-| vdem\_v2x\_jucon             |    1025 |
+| vdem\_v2x\_elecoff           |    1025 |
+| vdem\_v2x\_liberal           |    1058 |
+| vdem\_v2x\_jucon             |    1056 |
 | vdem\_v2x\_partip            |    1025 |
 | vdem\_v2x\_cspart            |    1025 |
 | vdem\_v2x\_egal              |    1025 |
@@ -674,28 +691,29 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | vdem\_v2x\_ex\_direlect      |    1025 |
 | vdem\_v2x\_ex\_hereditary    |    1025 |
 | vdem\_v2x\_ex\_military      |    1025 |
-| vdem\_v2x\_ex\_party         |    1026 |
-| vdem\_v2x\_neopat            |    1025 |
+| vdem\_v2x\_ex\_party         |    1025 |
+| vdem\_v2x\_neopat            |    1026 |
 | vdem\_v2x\_civlib            |    1025 |
 | vdem\_v2x\_clphy             |    1025 |
 | vdem\_v2x\_clpol             |    1025 |
-| vdem\_v2x\_clpriv            |    1059 |
-| vdem\_v2x\_corr              |    1025 |
+| vdem\_v2x\_clpriv            |    1025 |
+| vdem\_v2x\_corr              |    1059 |
 | vdem\_v2x\_execorr           |    1025 |
-| vdem\_v2x\_pubcorr           |    1202 |
-| vdem\_v2x\_gender            |    1025 |
+| vdem\_v2x\_pubcorr           |    1025 |
+| vdem\_v2x\_gender            |    1202 |
 | vdem\_v2x\_gencl             |    1025 |
-| vdem\_v2x\_gencs             |    1202 |
-| vdem\_v2x\_genpp             |    1025 |
+| vdem\_v2x\_gencs             |    1025 |
+| vdem\_v2x\_genpp             |    1202 |
 | vdem\_v2x\_rule              |    1025 |
-| vdem\_v2x\_elecreg           |    1044 |
-| vdem\_v2x\_EDcomp\_thick     |    1025 |
+| vdem\_v2x\_elecreg           |    1025 |
+| vdem\_v2x\_EDcomp\_thick     |    1044 |
 | vdem\_v2x\_freexp            |    1025 |
 | vdem\_v2x\_hosabort          |    1025 |
 | vdem\_v2x\_hosinter          |    1025 |
-| vdem\_v2x\_legabort          |    1063 |
-| vdem\_v2x\_divparctrl        |    1026 |
-| vdem\_v2x\_feduni            |    1025 |
+| vdem\_v2x\_legabort          |    1025 |
+| vdem\_v2x\_divparctrl        |    1063 |
+| vdem\_v2x\_feduni            |    1026 |
+| vdem\_spell\_id              |    1025 |
 
 ### Track overall cases and missing cases
 

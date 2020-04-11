@@ -1,0 +1,40 @@
+---
+title: "WDI Infant mortality"
+output: 
+  github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Last updated on: `r Sys.Date()`*
+
+Infant mortality data for all countries, 1960 on. 
+
+- The WDI indicator used for this is "SP.DYN.IMRT.IN". 
+- The data were changed to conform as much as possible to the Gleditsch & Ward state list. 
+- The data are lagged 1 year so that there are 2019 values; the resulting missing values for 1960 or the first year of independence if it was after 1960 are imputed by using the original 1960/first year of ind. value, i.e. carry back imputed. 
+- Several countries miss early portions of the data series, e.g. for the 50s and 60s. Missing values for those series were imputed using a linear model on the square root of infant mortality, \(\sqrt{Y} = a + b\times\textrm{Year}\), where *a* was picked so that the imputed values lined up with the first non-missing observation. 
+- "infmort_yearadj" is a scaled version adjusted for annual mean and sd. 
+
+```{r}
+library(ggplot2)
+
+df <- read.csv("output/wdi-infmort.csv")
+
+str(df)
+
+ggplot(df, aes(x = year, y = infmort, group = gwcode)) +
+  geom_line(alpha = 0.5) +
+  theme_light()
+
+# Scaled version that is adjusted for annual mean and sd
+ggplot(df, aes(x = year, y = infmort_yearadj, group = gwcode)) +
+  geom_line(alpha = 0.5) +
+  theme_light()
+```
+
+## Data cleaning
+
+See [clean-data.md](clean-data.md) for results of the data cleaning script. 

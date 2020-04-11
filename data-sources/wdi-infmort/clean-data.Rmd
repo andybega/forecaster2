@@ -1,0 +1,458 @@
+---
+title: "WDI Infant mortality"
+output: 
+  github_document:
+    toc: yes
+---
+
+*Last updated on `r as.character(format(Sys.Date(), "%d %B %Y"))`*
+
+Note that places that require attention during data updates are marked with *UPDATE:*
+
+```{r setup-local, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Functions / packages
+
+```{r}
+
+library(WDI)
+library(tidyverse)
+library(states)
+library(lubridate)
+library(stringr)
+
+wdi_to_gw <- function(x, iso2c = "iso2c", country = "country", year = "year") {
+  
+  # In case the ID columns don't match the WDI default, create them here. 
+  # dplyr is easier to use when we can refer to these columns directly
+  x$iso2c   <- x[[iso2c]]
+  x$country <- x[[country]]
+  x$year    <- x[[year]]
+  
+  # remove non-state entities, i.e. regions and aggregates
+  notstate <- c("1A", "1W", "4E", "7E", "8S", "B8", "F1", "S1", "S2", "S3", "S4",
+                "T2", "T3", "T4", "T5", "T6", "T7", "V1", "V2", "V3", "V4", "Z4",
+                "Z7", "EU", "OE", "XC", "XD", "XE", "XF", "XG", "XH", "XI", "XJ",
+                "XL", "XM", "XN", "XO", "XP", "XQ", "XT", "XU", "XY", "ZF", "ZG",
+                "ZJ", "ZQ", "ZT")
+  x <- x %>%
+    dplyr::filter(!iso2c %in% notstate) 
+  
+  # first pass G&W country code coding
+  x$gwcode <- suppressWarnings(countrycode::countrycode(x[["iso2c"]], "iso2c", "gwn"))
+
+  # this misses some countries; first the fixed, non-year-varying, cases
+  x <- x %>%
+    mutate(
+      gwcode = case_when(
+        iso2c=="AD" ~ 232L,
+        iso2c=="XK" ~ 347L,
+        country=="Namibia" ~ 565L,
+        iso2c=="VN" ~ 816L,  # countrycode uses 817, South Vietnam for this
+        iso2c=="YE" ~ 678L,  # Yemen
+        TRUE ~ gwcode
+      )
+    )
+
+  # Fix Serbia/Yugoslavia
+  # Right now all coded as 340, but in G&W 345 (Yugo) ends in 2006 and 
+  # 340 (Serbia) starts
+  serbia2006 <- x[x$gwcode==340 & x$year==2006 & !is.na(x$gwcode), ]
+  yugo_idx <- x$gwcode==340 & x$year < 2007 & !is.na(x$gwcode)
+  x$gwcode[yugo_idx]  <- 345
+  x$iso2c[yugo_idx]   <- "YU"
+  x$country[yugo_idx] <- "Yugoslavia/Serbia & Montenegro"
+  x <- bind_rows(x, serbia2006) %>%
+    arrange(gwcode, iso2c, country, year)
+  
+  x
+}
+
+
+# I'm going to use this function to impute missing values; see below for more details and the choice of a log-linear model
+impute_ts_loglinear <- function(x) {
+  # This is only meant to work for leading NAs; check to make sure this is 
+  # the case. 
+  xna <- is.na(x)
+  # if all NA's are leading sequence, they are all preceded by NA as well
+  stopifnot(!any(xna==TRUE & c(TRUE, head(stats::lag(xna), -1))==FALSE))
+  
+  if (all(is.na(x))) {
+    return(x)
+  }
+  xx <- seq_along(x)
+  mdl <- try(glm(x ~ xx, data = NULL, family = gaussian(link = "log")), silent = TRUE)
+  if (inherits(mdl, "try-error")) {
+    return(x)
+  }
+  xhat <- predict(mdl, newdata = list(xx = xx), type = "response")
+  
+  # Use the first overlapping point to shift xhat so the lines "connect" instead
+  # of having a sudden jump
+  pt <- min(which(!xna))
+  shift <- x[pt] - xhat[pt]
+  xhat  <- xhat + shift
+  
+  # drop in imputed values
+  x[xna] <- xhat[xna]
+  x
+}
+
+impute_ts_sqrt <- function(x) {
+  # This is only meant to work for leading NAs; check to make sure this is 
+  # the case. 
+  xna <- is.na(x)
+  # if all NA's are leading sequence, they are all preceded by NA as well
+  stopifnot(!any(xna==TRUE & c(TRUE, head(stats::lag(xna), -1))==FALSE))
+  
+  if (all(is.na(x))) {
+    return(x)
+  }
+  xx <- seq_along(x)
+  mdl <- try(glm(sqrt(x) ~ xx, data = NULL, family = gaussian(link = "identity")), silent = TRUE)
+  if (inherits(mdl, "try-error")) {
+    return(x)
+  }
+  xhat <- predict(mdl, newdata = list(xx = xx), type = "response")^2
+  
+  # Use the first overlapping point to shift xhat so the lines "connect" instead
+  # of having a sudden jump
+  pt <- min(which(!xna))
+  shift <- x[pt] - xhat[pt]
+  xhat  <- xhat + shift
+  
+  # drop in imputed values
+  x[xna] <- xhat[xna]
+  x
+}
+
+# check how this works
+x <- c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 
+       89.3, 85.1, 81.1, 77.2, 73.5, 70.1, 66.9, 63.9, 61.1, 58.6, 56.2, 
+       54.1, 52.1, 50.2, 48.5, 47, 45.8, 44.7, 44.1, 44, 44.4, 45.2, 
+       45.9, 46.8, 47.8, 48.4, 49, 49.4, 50, 50.9, 50.8, 49.7, 48.1, 
+       45.5, 42.9, 40.3, 38.2, 36.6, 35.3, 34.1, 32.9, 31.4, 30.7, 29.6, 
+       28.5)
+plot(x, type = "l", ylim = c(0, 150))
+lines(impute_ts_loglinear(x)[1:16], col = "red")
+
+```
+
+## Get raw data
+
+Download the raw source data. Since this takes a while, this will only raw if a copy of the source data is not present in the input folder. 
+
+*UPDATE: To trigger and update, delete the raw data input file or manually run this chunk.*
+
+```{r download-source}
+if (!file.exists("input/infmort.csv")) {
+  raw <- WDI(indicator = "infmort", country = "all", start = 1960, 
+           end = year(today()), extra = FALSE)
+  write_csv(raw, "input/infmort.csv")
+}
+```
+
+## Clean raw data
+
+```{r}
+raw <- read_csv("input/infmort.csv")
+
+# UPDATE: check this is still the case
+# In the raw data all values for 2019 are missing; drop that year from the data
+last_year <- filter(raw, year==max(year))
+stopifnot(all(is.na(last_year[["SP.DYN.IMRT.IN"]])))
+raw <- filter(raw, year!=max(year))
+
+# convert to G&W system
+wdi <- raw %>%
+  rename(infmort = SP.DYN.IMRT.IN) %>%
+  wdi_to_gw(.) %>%
+  arrange(gwcode, year)
+
+# Some minor countries don't have G&W codes
+nogwcode <- wdi %>%
+  filter(is.na(gwcode)) %>%
+  group_by(iso2c, country) %>%
+  count() 
+write_csv(nogwcode, "output/missing-gwcode.csv")
+knitr::kable(nogwcode)
+
+# Take those out
+wdi <- wdi %>%
+  dplyr::filter(!is.na(gwcode))
+```
+
+### Lag data
+
+*UPDATE: make sure the lagging is still correct*
+
+Lag the data before we check for an if possible impute missing values because the lagging will introduce missingness as well.
+
+```{r}
+wdi$year <- wdi$year + 1
+range(wdi$year)
+```
+
+### Normalize to G&W statelist
+
+```{r}
+# Add in missing cases from G&W state list and drop excess country-years not 
+# in G&W list (left join)
+statelist <- state_panel(1960,  # this cannot be min(year) because we lagged above
+                         max(wdi$year), partial = "any")
+wdi <- left_join(statelist, wdi, by = c("gwcode", "year")) %>%
+  arrange(gwcode, year)
+```
+
+*TODO: this join will take out some excess years for situations where WDI is missing data for a country like Czechoslovakia that later split into several different countries, and for which it does have data. In principle it might be possible to reconstruct mortality estimates for Czechoslovakia, the USSR, Yugoslavia, Sudan, etc. but this is a lot of work, so ¯\_(ツ)_/¯*
+
+## Handle missing values
+
+The rest of this script deals with identifying and potentially imputing missing values. 
+
+```{r}
+# Are any years completely missing?
+missing_year <- wdi %>%
+  group_by(year) %>%
+  summarize(n = n(), missing = sum(infmort)) %>%
+  filter(n==missing) 
+write_csv(missing_year, "output/missing-all-year.csv")
+missing_year %>%
+  knitr::kable()
+
+# This should not be the case since we lagged the data
+stopifnot(nrow(missing_year)==0)
+
+# Are any countries completely missing?
+missing_country <- wdi %>%
+  group_by(gwcode) %>%
+  summarize(n = n(), 
+            missing = sum(is.na(infmort))) %>%
+  mutate(country = country_names(gwcode, shorten = TRUE)) %>%
+  filter(n==missing) %>%
+  select(gwcode, country, n)
+write_csv(missing_country, "output/missing-all-country.csv")
+missing_country %>%
+  knitr::kable()
+
+# Take out countries missing all values
+wdi <- wdi %>% 
+  dplyr::filter(!gwcode %in% missing_country[["gwcode"]])
+```
+
+### Carry-back impute lag-induced missing data
+
+Because we lagged the data, countries will have missing values in 1960 or their first year of independence, if it was after 1960. Use the 1960 or independence year value to impute, i.e. carry back impute thoses cases.
+
+```{r}
+# Countries that gained indy in 1960 or later
+data(gwstates)
+indy <- gwstates %>% 
+  # some states are present more than 1 time if they had interrupted indy; only
+  # use last period
+  arrange(gwcode) %>%
+  group_by(gwcode) %>% 
+  slice(n()) %>%
+  mutate(syear = lubridate::year(start)) %>%
+  select(gwcode, syear)
+stopifnot(nrow(indy)==length(unique(indy$gwcode)))
+
+wdi <- wdi %>%
+  left_join(indy, by = "gwcode") %>%
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(infmort2 = case_when(
+    (is.na(infmort) & year>=syear) ~ lead(infmort, n = 1)[1],
+    TRUE ~ infmort
+  ))
+
+# I add the imputed values as second column to allow comparison, if one wants
+# to do that at this point. 
+sum(is.na(wdi$infmort))
+sum(is.na(wdi$infmort2))
+
+wdi <- wdi %>%
+  mutate(infmort = infmort2, infmort2 = NULL)
+```
+
+### Check remaining missing values
+
+```{r}
+missing <- wdi %>%
+  # Track the original N for a country before focusing only on missing cases
+  group_by(gwcode) %>%
+  dplyr::mutate(N = n()) %>%
+  filter(is.na(infmort)) %>%
+  # Right now this is country-year; turn this into a more readable form by 
+  # collapsing accross consecutive year spells
+  # First, code consecutive year spells
+  group_by(gwcode) %>%
+  arrange(year) %>%
+  dplyr::mutate(year = as.integer(year),
+                id = id_date_sequence(year)) %>%
+  # Collapse over years
+  dplyr::group_by(gwcode, id) %>%
+  dplyr::summarize(N = unique(N), 
+                   N_miss = n(),
+                   Frac_miss = N_miss/N,
+                   years = paste0(range(year), collapse = " - ")) %>%
+  select(-id) %>%
+  arrange(desc(Frac_miss), gwcode)
+
+missing %>% 
+  knitr::kable()
+
+# add an indicator if series is incomplete 
+wdi <- wdi %>%
+  mutate(has_missing = gwcode %in% missing$gwcode)
+```
+
+These are all missing values at the front of the series. 
+
+### Find imputation model
+
+The series overall look like the might be reasonably linear under some scale transformation like log or square root. 
+
+```{r}
+ggplot(wdi, aes(x = year, y = infmort, group = gwcode, 
+                color = has_missing)) +
+  geom_line(alpha = 0.5) +
+  theme_light()
+```
+
+Compare log-linear and square root linear models.
+
+```{r}
+fit <- wdi %>%
+  group_by(gwcode, has_missing) %>%
+  nest() %>%
+  mutate(
+    mdl_log = map(data, ~lm(log(infmort) ~ year, data = .)),
+    mdl_sqrt = map(data, ~lm(sqrt(infmort) ~ year, data = .)),
+    mdl_mix  = map(data, ~lm((infmort)^(0.42) ~ year, data = .))
+  ) %>%
+  gather(model, fit, starts_with("mdl")) %>%
+  mutate(r2 = map_dbl(fit, ~summary(.)$r.squared))
+
+# Bin the fit by R^2 and model
+table(fit$model, cut(fit$r2, c(0, .4, .5, .6, .7, .8, .9, 1)))
+
+
+fit %>% 
+  group_by(model, has_missing) %>%
+  summarize(countries = n(),
+            mean_r2 = round(mean(r2), 2),
+            median_r2 = round(median(r2), 2)) %>%
+  arrange(has_missing, mean_r2)
+```
+
+If a model is not performing well on a series where wer are not looking to impute, who cares. Look at low R2 models for series we are looking to impute.
+
+```{r}
+check_gwcodes <- fit %>% 
+  filter(model!="mdl_lm", r2 < 0.9, has_missing) %>% 
+  pull(gwcode) %>% 
+  unique()
+bad_fit <- fit %>%
+  filter(gwcode %in% check_gwcodes, model!="mdl_lm") 
+nn <- nrow(bad_fit)/3
+wdi %>%
+  filter(gwcode %in% check_gwcodes) %>%
+  mutate(syear = ifelse(syear<1960, 1960, syear)) %>%
+  ggplot(.) +
+  facet_wrap(~ gwcode) +
+  geom_line(aes(x = year, y = infmort, group = gwcode)) +
+  # mark how far back we need to impute
+  geom_vline(aes(xintercept = syear)) +
+  geom_text(
+    data = bad_fit, 
+    x = 1980, 
+    y = c(rep(50, nn), rep(100, nn), rep(150, nn)), 
+    aes(label = paste0(
+      c(rep("Log-linear: ", nn), rep("Quadratic: ", nn), 
+      rep("Mixed: ", nn)),
+      round(r2, 2))
+    )
+  ) +
+  stat_smooth(aes(x = year, y = infmort, color = "red"),
+              method = "glm", 
+              formula = y ~ x, 
+              method.args = list(family = gaussian(link = "log"))) +
+  stat_smooth(aes(x = year, y = infmort, color = "blue"),
+              method = "lm",
+              formula = y ~ poly(x, 2)) +
+  scale_color_manual("Model", values = c("red" = "red", "blue" = "blue"), 
+                     labels = c("blue" = "Quadratic", "red" = "Log-linear")) +
+  theme_light()
+```
+
+The log-lienar and square root models both perform about equally well. What do the imputed values look like?
+
+
+```{r}
+wdi <- wdi %>%
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(infmort_imputed = is.na(infmort),
+         infmort_log     = impute_ts_loglinear(infmort),
+         infmort_sqrt    = impute_ts_sqrt(infmort))
+
+# Visualize results
+highlight <- wdi %>% 
+  filter(has_missing) %>%
+  select(gwcode, year, infmort_imputed, infmort_log, infmort_sqrt) %>%
+  pivot_longer(infmort_log:infmort_sqrt) %>%
+  mutate(color = case_when(
+    infmort_imputed==FALSE ~ "Observed",
+    infmort_imputed==TRUE & name=="infmort_log" ~ "Log",
+    infmort_imputed==TRUE & name=="infmort_sqrt" ~ "Sqrt",
+    TRUE ~ "what?"
+  ))
+ggplot(wdi, aes(x = year)) +
+  geom_line(aes(y = infmort, group = gwcode), alpha = 0.2) +
+  geom_line(data = highlight,
+            aes(y = value, group = interaction(gwcode, name), color = color)) +
+  scale_color_manual(values = c("Observed" = "gray20", "Log" = "red", "Sqrt" = "blue")) +
+  theme_light()
+```
+
+The square root model's imputed values are less aggressive in their extrapolation so I will pick that.
+
+```{r}
+wdi <- wdi %>%
+  mutate(infmort = infmort_sqrt,
+         infmort_log = NULL)
+```
+
+Now all the countries we have not dropped should have full series / no missing values. 
+```{r check-no-missing-left}
+tbl <- wdi %>%
+  group_by(gwcode) %>%
+  summarize(n_miss = sum(is.na(infmort))) %>%
+  ungroup() %>%
+  filter(n_miss > 0)
+if (nrow(tbl) > 0) stop("Still some missing values remaining", call. = FALSE)
+```
+
+
+## Add year-normalized version
+
+```{r yearadj-version}
+wdi <- wdi %>%
+  group_by(year) %>%
+  mutate(infmort_yearadj = (infmort - mean(infmort))/sd(infmort)) %>%
+  ungroup()
+```
+
+## Done, save
+
+
+```{r}
+wdi <- wdi %>% 
+  ungroup() %>%
+  select(gwcode, year, infmort, infmort_yearadj, infmort_imputed) 
+write_csv(wdi, path = "output/wdi-infmort.csv")
+```
+

@@ -5,12 +5,12 @@ TODO:
 
 - add data source modules for gw-state-age, reign-cy, P&T, EPR
 - add sources:
+  - [x] V-Dem
+  - [x] Inf mort
   - oil price
-  - V-Dem
-  - Inf mort
   - WDI cell phones
-  - pop
-  - NY.GDP.MKTP.KD
+  - UCDP ACD
+  - GDP, pop
   - FP.CPI.TOTL.ZG
   - Freedom House
   - Polity
