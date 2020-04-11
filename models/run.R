@@ -2,6 +2,10 @@
 #   Run the test and live forecasts
 #
 
+CV_REPEATS = 2
+CV_FOLDS   = 8
+TUNE_N     = 20
+
 
 library(mlr3)
 library(mlr3learners)
@@ -53,15 +57,15 @@ tasks <- sapply(tasks, function(x) {
 
 learner         = mlr3::lrn("classif.ranger", 
                             predict_type = "prob",
-                            num.trees = 1200,
-                            mtry = 4)
+                            num.trees = 1000)
 tune_resampling = rsmp("repeated_cv")
-tune_resampling$param_set$values = list(repeats = 2, folds = 8)
+tune_resampling$param_set$values = list(repeats = CV_REPEATS, folds = CV_FOLDS)
 tune_measures   = msr("classif.auc")
 tune_ps = ParamSet$new(list(
-  ParamInt$new("min.node.size", lower = 1, upper = 200)
+  ParamInt$new("min.node.size", lower = 1, upper = 300),
+  ParamInt$new("mtry", lower = 8, upper = 20)
 ))
-tune_terminator = term("evals", n_evals = 20)
+tune_terminator = term("evals", n_evals = TUNE_N)
 tuner = mlr3tuning::tnr("random_search")
 
 auto_rf = AutoTuner$new(
