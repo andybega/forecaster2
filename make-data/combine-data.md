@@ -386,7 +386,7 @@ vdem <- read_csv("input/v-dem.csv",
                    country_name = col_character(),
                    year = col_integer()
                  )) %>%
-  select(-country_name) %>%
+  select(-country_name, -spell_id) %>%
   filter(!is.na(gwcode)) %>%
   setNames(c("gwcode", "year", paste0("vdem_", names(.)[3:ncol(.)])))
 
@@ -407,10 +407,10 @@ wdi <- read_csv("input/wdi-infmort.csv",
   mutate(infmort_imputed = as.integer(infmort_imputed)) %>%
   setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
 
-states <- left_join(states, vdem)
+states <- left_join(states, wdi)
 ```
 
-    ## Joining, by = c("gwcode", "year", "vdem_v2x_polyarchy", "vdem_v2x_libdem", "vdem_v2x_partipdem", "vdem_v2x_delibdem", "vdem_v2x_egaldem", "vdem_v2x_api", "vdem_v2x_mpi", "vdem_v2x_freexp_altinf", "vdem_v2x_frassoc_thick", "vdem_v2x_suffr", "vdem_v2x_elecoff", "vdem_v2x_liberal", "vdem_v2x_jucon", "vdem_v2x_partip", "vdem_v2x_cspart", "vdem_v2x_egal", "vdem_v2x_accountability", "vdem_v2x_veracc", "vdem_v2x_diagacc", "vdem_v2x_horacc", "vdem_v2x_ex_confidence", "vdem_v2x_ex_direlect", "vdem_v2x_ex_hereditary", "vdem_v2x_ex_military", "vdem_v2x_ex_party", "vdem_v2x_neopat", "vdem_v2x_civlib", "vdem_v2x_clphy", "vdem_v2x_clpol", "vdem_v2x_clpriv", "vdem_v2x_corr", "vdem_v2x_execorr", "vdem_v2x_pubcorr", "vdem_v2x_gender", "vdem_v2x_gencl", "vdem_v2x_gencs", "vdem_v2x_genpp", "vdem_v2x_rule", "vdem_v2x_elecreg", "vdem_v2x_EDcomp_thick", "vdem_v2x_freexp", "vdem_v2x_hosabort", "vdem_v2x_hosinter", "vdem_v2x_legabort", "vdem_v2x_divparctrl", "vdem_v2x_feduni", "vdem_spell_id")
+    ## Joining, by = c("gwcode", "year")
 
 ## Summarize and write output
 
@@ -555,7 +555,6 @@ knitr::kable(var_summary, digits = 2)
 | reign\_ref\_recent              |     171 |   0.11 | TRUE    |               0.00 |
 | reign\_tenure\_months           |     171 |  96.34 | TRUE    |               0.05 |
 | reign\_victory\_recent          |     171 |   0.25 | TRUE    |               0.00 |
-| vdem\_spell\_id                 |    1025 |   0.35 | TRUE    |               0.00 |
 | vdem\_v2x\_accountability       |    1025 |   1.01 | FALSE   |               0.30 |
 | vdem\_v2x\_api                  |    1044 |   0.28 | FALSE   |               0.08 |
 | vdem\_v2x\_civlib               |    1025 |   0.29 | FALSE   |               0.08 |
@@ -602,6 +601,9 @@ knitr::kable(var_summary, digits = 2)
 | vdem\_v2x\_rule                 |    1025 |   0.31 | FALSE   |               0.09 |
 | vdem\_v2x\_suffr                |    1025 |   0.21 | FALSE   |               0.00 |
 | vdem\_v2x\_veracc               |    1025 |   0.87 | FALSE   |               0.25 |
+| wdi\_infmort                    |    1999 |  50.02 | FALSE   |               0.19 |
+| wdi\_infmort\_imputed           |    1999 |   0.22 | TRUE    |               0.00 |
+| wdi\_infmort\_yearadj           |    1999 |   1.00 | FALSE   |               0.74 |
 | year                            |       0 |  19.09 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_attempt |       0 |  18.07 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_coup    |       0 |  18.32 | TRUE    |               0.01 |
@@ -713,7 +715,9 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | vdem\_v2x\_legabort          |    1025 |
 | vdem\_v2x\_divparctrl        |    1063 |
 | vdem\_v2x\_feduni            |    1026 |
-| vdem\_spell\_id              |    1025 |
+| wdi\_infmort                 |    1999 |
+| wdi\_infmort\_yearadj        |    1999 |
+| wdi\_infmort\_imputed        |    1999 |
 
 ### Track overall cases and missing cases
 
@@ -753,13 +757,13 @@ tbl %>%
 | Measure                  | Value       |
 | :----------------------- | :---------- |
 | N\_before\_drop          | 11202       |
-| N\_after\_drop           | 9503        |
-| Years                    | 1950 - 2019 |
-| Features                 | 107         |
-| Positive\_attempt\_lead1 | 376         |
-| Positive\_coup\_lead1    | 200         |
-| Positive\_failed\_lead1  | 198         |
-| N\_in\_forecast\_sets    | 1680        |
+| N\_after\_drop           | 8601        |
+| Years                    | 1960 - 2019 |
+| Features                 | 109         |
+| Positive\_attempt\_lead1 | 317         |
+| Positive\_coup\_lead1    | 169         |
+| Positive\_failed\_lead1  | 165         |
+| N\_in\_forecast\_sets    | 1674        |
 
 ``` r
 tbl %>%
@@ -842,8 +846,6 @@ covered %>%
 |    343 | North Macedonia          | 2010 - 2019 |
 |    344 | Croatia                  | 2010 - 2019 |
 |    346 | Bosnia-Herzegovina       | 2010 - 2019 |
-|    347 | Kosovo                   | 2013 - 2015 |
-|    347 | Kosovo                   | 2017 - 2019 |
 |    349 | Slovenia                 | 2010 - 2019 |
 |    350 | Greece                   | 2010 - 2019 |
 |    352 | Cyprus                   | 2010 - 2019 |
@@ -1000,8 +1002,7 @@ not_covered %>%
 |    232 | Andorra               | 2010 - 2019 |
 |    331 | San Marino            | 2010 - 2019 |
 |    340 | Serbia                | 2010 - 2019 |
-|    347 | Kosovo                | 2010 - 2012 |
-|    347 | Kosovo                | 2016        |
+|    347 | Kosovo                | 2010 - 2019 |
 |    396 | Abkhazia              | 2010 - 2019 |
 |    397 | South Ossetia         | 2010 - 2019 |
 |    403 | Sao Tome and Principe | 2010 - 2019 |
