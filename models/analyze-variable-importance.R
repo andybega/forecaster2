@@ -4,6 +4,10 @@
 
 library(readr)
 library(dplyr)
+library(ggplot2)
+library(here)
+
+setwd(here::here("models"))
 
 var_imp <- read_csv("output/full-model/variable-importance.csv")
 
