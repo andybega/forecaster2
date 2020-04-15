@@ -162,4 +162,5 @@ if (length(warn) > 1) {
   for (x in warn_strings) lgr$warn(x)
 }
 
+source("score-archive.R")
 source("score.R")
