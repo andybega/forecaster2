@@ -6,3 +6,6 @@
 *.DS_Store
 
 models/output/full-model/model-*.rds
+
+# Compiled website
+website/_site

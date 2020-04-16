@@ -4,6 +4,10 @@ Coup forecasts
 TODO:
 
 - add data source modules for gw-state-age, reign-cy, P&T, EPR
+- add REIGN data script to data-sources
+- add PT coups script to data-sources
+- for V-Dem, add variable transformations, e.g. y2y diff, volatility
+- for P&T coups, clean up years since last vars so it is years since last coup or independence or 1816, whichever is latest
 - add sources:
   - [x] V-Dem
   - [x] Inf mort
@@ -19,6 +23,7 @@ TODO:
   
 Variable importance from 2018 forecasts:
 
+```
 ## SP.DYN.IMRT.IN         100.000
 ## v2x_liberal             54.037
 ## pt_attempt_num10yrs     50.538
@@ -39,3 +44,4 @@ Variable importance from 2018 forecasts:
 ## NY.GDP.DEFL.KD.ZG        2.666
 ## v2x_partip               2.626
 ## v2xdl_delib              2.353
+```
