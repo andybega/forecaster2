@@ -1,0 +1,52 @@
+---
+title: "Table of forecasts"
+---
+
+The table below lists all countries for which there are forecasts. The columns correspond to different outcomes:
+
+- "Attempt": Any coup attempt, regardless of whether it was successful or failed. 
+- "Coup": A successful coup that results in overthrow of the government.
+- "Failed": A failed coup attempt that does not result in overthrow of the government.
+
+The risk values shown are percentages that can theoretically can range from 0% to 100%. These were created from raw risk probabilities that range from 0 to 1 and then are rounded to one decimal digit. 
+
+```{r setup, include = FALSE}
+library(dplyr)
+library(DT)
+library(states)
+library(tidyr)
+library(stringr)
+```
+
+
+```{r, echo = FALSE}
+fcasts <- readRDS("_data/fcasts.rds") 
+fcasts <- fcasts %>%
+  # take out the tests forecasts so we only retain the live forecast
+  filter(year==max(year)) %>% 
+  mutate(Country = country_names(gwcode),
+         Country = str_trim(str_remove(Country, " \\([a-zA-Z ]+\\)")),
+         Country = str_remove(Country, "/[a-zA-Z]+"),
+         Country = case_when(
+           Country=="German Federal Republic" ~ "Germany",
+           TRUE ~ Country
+         )) %>%
+  # capitalize first letter in outcome names
+  mutate(outcome = str_to_sentence(outcome)) %>%
+  pivot_wider(names_from = outcome, values_from = p) %>%
+  mutate(
+    Attempt_Rank = n() - rank(Attempt) + 1,
+    Coup_Rank    = n() - rank(Coup) + 1,
+    Failed_Rank  = n() - rank(Failed) + 1
+  ) %>%
+  # convert and round the risk probabilities to percent
+  mutate_at(vars(c(Attempt, Coup, Failed)), .funs = ~sprintf("%.1f", . * 100)) %>%
+  select(Country, Attempt, Attempt_Rank, Coup, Coup_Rank, Failed, Failed_Rank) %>%
+  arrange(Attempt_Rank)
+
+datatable(fcasts, rownames = FALSE, 
+          colnames = c("Attempt Rank" = 3, "Coup Rank" = 5, "Failed Rank" = 7),
+          extensions = "Responsive",
+          options = list(pageLength = 25))
+```
+

@@ -1,0 +1,19 @@
+---
+title: "Links to other public forecasting projects"
+---
+
+ViEWS
+
+Holocaust EWP
+
+Atrocities Forecasting Project
+
+5-year ahead forecasts for the onset of genocide or politicide.
+
+https://politicsir.cass.anu.edu.au/research/projects/atrocity-forecasting
+
+CoupCast
+
+1-month and 1-year ahead forecasts of the risk of coup attempts
+
+https://oefresearch.org/activities/coup-cast

@@ -1,0 +1,18 @@
+name: "coup-forecasts"
+exclude: ["Makefile", "data/*"]
+navbar:
+  title: "Coup forecasts"
+  left:
+    - text: "Map"
+      href: index.html
+    - text: "Table"
+      href: table.html
+    - text: "About"
+      href: about.html
+    - text: "Other forecasting projects"
+      href: links.html
+    - text: "Back to PH"
+      href: https://www.predictiveheuristics.com
+  right:
+    - icon: fa-github-square fa-lg
+      href: https://www.github.com/andybega/forecaster2

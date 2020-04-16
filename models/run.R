@@ -23,6 +23,7 @@ library(ranger)
 library(future.apply)
 
 lgr$info("Start forecast models")
+t0 <- proc.time()
 
 setwd(here::here("models"))
 
@@ -161,6 +162,9 @@ if (length(warn) > 1) {
   lgr$warn("There were R warnings, printing below:")
   for (x in warn_strings) lgr$warn(x)
 }
+
+lgr$info("Forecast models finished, total time: %ss", round((proc.time() - t0)["elapsed"]))
+
 
 source("score-archive.R")
 source("score.R")
