@@ -27,8 +27,9 @@ format_prob <- function(x) {
 }
 
 labels = sprintf(
-  "<strong>%s</strong><br/>Attempt: %s<br/>Coup: %s",
-  World$name, format_prob(World$attempt), format_prob(World$coup)
+  "<strong>%s</strong><br/>Attempt: %s<br/>Coup: %s<br>Failed: %s",
+  World$name, format_prob(World$attempt), format_prob(World$coup),
+  format_prob(World$failed)
 ) %>% lapply(htmltools::HTML)
 
 # I previously used colorQuantile for this, but this distorts how high the risk
@@ -40,21 +41,28 @@ leaflet(width = "100%", height = "600px") %>%
   addPolygons(data = World, weight = 1, color = "black", smoothFactor = 0.3,
               fillOpacity = 0.8, fillColor = ~pal_p(attempt),
               popup = labels,
-              group = "P(attempt)",
+              group = "Any Coup Attempt",
               highlight = highlightOptions(weight = 3)
               ) %>%
   # coup
   addPolygons(data = World, weight = 1, color = "black", smoothFactor = 0.3,
               fillOpacity = 0.8, fillColor = ~pal_p(coup),
               popup = labels,
-              group = "P(coup)",
+              group = "Successful Coup",
               highlight = highlightOptions(weight = 3)
               ) %>%
+  # failed attempt
+  addPolygons(data = World, weight = 1, color = "black", smoothFactor = 0.3,
+              fillOpacity = 0.8, fillColor = ~pal_p(failed),
+              popup = labels,
+              group = "Failed Attempt",
+              highlight = highlightOptions(weight = 3)
+              ) %>% 
   addLegend(pal = pal_p, values = World$coup, opacity = 0.8,
             labFormat = labelFormat(big.mark = "'"),
             title = "Statistical Risk (%)") %>%
   addLayersControl(
-    baseGroups = c("P(attempt)", "P(coup)"),
+    baseGroups = c("Any Coup Attempt", "Successful Coup", "Failed Attempt"),
                    position = "topleft",
     options = layersControlOptions(collapsed = FALSE)
   ) %>%
