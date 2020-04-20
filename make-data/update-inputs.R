@@ -31,4 +31,10 @@ file.copy(
   overwrite = TRUE
 )
 
+file.copy(
+  from = "../data-sources/oil-prices/output/oil-prices.csv",
+  to = "input/oil-prices.csv",
+  overwrite = TRUE
+)
+
 setwd(oldwd)

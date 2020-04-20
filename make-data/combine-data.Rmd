@@ -189,6 +189,15 @@ wdi <- read_csv("input/wdi-infmort.csv",
 states <- left_join(states, wdi)
 ```
 
+## Oil prices
+
+```{r}
+oil <- read_csv("input/oil-prices.csv")
+
+states <- left_join(states, oil)
+```
+
+
 ## Summarize and write output
 
 ```{r final-missplot}

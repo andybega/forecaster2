@@ -1,0 +1,30 @@
+---
+title: "Oil price"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Brent crude oil price
+
+The data are composed from two sources:
+
+- BP Statistical Review of World Energy for historical price information
+  https://www.bp.com/en/global/corporate/energy-economics/statistical-review-of-world-energy.html
+- EIA Brent crude prices to supplement the last year of data
+
+EIA oil prices are nominal while those from BP are real, but since we are only adding EIA prices for the most recent year, I'm not worrying about it. 
+
+## Summary
+
+```{r}
+library("dplyr")
+library("readr")
+
+oil <- read_csv("output/oil-prices.csv")
+
+glimpse(oil)
+```
+

@@ -15,8 +15,8 @@ TODO:
 - add sources:
   - [x] V-Dem
   - [x] Inf mort
-  - oil price
   - WDI cell phones
+  - [x] oil prices
   - UCDP ACD
   - GDP, pop
   - FP.CPI.TOTL.ZG
