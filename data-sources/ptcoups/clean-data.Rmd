@@ -1,0 +1,183 @@
+---
+title: "P&T Coups"
+output: 
+  github_document:
+    toc: yes
+---
+
+*Last updated on `r as.character(format(Sys.Date(), "%d %B %Y"))`*
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Packages / functions
+
+```{r}
+library("tidyverse")
+library("countrycode")
+library("states")
+
+
+# Time since last coup
+# Many countries have never had a coup; for these, start counting from their year
+# of independence or 1816, whichever is later.
+# x: a 0/1 vector marking even occurrence
+# indy: an integer to use as start for counting
+# index: an integer year for the year that x[1] is for
+.duration_counter <- function(x, indy, index) {
+  
+  stopifnot(length(indy)==1,
+            length(index)==1)
+  if (any(is.na(x))) stop("Missing values in x")
+  
+  duration <- vector("integer", length = length(x))
+  
+  for (i in seq_along(duration)) {
+    
+    # first obs in a series
+    if (i==1) { 
+      # if the first year is not a coup, adjust the starting count for indy year
+      if (x[i]==0) {
+        duration[i] <- index - indy + 1
+      } else {
+        duration[i] <- 1
+      }
+      # skip to i=2 so the code below doesn't error out
+      next
+    }
+    
+    if (x[i]==0) {
+      duration[i] <- duration[i-1] + 1
+    } else {
+      duration[i] <- 0
+    }
+  }
+  duration
+}
+
+# check it works correctly
+# indy in 2000, series starts 2010
+x <- rep(0, 11)
+data.frame(x = c(rep(NA, 10), x), 
+           dur = c(rep(1:10), .duration_counter(x, 2000, 2010)), 
+           year = 2000:2020)
+```
+
+## Download coup data
+
+```{r}
+pt_url <- "http://www.uky.edu/~clthyn2/coup_data/powell_thyne_coups_final.txt"
+
+coups_raw <- read_tsv(pt_url, col_types = cols(
+  country = col_character(),
+  ccode = col_integer(),
+  year = col_integer(),
+  month = col_integer(),
+  day = col_integer(),
+  coup = col_integer(),
+  version = col_character()
+))
+
+write_csv(coups_raw, "input/ptcoups.csv")
+```
+
+## Clean raw data
+
+```{r}
+cy <- states::state_panel(min(coups_raw$year), max(coups_raw$year), useGW = TRUE)
+
+stopifnot(all(coups_raw$ccode %in% cy$gwcode))
+
+coups <- coups_raw %>%
+  mutate(label = ifelse(coup==1, "pt_failed", "pt_coup")) %>%
+  mutate(coup = 1) %>%
+  tidyr::spread(label, coup, fill = 0) 
+
+# Some countries had more than 1 coup/attempt in 1 year, collapse those
+coups <- coups %>%
+  dplyr::group_by(ccode, year) %>%
+  dplyr::summarize(pt_attempt = max(pt_coup, pt_failed),
+                   pt_attempt_num = sum(pt_coup, pt_failed),
+                   pt_coup_num = sum(pt_coup), 
+                   pt_coup = as.integer(pt_coup_num > 0),
+                   pt_failed_num = sum(pt_failed),
+                   pt_failed = as.integer(pt_failed_num > 0))
+
+stopifnot(
+  sum(coups$pt_coup_num)==sum(coups_raw$coup==2),
+  sum(coups$pt_failed_num)==sum(coups_raw$coup==1)
+)
+
+# P&T not in CY
+nomatch <- anti_join(coups, cy, by = c("ccode" = "gwcode", "year"))
+
+if (nrow(nomatch > 0)) {
+  cat("Some P&T coups are not in G&W state list")
+  print(nomatch[, c("ccode", "year", "pt_coup", "pt_failed")])
+  cat("625 Sudan 1955 is prior to independence in 1956")
+}
+
+cy <- left_join(cy, coups, by = c("gwcode" = "ccode", "year"))
+cy <- cy %>%
+  replace_na(list(pt_coup = 0, pt_coup_num = 0, 
+                  pt_failed = 0, pt_failed_num = 0,
+                  pt_attempt = 0, pt_attempt_num = 0))
+coups <- cy
+
+# Cumulative counts of coups/attempts
+coups <- coups %>%
+  arrange(gwcode, year) %>%
+  group_by(gwcode) %>%
+  dplyr::mutate(
+    # Total number of coups so far
+    pt_coup_total      = cumsum(pt_coup_num),  
+    pt_failed_total    = cumsum(pt_failed_num),
+    pt_attempt_total   = cumsum(pt_coup_num),  
+    # #past 5 years
+    pt_coup_num5yrs    = zoo::rollapplyr(pt_coup_num, sum, partial = TRUE, 
+                                         width = 5),
+    pt_failed_num5yrs  = zoo::rollapplyr(pt_failed_num, sum, partial = TRUE, 
+                                         width = 5),
+    pt_attempt_num5yrs = zoo::rollapplyr(pt_attempt_num,  sum, partial = TRUE,
+                                         width = 5),
+    # #past 10 years
+    pt_coup_num10yrs   = zoo::rollapplyr(pt_coup_num, sum, partial = TRUE,
+                                         width = 10),
+    pt_failed_num10yrs = zoo::rollapplyr(pt_failed_num, sum, partial = TRUE, 
+                                         width = 10),
+    pt_attempt_num10yrs = zoo::rollapplyr(pt_attempt_num, sum, partial = TRUE, 
+                                          width = 10)
+  )
+
+# add counters, with years since 1816 or indy for countries without events
+data(gwstates)
+# keep only last period of indy for countries that had interrupted indy
+gwstates <- gwstates %>% 
+  select(gwcode, start) %>% 
+  group_by(gwcode) %>% 
+  slice(tail(1)) %>%
+  mutate(start = as.integer(substr(start, 1, 4)))
+
+coups <- coups %>%
+  left_join(gwstates, by = "gwcode") %>%
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate(years_since_last_pt_coup    = .duration_counter(pt_coup, min(start), min(year)),
+         years_since_last_pt_failed  = .duration_counter(pt_failed, min(start), min(year)),
+         years_since_last_pt_attempt = .duration_counter(pt_attempt, min(start), min(year))) %>%
+  ungroup() %>%
+  select(-start)
+  
+
+# Missingness plot
+plot_missing(coups) +
+  ggtitle(sprintf("P&T Coups, %s to %s", min(coups$year), max(coups$year)))
+```
+
+## Done, save
+
+```{r}
+write.csv(coups, file = "output/ptcoups.csv", row.names = FALSE)
+```
+

@@ -1,0 +1,29 @@
+---
+title: "P&T Coups, augmented for pre-WW2"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Last updated: `r as.character(format(Sys.Date(), "%d %B %Y"))`*
+
+P&T coup data.
+
+Updates are automatic as the clean-data script downloads from the web. 
+
+The script also add several variable transformations. 
+
+
+## Summary
+
+```{r}
+library("dplyr")
+library("readr")
+
+coups <- suppressMessages(read_csv("output/ptcoups.csv"))
+
+glimpse(coups)
+```
+

@@ -25,4 +25,10 @@ file.copy(
   overwrite = TRUE
 )
 
+file.copy(
+  from = "../data-sources/ptcoups/output/ptcoups.csv",
+  to = "input/ptcoups.csv",
+  overwrite = TRUE
+)
+
 setwd(oldwd)
