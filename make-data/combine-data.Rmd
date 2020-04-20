@@ -114,34 +114,8 @@ epr <- read_csv("input/epr.csv") %>%
   setNames(c("gwcode", "year", paste0("epr_", names(.)[3:ncol(.)])))
 
 glimpse(epr)
-```
 
-Add year-to-year difference of these variables. Changes could be significant. 
-
-```{r, eval=FALSE}
-TODO
-```
-
-
-EPR only ranges to 2017 right now. Lag and carry-back, or don't lag but do carry-forward from 2017 on?
-
-```{r}
-ggplot(epr, aes(x = year, y = epr_excluded_group_pop, group = gwcode)) +
-  geom_line()
-```
-
-There are quite frequent changes, as the plot above shows. Since I care more about recent cases, and since it seems fair to assume that the power structures pre-independence were similar to those at independence, lag and carry back for first two years in state's existence, for states that enter after 1950. 
-
-```{r}
-epr_lagged <- epr %>%
-  mutate(year = year + 2) %>%
-  arrange(gwcode, year) %>%
-  group_by(gwcode) %>%
-  tidyr::fill(-gwcode, -year, .direction = "up")
-```
-
-```{r}
-states <- left_join(states, epr_lagged, by = c("gwcode", "year"))
+states <- left_join(states, epr, by = c("gwcode", "year"))
 ```
 
 ## REIGN data

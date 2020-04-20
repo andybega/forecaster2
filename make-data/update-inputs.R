@@ -19,4 +19,10 @@ file.copy(
   overwrite = TRUE
 )
 
+file.copy(
+  from = "../data-sources/epr/output/epr.csv",
+  to = "input/epr.csv",
+  overwrite = TRUE
+)
+
 setwd(oldwd)

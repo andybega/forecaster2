@@ -184,65 +184,44 @@ epr <- read_csv("input/epr.csv") %>%
     ##   groups = col_double(),
     ##   elf = col_double(),
     ##   excluded_groups_count = col_double(),
-    ##   excluded_group_pop = col_double(),
+    ##   excluded_groups_pop = col_double(),
     ##   inpower_groups_count = col_double(),
     ##   inpower_groups_pop = col_double(),
     ##   regaut_groups_count = col_double(),
-    ##   regaut_group_pop = col_double()
+    ##   regaut_group_pop = col_double(),
+    ##   excluded_groups_shift = col_double(),
+    ##   inpower_groups_shift = col_double(),
+    ##   excluded_groups_count_diff = col_double(),
+    ##   excluded_groups_pop_diff = col_double(),
+    ##   inpower_groups_count_diff = col_double(),
+    ##   inpower_groups_pop_diff = col_double()
     ## )
 
 ``` r
 glimpse(epr)
 ```
 
-    ## Rows: 11,128
-    ## Columns: 10
-    ## $ gwcode                    <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2…
-    ## $ year                      <dbl> 1946, 1947, 1948, 1949, 1950, 1951, 1952, 1…
-    ## $ epr_groups                <dbl> 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6…
-    ## $ epr_elf                   <dbl> 0.5098565, 0.5098565, 0.5098565, 0.5098565,…
-    ## $ epr_excluded_groups_count <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2…
-    ## $ epr_excluded_group_pop    <dbl> 0.1318, 0.1318, 0.1318, 0.1318, 0.1318, 0.1…
-    ## $ epr_inpower_groups_count  <dbl> 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4…
-    ## $ epr_inpower_groups_pop    <dbl> 0.8562, 0.8562, 0.8562, 0.8562, 0.8562, 0.8…
-    ## $ epr_regaut_groups_count   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-    ## $ epr_regaut_group_pop      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-
-Add year-to-year difference of these variables. Changes could be
-significant.
-
-``` r
-TODO
-```
-
-EPR only ranges to 2017 right now. Lag and carry-back, or don’t lag but
-do carry-forward from 2017 on?
+    ## Rows: 10,488
+    ## Columns: 16
+    ## $ gwcode                         <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
+    ## $ year                           <dbl> 1946, 1947, 1948, 1949, 1950, 1951, 19…
+    ## $ epr_groups                     <dbl> 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,…
+    ## $ epr_elf                        <dbl> 0.5098565, 0.5098565, 0.5098565, 0.509…
+    ## $ epr_excluded_groups_count      <dbl> 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
+    ## $ epr_excluded_groups_pop        <dbl> 0.1318, 0.1318, 0.1318, 0.1318, 0.1318…
+    ## $ epr_inpower_groups_count       <dbl> 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,…
+    ## $ epr_inpower_groups_pop         <dbl> 0.8562, 0.8562, 0.8562, 0.8562, 0.8562…
+    ## $ epr_regaut_groups_count        <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_regaut_group_pop           <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_excluded_groups_shift      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_inpower_groups_shift       <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_excluded_groups_count_diff <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_excluded_groups_pop_diff   <dbl> 0.0000, 0.0000, 0.0000, 0.0000, 0.0000…
+    ## $ epr_inpower_groups_count_diff  <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ epr_inpower_groups_pop_diff    <dbl> 0.0000, 0.0000, 0.0000, 0.0000, 0.0000…
 
 ``` r
-ggplot(epr, aes(x = year, y = epr_excluded_group_pop, group = gwcode)) +
-  geom_line()
-```
-
-    ## Warning: Removed 986 rows containing missing values (geom_path).
-
-![](combine-data_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-There are quite frequent changes, as the plot above shows. Since I care
-more about recent cases, and since it seems fair to assume that the
-power structures pre-independence were similar to those at independence,
-lag and carry back for first two years in state’s existence, for states
-that enter after 1950.
-
-``` r
-epr_lagged <- epr %>%
-  mutate(year = year + 2) %>%
-  arrange(gwcode, year) %>%
-  group_by(gwcode) %>%
-  tidyr::fill(-gwcode, -year, .direction = "up")
-```
-
-``` r
-states <- left_join(states, epr_lagged, by = c("gwcode", "year"))
+states <- left_join(states, epr, by = c("gwcode", "year"))
 ```
 
 ## REIGN data
@@ -498,125 +477,131 @@ write_csv(var_summary, "output/variables.csv")
 knitr::kable(var_summary, digits = 2)
 ```
 
-| variable                        | missing |     sd | integer | unique\_val\_ratio |
-| :------------------------------ | ------: | -----: | :------ | -----------------: |
-| epr\_elf                        |    1152 |   0.30 | FALSE   |               0.03 |
-| epr\_excluded\_group\_pop       |    1152 |   0.22 | FALSE   |               0.03 |
-| epr\_excluded\_groups\_count    |    1152 |   4.99 | TRUE    |               0.00 |
-| epr\_groups                     |    1152 |   5.68 | TRUE    |               0.00 |
-| epr\_inpower\_groups\_count     |    1152 |   2.18 | TRUE    |               0.00 |
-| epr\_inpower\_groups\_pop       |    1152 |   0.26 | FALSE   |               0.03 |
-| epr\_regaut\_group\_pop         |    1152 |   0.00 | TRUE    |               0.00 |
-| epr\_regaut\_groups\_count      |    1152 |   0.00 | TRUE    |               0.00 |
-| gwcode                          |       0 | 261.20 | TRUE    |               0.02 |
-| ln\_state\_age                  |       0 |   1.14 | FALSE   |               0.02 |
-| pt\_attempt                     |       0 |   0.18 | TRUE    |               0.00 |
-| pt\_attempt\_lead1              |     197 |   0.18 | TRUE    |               0.00 |
-| pt\_attempt\_lead2              |     394 |   0.18 | TRUE    |               0.00 |
-| pt\_attempt\_num                |       0 |   0.23 | TRUE    |               0.00 |
-| pt\_attempt\_num10yrs           |       0 |   1.07 | TRUE    |               0.00 |
-| pt\_attempt\_num5yrs            |       0 |   0.65 | TRUE    |               0.00 |
-| pt\_attempt\_total              |       0 |   1.75 | TRUE    |               0.00 |
-| pt\_coup                        |       0 |   0.14 | TRUE    |               0.00 |
-| pt\_coup\_lead1                 |     197 |   0.14 | TRUE    |               0.00 |
-| pt\_coup\_lead2                 |     394 |   0.13 | TRUE    |               0.00 |
-| pt\_coup\_num                   |       0 |   0.15 | TRUE    |               0.00 |
-| pt\_coup\_num10yrs              |       0 |   0.61 | TRUE    |               0.00 |
-| pt\_coup\_num5yrs               |       0 |   0.38 | TRUE    |               0.00 |
-| pt\_coup\_total                 |       0 |   1.75 | TRUE    |               0.00 |
-| pt\_failed                      |       0 |   0.13 | TRUE    |               0.00 |
-| pt\_failed\_lead1               |     197 |   0.13 | TRUE    |               0.00 |
-| pt\_failed\_lead2               |     394 |   0.13 | TRUE    |               0.00 |
-| pt\_failed\_num                 |       0 |   0.16 | TRUE    |               0.00 |
-| pt\_failed\_num10yrs            |       0 |   0.67 | TRUE    |               0.00 |
-| pt\_failed\_num5yrs             |       0 |   0.43 | TRUE    |               0.00 |
-| pt\_failed\_total               |       0 |   1.93 | TRUE    |               0.00 |
-| reign\_age                      |     138 |  11.14 | TRUE    |               0.01 |
-| reign\_anticipation             |     138 |   0.31 | TRUE    |               0.00 |
-| reign\_change\_recent           |     138 |   0.20 | TRUE    |               0.00 |
-| reign\_defeat\_recent           |     138 |   0.19 | TRUE    |               0.00 |
-| reign\_delayed                  |     138 |   0.09 | TRUE    |               0.00 |
-| reign\_direct\_recent           |     138 |   0.30 | TRUE    |               0.00 |
-| reign\_elected                  |     138 |   0.47 | TRUE    |               0.00 |
-| reign\_election\_now            |     138 |   0.15 | TRUE    |               0.00 |
-| reign\_election\_recent         |     138 |   0.31 | TRUE    |               0.00 |
-| reign\_exec\_ant                |     138 |   0.23 | TRUE    |               0.00 |
-| reign\_exec\_recent             |     138 |   0.21 | TRUE    |               0.00 |
-| reign\_gov\_military            |     138 |   0.24 | TRUE    |               0.00 |
-| reign\_gov\_parl                |     138 |   0.46 | TRUE    |               0.00 |
-| reign\_gov\_party               |     138 |   0.41 | TRUE    |               0.00 |
-| reign\_gov\_personal            |     138 |   0.41 | TRUE    |               0.00 |
-| reign\_gov\_pres                |     138 |   0.37 | TRUE    |               0.00 |
-| reign\_gov\_provisional         |     138 |   0.10 | TRUE    |               0.00 |
-| reign\_indirect\_recent         |     138 |   0.09 | TRUE    |               0.00 |
-| reign\_irreg\_lead\_ant         |     138 |   0.13 | TRUE    |               0.00 |
-| reign\_irregular                |     138 |   1.46 | FALSE   |               0.12 |
-| reign\_lastelection             |     138 |   1.33 | FALSE   |               0.07 |
-| reign\_lead\_recent             |     138 |   0.29 | TRUE    |               0.00 |
-| reign\_leg\_ant                 |     138 |   0.20 | TRUE    |               0.00 |
-| reign\_leg\_recent              |     138 |   0.21 | TRUE    |               0.00 |
-| reign\_loss                     |     138 |   1.39 | FALSE   |               0.09 |
-| reign\_male                     |     138 |   0.17 | TRUE    |               0.00 |
-| reign\_militarycareer           |     138 |   0.40 | TRUE    |               0.00 |
-| reign\_nochange\_recent         |     138 |   0.24 | TRUE    |               0.00 |
-| reign\_prev\_conflict           |     138 |   0.60 | TRUE    |               0.00 |
-| reign\_ref\_ant                 |     138 |   0.10 | TRUE    |               0.00 |
-| reign\_ref\_recent              |     138 |   0.11 | TRUE    |               0.00 |
-| reign\_tenure\_months           |     138 |  98.30 | TRUE    |               0.05 |
-| reign\_victory\_recent          |     138 |   0.25 | TRUE    |               0.00 |
-| vdem\_v2x\_accountability       |     969 |   1.01 | FALSE   |               0.31 |
-| vdem\_v2x\_api                  |     988 |   0.28 | FALSE   |               0.09 |
-| vdem\_v2x\_civlib               |     969 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_clphy                |     969 |   0.31 | FALSE   |               0.09 |
-| vdem\_v2x\_clpol                |     969 |   0.33 | FALSE   |               0.09 |
-| vdem\_v2x\_clpriv               |     969 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_corr                 |    1003 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_cspart               |     969 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_delibdem             |     988 |   0.27 | FALSE   |               0.09 |
-| vdem\_v2x\_diagacc              |     969 |   1.04 | FALSE   |               0.32 |
-| vdem\_v2x\_divparctrl           |    1007 |   0.97 | FALSE   |               0.16 |
-| vdem\_v2x\_EDcomp\_thick        |     988 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_egal                 |     969 |   0.23 | FALSE   |               0.09 |
-| vdem\_v2x\_egaldem              |     988 |   0.25 | FALSE   |               0.08 |
-| vdem\_v2x\_elecoff              |     969 |   0.41 | FALSE   |               0.01 |
-| vdem\_v2x\_elecreg              |     969 |   0.35 | TRUE    |               0.00 |
-| vdem\_v2x\_ex\_confidence       |     969 |   0.38 | FALSE   |               0.00 |
-| vdem\_v2x\_ex\_direlect         |     969 |   0.47 | FALSE   |               0.00 |
-| vdem\_v2x\_ex\_hereditary       |     969 |   0.16 | FALSE   |               0.01 |
-| vdem\_v2x\_ex\_military         |     969 |   0.24 | FALSE   |               0.01 |
-| vdem\_v2x\_ex\_party            |     969 |   0.21 | FALSE   |               0.01 |
-| vdem\_v2x\_execorr              |     969 |   0.30 | FALSE   |               0.08 |
-| vdem\_v2x\_feduni               |     970 |   0.36 | FALSE   |               0.06 |
-| vdem\_v2x\_frassoc\_thick       |     969 |   0.34 | FALSE   |               0.09 |
-| vdem\_v2x\_freexp               |     969 |   0.32 | FALSE   |               0.09 |
-| vdem\_v2x\_freexp\_altinf       |     969 |   0.33 | FALSE   |               0.09 |
-| vdem\_v2x\_gencl                |     969 |   0.27 | FALSE   |               0.09 |
-| vdem\_v2x\_gencs                |     969 |   0.25 | FALSE   |               0.09 |
-| vdem\_v2x\_gender               |    1125 |   0.23 | FALSE   |               0.08 |
-| vdem\_v2x\_genpp                |    1125 |   0.27 | FALSE   |               0.08 |
-| vdem\_v2x\_horacc               |     969 |   1.04 | FALSE   |               0.33 |
-| vdem\_v2x\_hosabort             |     969 |   0.06 | TRUE    |               0.00 |
-| vdem\_v2x\_hosinter             |     969 |   0.10 | TRUE    |               0.00 |
-| vdem\_v2x\_jucon                |    1000 |   0.31 | FALSE   |               0.09 |
-| vdem\_v2x\_legabort             |     969 |   0.05 | TRUE    |               0.00 |
-| vdem\_v2x\_libdem               |    1021 |   0.28 | FALSE   |               0.09 |
-| vdem\_v2x\_liberal              |    1002 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_mpi                  |     988 |   0.31 | FALSE   |               0.08 |
-| vdem\_v2x\_neopat               |     970 |   0.31 | FALSE   |               0.09 |
-| vdem\_v2x\_partip               |     969 |   0.21 | FALSE   |               0.08 |
-| vdem\_v2x\_partipdem            |     988 |   0.21 | FALSE   |               0.07 |
-| vdem\_v2x\_polyarchy            |     988 |   0.29 | FALSE   |               0.09 |
-| vdem\_v2x\_pubcorr              |     969 |   0.30 | FALSE   |               0.08 |
-| vdem\_v2x\_rule                 |     969 |   0.31 | FALSE   |               0.09 |
-| vdem\_v2x\_suffr                |     969 |   0.19 | FALSE   |               0.00 |
-| vdem\_v2x\_veracc               |     969 |   0.87 | FALSE   |               0.26 |
-| wdi\_infmort                    |    1094 |  50.02 | FALSE   |               0.21 |
-| wdi\_infmort\_imputed           |    1094 |   0.22 | TRUE    |               0.00 |
-| wdi\_infmort\_yearadj           |    1094 |   1.00 | FALSE   |               0.81 |
-| year                            |       0 |  16.84 | TRUE    |               0.01 |
-| years\_since\_last\_pt\_attempt |       0 |  18.10 | TRUE    |               0.01 |
-| years\_since\_last\_pt\_coup    |       0 |  18.17 | TRUE    |               0.01 |
-| years\_since\_last\_pt\_failed  |       0 |  18.00 | TRUE    |               0.01 |
+| variable                           | missing |     sd | integer | unique\_val\_ratio |
+| :--------------------------------- | ------: | -----: | :------ | -----------------: |
+| epr\_elf                           |     978 |   0.30 | FALSE   |               0.03 |
+| epr\_excluded\_groups\_count       |     978 |   4.95 | TRUE    |               0.00 |
+| epr\_excluded\_groups\_count\_diff |     978 |   0.42 | TRUE    |               0.00 |
+| epr\_excluded\_groups\_pop         |     978 |   0.22 | FALSE   |               0.03 |
+| epr\_excluded\_groups\_pop\_diff   |     978 |   0.05 | FALSE   |               0.02 |
+| epr\_excluded\_groups\_shift       |     978 |   0.17 | TRUE    |               0.00 |
+| epr\_groups                        |     978 |   5.63 | TRUE    |               0.00 |
+| epr\_inpower\_groups\_count        |     978 |   2.17 | TRUE    |               0.00 |
+| epr\_inpower\_groups\_count\_diff  |     978 |   0.39 | TRUE    |               0.00 |
+| epr\_inpower\_groups\_pop          |     978 |   0.26 | FALSE   |               0.03 |
+| epr\_inpower\_groups\_pop\_diff    |     978 |   0.05 | FALSE   |               0.02 |
+| epr\_inpower\_groups\_shift        |     978 |   0.17 | TRUE    |               0.00 |
+| epr\_regaut\_group\_pop            |     978 |   0.00 | TRUE    |               0.00 |
+| epr\_regaut\_groups\_count         |     978 |   0.00 | TRUE    |               0.00 |
+| gwcode                             |       0 | 261.20 | TRUE    |               0.02 |
+| ln\_state\_age                     |       0 |   1.14 | FALSE   |               0.02 |
+| pt\_attempt                        |       0 |   0.18 | TRUE    |               0.00 |
+| pt\_attempt\_lead1                 |     197 |   0.18 | TRUE    |               0.00 |
+| pt\_attempt\_lead2                 |     394 |   0.18 | TRUE    |               0.00 |
+| pt\_attempt\_num                   |       0 |   0.23 | TRUE    |               0.00 |
+| pt\_attempt\_num10yrs              |       0 |   1.07 | TRUE    |               0.00 |
+| pt\_attempt\_num5yrs               |       0 |   0.65 | TRUE    |               0.00 |
+| pt\_attempt\_total                 |       0 |   1.75 | TRUE    |               0.00 |
+| pt\_coup                           |       0 |   0.14 | TRUE    |               0.00 |
+| pt\_coup\_lead1                    |     197 |   0.14 | TRUE    |               0.00 |
+| pt\_coup\_lead2                    |     394 |   0.13 | TRUE    |               0.00 |
+| pt\_coup\_num                      |       0 |   0.15 | TRUE    |               0.00 |
+| pt\_coup\_num10yrs                 |       0 |   0.61 | TRUE    |               0.00 |
+| pt\_coup\_num5yrs                  |       0 |   0.38 | TRUE    |               0.00 |
+| pt\_coup\_total                    |       0 |   1.75 | TRUE    |               0.00 |
+| pt\_failed                         |       0 |   0.13 | TRUE    |               0.00 |
+| pt\_failed\_lead1                  |     197 |   0.13 | TRUE    |               0.00 |
+| pt\_failed\_lead2                  |     394 |   0.13 | TRUE    |               0.00 |
+| pt\_failed\_num                    |       0 |   0.16 | TRUE    |               0.00 |
+| pt\_failed\_num10yrs               |       0 |   0.67 | TRUE    |               0.00 |
+| pt\_failed\_num5yrs                |       0 |   0.43 | TRUE    |               0.00 |
+| pt\_failed\_total                  |       0 |   1.93 | TRUE    |               0.00 |
+| reign\_age                         |     138 |  11.14 | TRUE    |               0.01 |
+| reign\_anticipation                |     138 |   0.31 | TRUE    |               0.00 |
+| reign\_change\_recent              |     138 |   0.20 | TRUE    |               0.00 |
+| reign\_defeat\_recent              |     138 |   0.19 | TRUE    |               0.00 |
+| reign\_delayed                     |     138 |   0.09 | TRUE    |               0.00 |
+| reign\_direct\_recent              |     138 |   0.30 | TRUE    |               0.00 |
+| reign\_elected                     |     138 |   0.47 | TRUE    |               0.00 |
+| reign\_election\_now               |     138 |   0.15 | TRUE    |               0.00 |
+| reign\_election\_recent            |     138 |   0.31 | TRUE    |               0.00 |
+| reign\_exec\_ant                   |     138 |   0.23 | TRUE    |               0.00 |
+| reign\_exec\_recent                |     138 |   0.21 | TRUE    |               0.00 |
+| reign\_gov\_military               |     138 |   0.24 | TRUE    |               0.00 |
+| reign\_gov\_parl                   |     138 |   0.46 | TRUE    |               0.00 |
+| reign\_gov\_party                  |     138 |   0.41 | TRUE    |               0.00 |
+| reign\_gov\_personal               |     138 |   0.41 | TRUE    |               0.00 |
+| reign\_gov\_pres                   |     138 |   0.37 | TRUE    |               0.00 |
+| reign\_gov\_provisional            |     138 |   0.10 | TRUE    |               0.00 |
+| reign\_indirect\_recent            |     138 |   0.09 | TRUE    |               0.00 |
+| reign\_irreg\_lead\_ant            |     138 |   0.13 | TRUE    |               0.00 |
+| reign\_irregular                   |     138 |   1.46 | FALSE   |               0.12 |
+| reign\_lastelection                |     138 |   1.33 | FALSE   |               0.07 |
+| reign\_lead\_recent                |     138 |   0.29 | TRUE    |               0.00 |
+| reign\_leg\_ant                    |     138 |   0.20 | TRUE    |               0.00 |
+| reign\_leg\_recent                 |     138 |   0.21 | TRUE    |               0.00 |
+| reign\_loss                        |     138 |   1.39 | FALSE   |               0.09 |
+| reign\_male                        |     138 |   0.17 | TRUE    |               0.00 |
+| reign\_militarycareer              |     138 |   0.40 | TRUE    |               0.00 |
+| reign\_nochange\_recent            |     138 |   0.24 | TRUE    |               0.00 |
+| reign\_prev\_conflict              |     138 |   0.60 | TRUE    |               0.00 |
+| reign\_ref\_ant                    |     138 |   0.10 | TRUE    |               0.00 |
+| reign\_ref\_recent                 |     138 |   0.11 | TRUE    |               0.00 |
+| reign\_tenure\_months              |     138 |  98.30 | TRUE    |               0.05 |
+| reign\_victory\_recent             |     138 |   0.25 | TRUE    |               0.00 |
+| vdem\_v2x\_accountability          |     969 |   1.01 | FALSE   |               0.31 |
+| vdem\_v2x\_api                     |     988 |   0.28 | FALSE   |               0.09 |
+| vdem\_v2x\_civlib                  |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_clphy                   |     969 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_clpol                   |     969 |   0.33 | FALSE   |               0.09 |
+| vdem\_v2x\_clpriv                  |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_corr                    |    1003 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_cspart                  |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_delibdem                |     988 |   0.27 | FALSE   |               0.09 |
+| vdem\_v2x\_diagacc                 |     969 |   1.04 | FALSE   |               0.32 |
+| vdem\_v2x\_divparctrl              |    1007 |   0.97 | FALSE   |               0.16 |
+| vdem\_v2x\_EDcomp\_thick           |     988 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_egal                    |     969 |   0.23 | FALSE   |               0.09 |
+| vdem\_v2x\_egaldem                 |     988 |   0.25 | FALSE   |               0.08 |
+| vdem\_v2x\_elecoff                 |     969 |   0.41 | FALSE   |               0.01 |
+| vdem\_v2x\_elecreg                 |     969 |   0.35 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_confidence          |     969 |   0.38 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_direlect            |     969 |   0.47 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_hereditary          |     969 |   0.16 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_military            |     969 |   0.24 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_party               |     969 |   0.21 | FALSE   |               0.01 |
+| vdem\_v2x\_execorr                 |     969 |   0.30 | FALSE   |               0.08 |
+| vdem\_v2x\_feduni                  |     970 |   0.36 | FALSE   |               0.06 |
+| vdem\_v2x\_frassoc\_thick          |     969 |   0.34 | FALSE   |               0.09 |
+| vdem\_v2x\_freexp                  |     969 |   0.32 | FALSE   |               0.09 |
+| vdem\_v2x\_freexp\_altinf          |     969 |   0.33 | FALSE   |               0.09 |
+| vdem\_v2x\_gencl                   |     969 |   0.27 | FALSE   |               0.09 |
+| vdem\_v2x\_gencs                   |     969 |   0.25 | FALSE   |               0.09 |
+| vdem\_v2x\_gender                  |    1125 |   0.23 | FALSE   |               0.08 |
+| vdem\_v2x\_genpp                   |    1125 |   0.27 | FALSE   |               0.08 |
+| vdem\_v2x\_horacc                  |     969 |   1.04 | FALSE   |               0.33 |
+| vdem\_v2x\_hosabort                |     969 |   0.06 | TRUE    |               0.00 |
+| vdem\_v2x\_hosinter                |     969 |   0.10 | TRUE    |               0.00 |
+| vdem\_v2x\_jucon                   |    1000 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_legabort                |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_libdem                  |    1021 |   0.28 | FALSE   |               0.09 |
+| vdem\_v2x\_liberal                 |    1002 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_mpi                     |     988 |   0.31 | FALSE   |               0.08 |
+| vdem\_v2x\_neopat                  |     970 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_partip                  |     969 |   0.21 | FALSE   |               0.08 |
+| vdem\_v2x\_partipdem               |     988 |   0.21 | FALSE   |               0.07 |
+| vdem\_v2x\_polyarchy               |     988 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_pubcorr                 |     969 |   0.30 | FALSE   |               0.08 |
+| vdem\_v2x\_rule                    |     969 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_suffr                   |     969 |   0.19 | FALSE   |               0.00 |
+| vdem\_v2x\_veracc                  |     969 |   0.87 | FALSE   |               0.26 |
+| wdi\_infmort                       |    1094 |  50.02 | FALSE   |               0.21 |
+| wdi\_infmort\_imputed              |    1094 |   0.22 | TRUE    |               0.00 |
+| wdi\_infmort\_yearadj              |    1094 |   1.00 | FALSE   |               0.81 |
+| year                               |       0 |  16.84 | TRUE    |               0.01 |
+| years\_since\_last\_pt\_attempt    |       0 |  18.10 | TRUE    |               0.01 |
+| years\_since\_last\_pt\_coup       |       0 |  18.17 | TRUE    |               0.01 |
+| years\_since\_last\_pt\_failed     |       0 |  18.00 | TRUE    |               0.01 |
 
 ### Missing values by column
 
@@ -629,104 +614,110 @@ sapply(states, function(x) sum(is.na(x))) %>%
   knitr::kable()
 ```
 
-| Variable                     | Missing |
-| :--------------------------- | ------: |
-| pt\_attempt\_lead1           |     197 |
-| pt\_coup\_lead1              |     197 |
-| pt\_failed\_lead1            |     197 |
-| pt\_attempt\_lead2           |     394 |
-| pt\_coup\_lead2              |     394 |
-| pt\_failed\_lead2            |     394 |
-| epr\_groups                  |    1152 |
-| epr\_elf                     |    1152 |
-| epr\_excluded\_groups\_count |    1152 |
-| epr\_excluded\_group\_pop    |    1152 |
-| epr\_inpower\_groups\_count  |    1152 |
-| epr\_inpower\_groups\_pop    |    1152 |
-| epr\_regaut\_groups\_count   |    1152 |
-| epr\_regaut\_group\_pop      |    1152 |
-| reign\_elected               |     138 |
-| reign\_age                   |     138 |
-| reign\_male                  |     138 |
-| reign\_militarycareer        |     138 |
-| reign\_tenure\_months        |     138 |
-| reign\_anticipation          |     138 |
-| reign\_ref\_ant              |     138 |
-| reign\_leg\_ant              |     138 |
-| reign\_exec\_ant             |     138 |
-| reign\_irreg\_lead\_ant      |     138 |
-| reign\_election\_now         |     138 |
-| reign\_election\_recent      |     138 |
-| reign\_leg\_recent           |     138 |
-| reign\_exec\_recent          |     138 |
-| reign\_lead\_recent          |     138 |
-| reign\_ref\_recent           |     138 |
-| reign\_direct\_recent        |     138 |
-| reign\_indirect\_recent      |     138 |
-| reign\_victory\_recent       |     138 |
-| reign\_defeat\_recent        |     138 |
-| reign\_change\_recent        |     138 |
-| reign\_nochange\_recent      |     138 |
-| reign\_delayed               |     138 |
-| reign\_lastelection          |     138 |
-| reign\_loss                  |     138 |
-| reign\_irregular             |     138 |
-| reign\_prev\_conflict        |     138 |
-| reign\_gov\_pres             |     138 |
-| reign\_gov\_parl             |     138 |
-| reign\_gov\_personal         |     138 |
-| reign\_gov\_party            |     138 |
-| reign\_gov\_provisional      |     138 |
-| reign\_gov\_military         |     138 |
-| vdem\_v2x\_polyarchy         |     988 |
-| vdem\_v2x\_libdem            |    1021 |
-| vdem\_v2x\_partipdem         |     988 |
-| vdem\_v2x\_delibdem          |     988 |
-| vdem\_v2x\_egaldem           |     988 |
-| vdem\_v2x\_api               |     988 |
-| vdem\_v2x\_mpi               |     988 |
-| vdem\_v2x\_freexp\_altinf    |     969 |
-| vdem\_v2x\_frassoc\_thick    |     969 |
-| vdem\_v2x\_suffr             |     969 |
-| vdem\_v2x\_elecoff           |     969 |
-| vdem\_v2x\_liberal           |    1002 |
-| vdem\_v2x\_jucon             |    1000 |
-| vdem\_v2x\_partip            |     969 |
-| vdem\_v2x\_cspart            |     969 |
-| vdem\_v2x\_egal              |     969 |
-| vdem\_v2x\_accountability    |     969 |
-| vdem\_v2x\_veracc            |     969 |
-| vdem\_v2x\_diagacc           |     969 |
-| vdem\_v2x\_horacc            |     969 |
-| vdem\_v2x\_ex\_confidence    |     969 |
-| vdem\_v2x\_ex\_direlect      |     969 |
-| vdem\_v2x\_ex\_hereditary    |     969 |
-| vdem\_v2x\_ex\_military      |     969 |
-| vdem\_v2x\_ex\_party         |     969 |
-| vdem\_v2x\_neopat            |     970 |
-| vdem\_v2x\_civlib            |     969 |
-| vdem\_v2x\_clphy             |     969 |
-| vdem\_v2x\_clpol             |     969 |
-| vdem\_v2x\_clpriv            |     969 |
-| vdem\_v2x\_corr              |    1003 |
-| vdem\_v2x\_execorr           |     969 |
-| vdem\_v2x\_pubcorr           |     969 |
-| vdem\_v2x\_gender            |    1125 |
-| vdem\_v2x\_gencl             |     969 |
-| vdem\_v2x\_gencs             |     969 |
-| vdem\_v2x\_genpp             |    1125 |
-| vdem\_v2x\_rule              |     969 |
-| vdem\_v2x\_elecreg           |     969 |
-| vdem\_v2x\_EDcomp\_thick     |     988 |
-| vdem\_v2x\_freexp            |     969 |
-| vdem\_v2x\_hosabort          |     969 |
-| vdem\_v2x\_hosinter          |     969 |
-| vdem\_v2x\_legabort          |     969 |
-| vdem\_v2x\_divparctrl        |    1007 |
-| vdem\_v2x\_feduni            |     970 |
-| wdi\_infmort                 |    1094 |
-| wdi\_infmort\_yearadj        |    1094 |
-| wdi\_infmort\_imputed        |    1094 |
+| Variable                           | Missing |
+| :--------------------------------- | ------: |
+| pt\_attempt\_lead1                 |     197 |
+| pt\_coup\_lead1                    |     197 |
+| pt\_failed\_lead1                  |     197 |
+| pt\_attempt\_lead2                 |     394 |
+| pt\_coup\_lead2                    |     394 |
+| pt\_failed\_lead2                  |     394 |
+| epr\_groups                        |     978 |
+| epr\_elf                           |     978 |
+| epr\_excluded\_groups\_count       |     978 |
+| epr\_excluded\_groups\_pop         |     978 |
+| epr\_inpower\_groups\_count        |     978 |
+| epr\_inpower\_groups\_pop          |     978 |
+| epr\_regaut\_groups\_count         |     978 |
+| epr\_regaut\_group\_pop            |     978 |
+| epr\_excluded\_groups\_shift       |     978 |
+| epr\_inpower\_groups\_shift        |     978 |
+| epr\_excluded\_groups\_count\_diff |     978 |
+| epr\_excluded\_groups\_pop\_diff   |     978 |
+| epr\_inpower\_groups\_count\_diff  |     978 |
+| epr\_inpower\_groups\_pop\_diff    |     978 |
+| reign\_elected                     |     138 |
+| reign\_age                         |     138 |
+| reign\_male                        |     138 |
+| reign\_militarycareer              |     138 |
+| reign\_tenure\_months              |     138 |
+| reign\_anticipation                |     138 |
+| reign\_ref\_ant                    |     138 |
+| reign\_leg\_ant                    |     138 |
+| reign\_exec\_ant                   |     138 |
+| reign\_irreg\_lead\_ant            |     138 |
+| reign\_election\_now               |     138 |
+| reign\_election\_recent            |     138 |
+| reign\_leg\_recent                 |     138 |
+| reign\_exec\_recent                |     138 |
+| reign\_lead\_recent                |     138 |
+| reign\_ref\_recent                 |     138 |
+| reign\_direct\_recent              |     138 |
+| reign\_indirect\_recent            |     138 |
+| reign\_victory\_recent             |     138 |
+| reign\_defeat\_recent              |     138 |
+| reign\_change\_recent              |     138 |
+| reign\_nochange\_recent            |     138 |
+| reign\_delayed                     |     138 |
+| reign\_lastelection                |     138 |
+| reign\_loss                        |     138 |
+| reign\_irregular                   |     138 |
+| reign\_prev\_conflict              |     138 |
+| reign\_gov\_pres                   |     138 |
+| reign\_gov\_parl                   |     138 |
+| reign\_gov\_personal               |     138 |
+| reign\_gov\_party                  |     138 |
+| reign\_gov\_provisional            |     138 |
+| reign\_gov\_military               |     138 |
+| vdem\_v2x\_polyarchy               |     988 |
+| vdem\_v2x\_libdem                  |    1021 |
+| vdem\_v2x\_partipdem               |     988 |
+| vdem\_v2x\_delibdem                |     988 |
+| vdem\_v2x\_egaldem                 |     988 |
+| vdem\_v2x\_api                     |     988 |
+| vdem\_v2x\_mpi                     |     988 |
+| vdem\_v2x\_freexp\_altinf          |     969 |
+| vdem\_v2x\_frassoc\_thick          |     969 |
+| vdem\_v2x\_suffr                   |     969 |
+| vdem\_v2x\_elecoff                 |     969 |
+| vdem\_v2x\_liberal                 |    1002 |
+| vdem\_v2x\_jucon                   |    1000 |
+| vdem\_v2x\_partip                  |     969 |
+| vdem\_v2x\_cspart                  |     969 |
+| vdem\_v2x\_egal                    |     969 |
+| vdem\_v2x\_accountability          |     969 |
+| vdem\_v2x\_veracc                  |     969 |
+| vdem\_v2x\_diagacc                 |     969 |
+| vdem\_v2x\_horacc                  |     969 |
+| vdem\_v2x\_ex\_confidence          |     969 |
+| vdem\_v2x\_ex\_direlect            |     969 |
+| vdem\_v2x\_ex\_hereditary          |     969 |
+| vdem\_v2x\_ex\_military            |     969 |
+| vdem\_v2x\_ex\_party               |     969 |
+| vdem\_v2x\_neopat                  |     970 |
+| vdem\_v2x\_civlib                  |     969 |
+| vdem\_v2x\_clphy                   |     969 |
+| vdem\_v2x\_clpol                   |     969 |
+| vdem\_v2x\_clpriv                  |     969 |
+| vdem\_v2x\_corr                    |    1003 |
+| vdem\_v2x\_execorr                 |     969 |
+| vdem\_v2x\_pubcorr                 |     969 |
+| vdem\_v2x\_gender                  |    1125 |
+| vdem\_v2x\_gencl                   |     969 |
+| vdem\_v2x\_gencs                   |     969 |
+| vdem\_v2x\_genpp                   |    1125 |
+| vdem\_v2x\_rule                    |     969 |
+| vdem\_v2x\_elecreg                 |     969 |
+| vdem\_v2x\_EDcomp\_thick           |     988 |
+| vdem\_v2x\_freexp                  |     969 |
+| vdem\_v2x\_hosabort                |     969 |
+| vdem\_v2x\_hosinter                |     969 |
+| vdem\_v2x\_legabort                |     969 |
+| vdem\_v2x\_divparctrl              |    1007 |
+| vdem\_v2x\_feduni                  |     970 |
+| wdi\_infmort                       |    1094 |
+| wdi\_infmort\_yearadj              |    1094 |
+| wdi\_infmort\_imputed              |    1094 |
 
 ### Track overall cases and missing cases
 
@@ -766,13 +757,13 @@ tbl %>%
 | Measure                  | Value       |
 | :----------------------- | :---------- |
 | N\_before\_drop          | 10297       |
-| N\_after\_drop           | 8613        |
+| N\_after\_drop           | 8754        |
 | Years                    | 1960 - 2019 |
-| Features                 | 109         |
-| Positive\_attempt\_lead1 | 317         |
+| Features                 | 115         |
+| Positive\_attempt\_lead1 | 323         |
 | Positive\_coup\_lead1    | 169         |
-| Positive\_failed\_lead1  | 165         |
-| N\_in\_forecast\_sets    | 1684        |
+| Positive\_failed\_lead1  | 171         |
+| N\_in\_forecast\_sets    | 1686        |
 
 ``` r
 tbl %>%
@@ -926,7 +917,7 @@ covered %>%
 |    616 | Tunisia                  | 2010 - 2019 |
 |    620 | Libya                    | 2010 - 2019 |
 |    625 | Sudan                    | 2010 - 2019 |
-|    626 | South Sudan              | 2013 - 2019 |
+|    626 | South Sudan              | 2011 - 2019 |
 |    630 | Iran                     | 2010 - 2019 |
 |    640 | Turkey                   | 2010 - 2019 |
 |    645 | Iraq                     | 2010 - 2019 |
@@ -1017,7 +1008,6 @@ not_covered %>%
 |    403 | Sao Tome and Principe | 2010 - 2019 |
 |    520 | Somalia               | 2010 - 2011 |
 |    591 | Seychelles            | 2010 - 2019 |
-|    626 | South Sudan           | 2011 - 2012 |
 |    713 | Taiwan                | 2010 - 2019 |
 |    830 | Singapore             | 2019        |
 |    835 | Brunei                | 2010 - 2019 |
