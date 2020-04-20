@@ -11,6 +11,11 @@ setwd(here::here("models"))
 
 var_imp <- read_csv("output/full-model/variable-importance.csv")
 
+# rescale var imp to 0-1
+var_imp <- var_imp %>%
+  group_by(outcome) %>%
+  mutate(value = value / max(value))
+
 var_imp %>% 
   arrange(outcome, desc(value)) %>%
   group_by(outcome) %>% 

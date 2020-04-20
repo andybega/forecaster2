@@ -33,6 +33,11 @@ plan(multiprocess(workers = availableCores()))
 states <- readRDS("input/states.rds") %>%
   as_tibble() 
 
+# TEMP: take out new EPR columns to see what changes only the case set diff 
+# makes
+states <- states %>%
+  select(-matches("epr\\_[a-z\\_]+\\_(diff|shift)"))
+
 # mlr3 needs DV to be factors
 states <- states %>%
   mutate_at(.vars = vars(ends_with("lead1"), ends_with("lead2")),
