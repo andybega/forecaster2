@@ -167,7 +167,7 @@ vdem <- read_csv("input/v-dem.csv",
                    country_name = col_character(),
                    year = col_integer()
                  )) %>%
-  select(-country_name, -spell_id) %>%
+  select(-country_name) %>%
   filter(!is.na(gwcode)) %>%
   setNames(c("gwcode", "year", paste0("vdem_", names(.)[3:ncol(.)])))
 
