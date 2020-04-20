@@ -3,11 +3,17 @@ Coup forecasts
 
 TODO:
 
+- add sovereign defaults as outcome
 - add data source modules for gw-state-age, reign-cy, P&T, EPR
 - add REIGN data script to data-sources
 - add PT coups script to data-sources
-- for V-Dem, add variable transformations, e.g. y2y diff, volatility
+- for V-Dem:
+  + add "v2x[a-z]{2}" form indices
+  + add variable transformations, e.g. y2y diff, volatility
+  + this is a fucking nightmare; impute missing values as they currently are
+    before adding var transforms without missing values; then add more indices
 - for P&T coups, clean up years since last vars so it is years since last coup or independence or 1816, whichever is latest
+- for EPR, add indicator if group dynamics changed 
 - add sources:
   - [x] V-Dem
   - [x] Inf mort
