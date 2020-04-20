@@ -1,18 +1,19 @@
 V-Dem
 ================
 
+  - [Packages / functions](#packages-functions)
   - [Clean raw data](#clean-raw-data)
       - [Normalize to G\&W statelist](#normalize-to-gw-statelist)
   - [Handle missing values](#handle-missing-values)
   - [Add variable transformations](#add-variable-transformations)
   - [Done, save](#done-save)
 
-*Last updated on 17 April 2020*
+*Last updated on 20 April 2020*
 
 This script:
 
   - 
-## Clean raw data
+## Packages / functions
 
 ``` r
 library(readr)
@@ -42,37 +43,40 @@ library(dplyr)
     ##     intersect, setdiff, setequal, union
 
 ``` r
-raw = read_csv("input/v10/V-Dem-CY-Core-v10.csv")
+library(imputeTS)
 ```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   .default = col_double(),
-    ##   country_name = col_character(),
-    ##   country_text_id = col_character(),
-    ##   historical_date = col_date(format = ""),
-    ##   histname = col_character(),
-    ##   gapstart1 = col_logical(),
-    ##   gapstart2 = col_logical(),
-    ##   gapstart3 = col_logical(),
-    ##   gapend1 = col_logical(),
-    ##   gapend2 = col_logical(),
-    ##   gapend3 = col_logical()
-    ## )
+    ## Registered S3 method overwritten by 'xts':
+    ##   method     from
+    ##   as.zoo.xts zoo
 
-    ## See spec(...) for full column specifications.
+    ## Registered S3 method overwritten by 'quantmod':
+    ##   method            from
+    ##   as.zoo.data.frame zoo
 
-    ## Warning: 8330 parsing failures.
-    ##  row       col           expected actual                              file
-    ## 2075 gapstart1 1/0/T/F/TRUE/FALSE   1851 'input/v10/V-Dem-CY-Core-v10.csv'
-    ## 2075 gapend1   1/0/T/F/TRUE/FALSE   1917 'input/v10/V-Dem-CY-Core-v10.csv'
-    ## 2076 gapstart1 1/0/T/F/TRUE/FALSE   1851 'input/v10/V-Dem-CY-Core-v10.csv'
-    ## 2076 gapend1   1/0/T/F/TRUE/FALSE   1917 'input/v10/V-Dem-CY-Core-v10.csv'
-    ## 2077 gapstart1 1/0/T/F/TRUE/FALSE   1851 'input/v10/V-Dem-CY-Core-v10.csv'
-    ## .... ......... .................. ...... .................................
-    ## See problems(...) for more details.
+    ## Registered S3 methods overwritten by 'forecast':
+    ##   method             from    
+    ##   fitted.fracdiff    fracdiff
+    ##   residuals.fracdiff fracdiff
 
 ``` r
+library(tidyr)
+library(ggplot2)
+```
+
+## Clean raw data
+
+``` r
+raw = read_csv("input/v10/V-Dem-CY-Core-v10.csv",
+               col_types = cols(
+                 gapend1 = col_integer(),
+                 gapend2 = col_integer(),
+                 gapend3 = col_integer(),
+                 gapstart1 = col_integer(),
+                 gapstart2 = col_integer(),
+                 gapstart3 = col_integer()
+               ))
+
 v2x = raw %>%
   # Most v-dem incies starts with v2x, but some have the form v2x[a-z]{2}
   # Thus uses machtes() rather than starts_with()
@@ -244,10 +248,6 @@ missing_country %>%
 v2x <- v2x %>% 
   dplyr::filter(!gwcode %in% missing_country[["gwcode"]])
 
-# Cameroon is missing first year values; take 2nd year values
-drop_in <- v2x %>% filter(gwcode==471 & year==1961) %>% mutate(year = 1960)
-v2x[v2x$gwcode==471 & v2x$year==1960, ] <- drop_in
-
 # Now check whether any particular variable is missing completely for a year
 # I'm not ok imputing in such an instance, so in that case the variable should
 # be taken out.
@@ -258,74 +258,209 @@ check <- v2x %>%
   # for each column we will now have # of missing vals
   summarize_all(~sum(is.na(.))) %>%
   # only check ones with at least 1 missing value
-  filter_at(vars(starts_with("v2x")), any_vars(. > 0))
+  filter_at(vars(starts_with("v2x")), any_vars(. > 0)) %>%
+  # select only vars that have missing vals
+  pivot_longer(-c(gwcode, n, country_name)) %>%
+  group_by(name) %>%
+  mutate(any_na = any(value > 0)) %>%
+  filter(any_na) %>%
+  select(-any_na) %>%
+  pivot_wider()
 
 # How many missing values are there for each variable?
 sapply(v2x, function(x) sum(is.na(x))) %>%
   tibble::enframe(name = "variable", value = "missing") %>%
   arrange(desc(missing)) %>%
+  filter(missing > 0) %>%
   knitr::kable()
 ```
 
 | variable            | missing |
 | :------------------ | ------: |
-| v2x\_gender         |     158 |
-| v2x\_genpp          |     158 |
-| v2x\_libdem         |      52 |
-| v2x\_divparctrl     |      38 |
-| v2x\_corr           |      34 |
-| v2x\_liberal        |      33 |
-| v2x\_jucon          |      31 |
-| v2x\_polyarchy      |      19 |
-| v2x\_partipdem      |      19 |
-| v2x\_delibdem       |      19 |
-| v2x\_egaldem        |      19 |
-| v2x\_api            |      19 |
-| v2x\_mpi            |      19 |
-| v2x\_EDcomp\_thick  |      19 |
-| v2x\_neopat         |       1 |
-| v2x\_feduni         |       1 |
-| gwcode              |       0 |
-| year                |       0 |
-| country\_name       |       0 |
-| v2x\_freexp\_altinf |       0 |
-| v2x\_frassoc\_thick |       0 |
-| v2x\_suffr          |       0 |
-| v2x\_elecoff        |       0 |
-| v2x\_partip         |       0 |
-| v2x\_cspart         |       0 |
-| v2x\_egal           |       0 |
-| v2x\_accountability |       0 |
-| v2x\_veracc         |       0 |
-| v2x\_diagacc        |       0 |
-| v2x\_horacc         |       0 |
-| v2x\_ex\_confidence |       0 |
-| v2x\_ex\_direlect   |       0 |
-| v2x\_ex\_hereditary |       0 |
-| v2x\_ex\_military   |       0 |
-| v2x\_ex\_party      |       0 |
-| v2x\_civlib         |       0 |
-| v2x\_clphy          |       0 |
-| v2x\_clpol          |       0 |
-| v2x\_clpriv         |       0 |
-| v2x\_execorr        |       0 |
-| v2x\_pubcorr        |       0 |
-| v2x\_gencl          |       0 |
-| v2x\_gencs          |       0 |
-| v2x\_rule           |       0 |
-| v2x\_elecreg        |       0 |
-| v2x\_freexp         |       0 |
-| v2x\_hosabort       |       0 |
-| v2x\_hosinter       |       0 |
-| v2x\_legabort       |       0 |
+| v2x\_gender         |     159 |
+| v2x\_genpp          |     159 |
+| v2x\_libdem         |      53 |
+| v2x\_divparctrl     |      39 |
+| v2x\_corr           |      35 |
+| v2x\_liberal        |      34 |
+| v2x\_jucon          |      32 |
+| v2x\_polyarchy      |      20 |
+| v2x\_partipdem      |      20 |
+| v2x\_delibdem       |      20 |
+| v2x\_egaldem        |      20 |
+| v2x\_api            |      20 |
+| v2x\_mpi            |      20 |
+| v2x\_EDcomp\_thick  |      20 |
+| v2x\_neopat         |       2 |
+| v2x\_feduni         |       2 |
+| country\_name       |       1 |
+| v2x\_freexp\_altinf |       1 |
+| v2x\_frassoc\_thick |       1 |
+| v2x\_suffr          |       1 |
+| v2x\_elecoff        |       1 |
+| v2x\_partip         |       1 |
+| v2x\_cspart         |       1 |
+| v2x\_egal           |       1 |
+| v2x\_accountability |       1 |
+| v2x\_veracc         |       1 |
+| v2x\_diagacc        |       1 |
+| v2x\_horacc         |       1 |
+| v2x\_ex\_confidence |       1 |
+| v2x\_ex\_direlect   |       1 |
+| v2x\_ex\_hereditary |       1 |
+| v2x\_ex\_military   |       1 |
+| v2x\_ex\_party      |       1 |
+| v2x\_civlib         |       1 |
+| v2x\_clphy          |       1 |
+| v2x\_clpol          |       1 |
+| v2x\_clpriv         |       1 |
+| v2x\_execorr        |       1 |
+| v2x\_pubcorr        |       1 |
+| v2x\_gencl          |       1 |
+| v2x\_gencs          |       1 |
+| v2x\_rule           |       1 |
+| v2x\_elecreg        |       1 |
+| v2x\_freexp         |       1 |
+| v2x\_hosabort       |       1 |
+| v2x\_hosinter       |       1 |
+| v2x\_legabort       |       1 |
 
 ``` r
-foo <- v2x
-foo$country_name <- NULL
-plot_missing(foo)
+#
+#   Start imputing missing series, one by one
+#   __________________________________________
+# 
+#   UPDATE: all of these will need manual rechecking during data updates
+#
+
+# Bahrain
+stopifnot(all(is.na(
+  filter(v2x, gwcode==692, year < 2002) %>%
+    select(v2x_libdem, v2x_liberal, v2x_jucon, v2x_corr) %>%
+    unlist()
+)))
+
+filter(v2x, gwcode==692) %>%
+  pivot_longer(-c(gwcode, year, country_name)) %>%
+  # only keep variables with missing vals
+  group_by(name) %>%
+  mutate(any_na = any(is.na(value))) %>%
+  ungroup() %>%
+  filter(any_na) %>%
+  ggplot(aes(x = year, y = value, group = name)) +
+  geom_line(data = v2x %>% filter(gwcode==692) %>% 
+              select(-gwcode, -country_name) %>% pivot_longer(-year),
+  alpha = 0.2) +
+  geom_line(aes(color = name))
 ```
 
-![](clean-data_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+    ## Warning: Removed 128 rows containing missing values (geom_path).
+    
+    ## Warning: Removed 128 rows containing missing values (geom_path).
+
+![](clean-data_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+# carry back first observed value
+v2x[v2x$gwcode==692, ] <- v2x[v2x$gwcode==692, ] %>% 
+  tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
+
+# Cameroon is missing first year values; take 2nd year values
+stopifnot(all(is.na(v2x %>% filter(gwcode==471 & year==1960) %>% select(-gwcode, -year))))
+drop_in <- v2x %>% filter(gwcode==471 & year==1961) %>% mutate(year = 1960)
+v2x[v2x$gwcode==471 & v2x$year==1960, ] <- drop_in
+
+# Mozambique; missing several indices during civil war years; carry back first 
+# available value
+stopifnot(all(is.na(
+  filter(v2x, gwcode==541, year==1975) %>% select(v2x_polyarchy, v2x_libdem, v2x_partipdem,
+                                      v2x_delibdem, v2x_api) %>%
+    unlist()
+)))
+
+filter(v2x, gwcode==541) %>% 
+  pivot_longer(-c(gwcode, year, country_name)) %>%
+  # only keep variables with missing vals
+  group_by(name) %>%
+  mutate(any_na = any(is.na(value))) %>%
+  ungroup() %>%
+  filter(any_na) %>%
+  ggplot(aes(x = year, y = value, color = name)) +
+  geom_line()
+```
+
+    ## Warning: Removed 152 rows containing missing values (geom_path).
+
+![](clean-data_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+
+``` r
+v2x[v2x$gwcode==541, ] <- v2x[v2x$gwcode==541, ] %>% 
+  tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
+
+# CAR; has a couple of gaps, so linear impute
+stopifnot(all(is.na(
+  filter(v2x, gwcode==482, year %in% c(1964, 1965)) %>%
+    select(v2x_libdem, v2x_liberal, v2x_gender, v2x_genpp) %>%
+    unlist()
+)))
+
+filter(v2x, gwcode==482) %>% 
+  select(year, v2x_libdem) %>% 
+  plot(main = "CAR", type = "b")
+```
+
+![](clean-data_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
+
+``` r
+v2x$v2x_libdem[v2x$gwcode==482] <- na_interpolation(v2x$v2x_libdem[v2x$gwcode==482], "linear")
+v2x$v2x_liberal[v2x$gwcode==482] <- na_interpolation(v2x$v2x_liberal[v2x$gwcode==482], "linear")
+v2x$v2x_gender[v2x$gwcode==482] <- na_interpolation(v2x$v2x_gender[v2x$gwcode==482], "linear")
+v2x$v2x_genpp[v2x$gwcode==482] <- na_interpolation(v2x$v2x_genpp[v2x$gwcode==482], "linear")
+
+# Saudi Arabia
+stopifnot(all(is.na(
+  filter(v2x, gwcode==670, year < 2000) %>% select(v2x_gender, v2x_genpp) %>% unlist()
+)))
+
+filter(v2x, gwcode==670) %>%
+  pivot_longer(-c(gwcode, year, country_name)) %>%
+  # only keep variables with missing vals
+  group_by(name) %>%
+  mutate(any_na = any(is.na(value))) %>%
+  ungroup() %>%
+  filter(any_na) %>%
+  ggplot(aes(x = year, y = value, group = name)) +
+  geom_line(data = v2x %>% filter(gwcode==670) %>% 
+              select(-gwcode, -country_name) %>% pivot_longer(-year),
+  alpha = 0.2) +
+  geom_line(aes(color = name))
+```
+
+    ## Warning: Removed 88 rows containing missing values (geom_path).
+
+    ## Warning: Removed 88 rows containing missing values (geom_path).
+
+![](clean-data_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
+
+``` r
+v2x[v2x$gwcode==670, ] <- v2x[v2x$gwcode==670, ] %>% 
+  tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
+
+
+# How many missing values are there for each variable?
+sapply(v2x, function(x) sum(is.na(x))) %>%
+  tibble::enframe(name = "variable", value = "missing") %>%
+  arrange(desc(missing)) %>%
+  filter(missing > 0) %>%
+  knitr::kable()
+```
+
+| variable        | missing |
+| :-------------- | ------: |
+| v2x\_gender     |     112 |
+| v2x\_genpp      |     112 |
+| v2x\_divparctrl |      38 |
+| v2x\_feduni     |       1 |
 
 ## Add variable transformations
 
