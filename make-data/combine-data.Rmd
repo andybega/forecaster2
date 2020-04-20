@@ -221,6 +221,13 @@ states <- left_join(states, wdi)
 plotmiss(states)
 ```
 
+WDI does not start until 1960, so it is missing for the 50s. This clogs up the missing cases logs I'm creating below and makes it harder to ID actual cases I could try to fix. Take out the 50s data before going over the data summaries.
+
+```{r}
+states <- states[states$year >= 1960, ]
+```
+
+
 Write all incomplete cases to a CSV so changes introduced by something in one of the input datasets is easier to notice:
 
 ```{r}
