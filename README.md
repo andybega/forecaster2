@@ -1,9 +1,15 @@
 Coup forecasts
 ==============
 
+mini TODO:
+
+- add updated ptcoups (with new counter), oil prices, EPR vars to states and re-run models
+- work on fixing up V-Dem missing vars for existing indicators
+- V-Dem cautiously add v2x[a-z]{2} indicators if they don't add missing cases
+- work on adding WDI cell phone data
+
 TODO:
 
-- add updated ptcoups (with new counter) to states and re-run models
 - add sovereign defaults as outcome
 - add data source modules for gw-state-age, reign-cy
 - for V-Dem:
@@ -11,7 +17,6 @@ TODO:
   + add variable transformations, e.g. y2y diff, volatility
   + this is a fucking nightmare; impute missing values as they currently are
     before adding var transforms without missing values; then add more indices
-- for EPR, add indicator if group dynamics changed 
 - add sources:
   - [x] V-Dem
   - [x] Inf mort
