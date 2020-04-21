@@ -5,6 +5,7 @@ mini TODO:
 
 - add updated ptcoups (with new counter), oil prices, EPR vars to states and re-run models
 - work on fixing up V-Dem missing vars for existing indicators
+- formalize imputer in V-Dem: carry back if initial miss, if gap linear impute; add _imputed variable flag too
 - V-Dem cautiously add v2x[a-z]{2} indicators if they don't add missing cases
 - work on adding WDI cell phone data
 

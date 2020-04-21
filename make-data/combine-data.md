@@ -570,51 +570,189 @@ knitr::kable(var_summary, digits = 2)
 | reign\_tenure\_months              |     138 |  98.30 | TRUE    |               0.05 |
 | reign\_victory\_recent             |     138 |   0.25 | TRUE    |               0.00 |
 | vdem\_v2x\_accountability          |     969 |   1.01 | FALSE   |               0.31 |
+| vdem\_v2x\_accountability\_d1      |     969 |   0.15 | FALSE   |               0.18 |
+| vdem\_v2x\_accountability\_imputed |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_accountability\_sd      |     969 |   0.15 | FALSE   |               0.83 |
 | vdem\_v2x\_api                     |     969 |   0.28 | FALSE   |               0.09 |
+| vdem\_v2x\_api\_d1                 |     969 |   0.05 | FALSE   |               0.09 |
+| vdem\_v2x\_api\_imputed            |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_api\_sd                 |     969 |   0.05 | FALSE   |               0.55 |
 | vdem\_v2x\_civlib                  |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_civlib\_d1              |     969 |   0.04 | FALSE   |               0.09 |
+| vdem\_v2x\_civlib\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_civlib\_sd              |     969 |   0.04 | FALSE   |               0.53 |
 | vdem\_v2x\_clphy                   |     969 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_clphy\_d1               |     969 |   0.05 | FALSE   |               0.10 |
+| vdem\_v2x\_clphy\_imputed          |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_clphy\_sd               |     969 |   0.05 | FALSE   |               0.37 |
 | vdem\_v2x\_clpol                   |     969 |   0.33 | FALSE   |               0.09 |
+| vdem\_v2x\_clpol\_d1               |     969 |   0.06 | FALSE   |               0.10 |
+| vdem\_v2x\_clpol\_imputed          |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_clpol\_sd               |     969 |   0.05 | FALSE   |               0.51 |
 | vdem\_v2x\_clpriv                  |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_clpriv\_d1              |     969 |   0.04 | FALSE   |               0.08 |
+| vdem\_v2x\_clpriv\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_clpriv\_sd              |     969 |   0.04 | FALSE   |               0.43 |
 | vdem\_v2x\_corr                    |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_corr\_d1                |     969 |   0.03 | FALSE   |               0.08 |
+| vdem\_v2x\_corr\_imputed           |     969 |   0.06 | TRUE    |               0.00 |
+| vdem\_v2x\_corr\_sd                |     969 |   0.03 | FALSE   |               0.36 |
 | vdem\_v2x\_cspart                  |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_cspart\_d1              |     969 |   0.05 | FALSE   |               0.10 |
+| vdem\_v2x\_cspart\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_cspart\_sd              |     969 |   0.04 | FALSE   |               0.43 |
 | vdem\_v2x\_delibdem                |     969 |   0.27 | FALSE   |               0.09 |
+| vdem\_v2x\_delibdem\_d1            |     969 |   0.04 | FALSE   |               0.10 |
+| vdem\_v2x\_delibdem\_imputed       |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_delibdem\_sd            |     969 |   0.03 | FALSE   |               0.64 |
 | vdem\_v2x\_diagacc                 |     969 |   1.04 | FALSE   |               0.32 |
-| vdem\_v2x\_divparctrl              |    1007 |   0.97 | FALSE   |               0.16 |
+| vdem\_v2x\_diagacc\_d1             |     969 |   0.16 | FALSE   |               0.18 |
+| vdem\_v2x\_diagacc\_imputed        |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_diagacc\_sd             |     969 |   0.15 | FALSE   |               0.77 |
+| vdem\_v2x\_divparctrl              |     969 |   0.97 | FALSE   |               0.16 |
+| vdem\_v2x\_divparctrl\_d1          |     969 |   0.48 | FALSE   |               0.16 |
+| vdem\_v2x\_divparctrl\_imputed     |     969 |   0.06 | TRUE    |               0.00 |
+| vdem\_v2x\_divparctrl\_sd          |     969 |   0.37 | FALSE   |               0.34 |
 | vdem\_v2x\_EDcomp\_thick           |     969 |   0.28 | FALSE   |               0.09 |
+| vdem\_v2x\_EDcomp\_thick\_d1       |     969 |   0.05 | FALSE   |               0.10 |
+| vdem\_v2x\_EDcomp\_thick\_imputed  |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_EDcomp\_thick\_sd       |     969 |   0.05 | FALSE   |               0.53 |
 | vdem\_v2x\_egal                    |     969 |   0.23 | FALSE   |               0.09 |
+| vdem\_v2x\_egal\_d1                |     969 |   0.03 | FALSE   |               0.07 |
+| vdem\_v2x\_egal\_imputed           |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_egal\_sd                |     969 |   0.02 | FALSE   |               0.50 |
 | vdem\_v2x\_egaldem                 |     969 |   0.25 | FALSE   |               0.08 |
+| vdem\_v2x\_egaldem\_d1             |     969 |   0.03 | FALSE   |               0.08 |
+| vdem\_v2x\_egaldem\_imputed        |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_egaldem\_sd             |     969 |   0.02 | FALSE   |               0.58 |
 | vdem\_v2x\_elecoff                 |     969 |   0.41 | FALSE   |               0.01 |
+| vdem\_v2x\_elecoff\_d1             |     969 |   0.17 | FALSE   |               0.01 |
+| vdem\_v2x\_elecoff\_imputed        |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_elecoff\_sd             |     969 |   0.15 | FALSE   |               0.03 |
 | vdem\_v2x\_elecreg                 |     969 |   0.35 | TRUE    |               0.00 |
+| vdem\_v2x\_elecreg\_d1             |     969 |   0.18 | TRUE    |               0.00 |
+| vdem\_v2x\_elecreg\_imputed        |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_elecreg\_sd             |     969 |   0.16 | FALSE   |               0.00 |
 | vdem\_v2x\_ex\_confidence          |     969 |   0.38 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_confidence\_d1      |     969 |   0.08 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_confidence\_imputed |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_confidence\_sd      |     969 |   0.07 | FALSE   |               0.01 |
 | vdem\_v2x\_ex\_direlect            |     969 |   0.47 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_direlect\_d1        |     969 |   0.16 | FALSE   |               0.00 |
+| vdem\_v2x\_ex\_direlect\_imputed   |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_direlect\_sd        |     969 |   0.14 | FALSE   |               0.00 |
 | vdem\_v2x\_ex\_hereditary          |     969 |   0.16 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_hereditary\_d1      |     969 |   0.02 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_hereditary\_imputed |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_hereditary\_sd      |     969 |   0.02 | FALSE   |               0.02 |
 | vdem\_v2x\_ex\_military            |     969 |   0.24 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_military\_d1        |     969 |   0.09 | FALSE   |               0.05 |
+| vdem\_v2x\_ex\_military\_imputed   |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_military\_sd        |     969 |   0.08 | FALSE   |               0.13 |
 | vdem\_v2x\_ex\_party               |     969 |   0.21 | FALSE   |               0.01 |
+| vdem\_v2x\_ex\_party\_d1           |     969 |   0.05 | FALSE   |               0.04 |
+| vdem\_v2x\_ex\_party\_imputed      |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_ex\_party\_sd           |     969 |   0.04 | FALSE   |               0.11 |
 | vdem\_v2x\_execorr                 |     969 |   0.30 | FALSE   |               0.08 |
-| vdem\_v2x\_feduni                  |     970 |   0.36 | FALSE   |               0.06 |
+| vdem\_v2x\_execorr\_d1             |     969 |   0.04 | FALSE   |               0.09 |
+| vdem\_v2x\_execorr\_imputed        |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_execorr\_sd             |     969 |   0.04 | FALSE   |               0.28 |
+| vdem\_v2x\_feduni                  |     969 |   0.36 | FALSE   |               0.06 |
+| vdem\_v2x\_feduni\_d1              |     969 |   0.05 | FALSE   |               0.06 |
+| vdem\_v2x\_feduni\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_feduni\_sd              |     969 |   0.05 | FALSE   |               0.16 |
 | vdem\_v2x\_frassoc\_thick          |     969 |   0.34 | FALSE   |               0.09 |
+| vdem\_v2x\_frassoc\_thick\_d1      |     969 |   0.06 | FALSE   |               0.10 |
+| vdem\_v2x\_frassoc\_thick\_imputed |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_frassoc\_thick\_sd      |     969 |   0.06 | FALSE   |               0.51 |
 | vdem\_v2x\_freexp                  |     969 |   0.32 | FALSE   |               0.09 |
 | vdem\_v2x\_freexp\_altinf          |     969 |   0.33 | FALSE   |               0.09 |
+| vdem\_v2x\_freexp\_altinf\_d1      |     969 |   0.06 | FALSE   |               0.10 |
+| vdem\_v2x\_freexp\_altinf\_imputed |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_freexp\_altinf\_sd      |     969 |   0.05 | FALSE   |               0.49 |
+| vdem\_v2x\_freexp\_d1              |     969 |   0.06 | FALSE   |               0.10 |
+| vdem\_v2x\_freexp\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_freexp\_sd              |     969 |   0.05 | FALSE   |               0.49 |
 | vdem\_v2x\_gencl                   |     969 |   0.27 | FALSE   |               0.09 |
+| vdem\_v2x\_gencl\_d1               |     969 |   0.04 | FALSE   |               0.08 |
+| vdem\_v2x\_gencl\_imputed          |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_gencl\_sd               |     969 |   0.03 | FALSE   |               0.33 |
 | vdem\_v2x\_gencs                   |     969 |   0.25 | FALSE   |               0.09 |
-| vdem\_v2x\_gender                  |    1080 |   0.23 | FALSE   |               0.08 |
-| vdem\_v2x\_genpp                   |    1080 |   0.27 | FALSE   |               0.08 |
+| vdem\_v2x\_gencs\_d1               |     969 |   0.04 | FALSE   |               0.08 |
+| vdem\_v2x\_gencs\_imputed          |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_gencs\_sd               |     969 |   0.03 | FALSE   |               0.43 |
+| vdem\_v2x\_gender                  |     971 |   0.23 | FALSE   |               0.08 |
+| vdem\_v2x\_gender\_d1              |     970 |   0.03 | FALSE   |               0.07 |
+| vdem\_v2x\_gender\_imputed         |     969 |   0.13 | TRUE    |               0.00 |
+| vdem\_v2x\_gender\_sd              |     971 |   0.02 | FALSE   |               0.55 |
+| vdem\_v2x\_genpp                   |     971 |   0.27 | FALSE   |               0.08 |
+| vdem\_v2x\_genpp\_d1               |     970 |   0.05 | FALSE   |               0.09 |
+| vdem\_v2x\_genpp\_imputed          |     969 |   0.13 | TRUE    |               0.00 |
+| vdem\_v2x\_genpp\_sd               |     971 |   0.04 | FALSE   |               0.41 |
 | vdem\_v2x\_horacc                  |     969 |   1.04 | FALSE   |               0.33 |
+| vdem\_v2x\_horacc\_d1              |     969 |   0.19 | FALSE   |               0.18 |
+| vdem\_v2x\_horacc\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_horacc\_sd              |     969 |   0.16 | FALSE   |               0.77 |
 | vdem\_v2x\_hosabort                |     969 |   0.06 | TRUE    |               0.00 |
+| vdem\_v2x\_hosabort\_d1            |     969 |   0.09 | TRUE    |               0.00 |
+| vdem\_v2x\_hosabort\_imputed       |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_hosabort\_sd            |     969 |   0.06 | FALSE   |               0.00 |
 | vdem\_v2x\_hosinter                |     969 |   0.10 | TRUE    |               0.00 |
+| vdem\_v2x\_hosinter\_d1            |     969 |   0.13 | TRUE    |               0.00 |
+| vdem\_v2x\_hosinter\_imputed       |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_hosinter\_sd            |     969 |   0.09 | FALSE   |               0.00 |
 | vdem\_v2x\_jucon                   |     969 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_jucon\_d1               |     969 |   0.05 | FALSE   |               0.09 |
+| vdem\_v2x\_jucon\_imputed          |     969 |   0.06 | TRUE    |               0.00 |
+| vdem\_v2x\_jucon\_sd               |     969 |   0.04 | FALSE   |               0.35 |
 | vdem\_v2x\_legabort                |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_legabort\_d1            |     969 |   0.07 | TRUE    |               0.00 |
+| vdem\_v2x\_legabort\_imputed       |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_legabort\_sd            |     969 |   0.05 | FALSE   |               0.00 |
 | vdem\_v2x\_libdem                  |     969 |   0.28 | FALSE   |               0.09 |
+| vdem\_v2x\_libdem\_d1              |     969 |   0.04 | FALSE   |               0.09 |
+| vdem\_v2x\_libdem\_imputed         |     969 |   0.08 | TRUE    |               0.00 |
+| vdem\_v2x\_libdem\_sd              |     969 |   0.03 | FALSE   |               0.59 |
 | vdem\_v2x\_liberal                 |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_liberal\_d1             |     969 |   0.05 | FALSE   |               0.10 |
+| vdem\_v2x\_liberal\_imputed        |     969 |   0.06 | TRUE    |               0.00 |
+| vdem\_v2x\_liberal\_sd             |     969 |   0.04 | FALSE   |               0.55 |
 | vdem\_v2x\_mpi                     |     969 |   0.31 | FALSE   |               0.08 |
+| vdem\_v2x\_mpi\_d1                 |     969 |   0.05 | FALSE   |               0.11 |
+| vdem\_v2x\_mpi\_imputed            |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_mpi\_sd                 |     969 |   0.04 | FALSE   |               0.51 |
 | vdem\_v2x\_neopat                  |     969 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_neopat\_d1              |     969 |   0.04 | FALSE   |               0.08 |
+| vdem\_v2x\_neopat\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_neopat\_sd              |     969 |   0.03 | FALSE   |               0.54 |
 | vdem\_v2x\_partip                  |     969 |   0.21 | FALSE   |               0.08 |
+| vdem\_v2x\_partip\_d1              |     969 |   0.03 | FALSE   |               0.08 |
+| vdem\_v2x\_partip\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_partip\_sd              |     969 |   0.03 | FALSE   |               0.48 |
 | vdem\_v2x\_partipdem               |     969 |   0.21 | FALSE   |               0.07 |
+| vdem\_v2x\_partipdem\_d1           |     969 |   0.03 | FALSE   |               0.08 |
+| vdem\_v2x\_partipdem\_imputed      |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_partipdem\_sd           |     969 |   0.02 | FALSE   |               0.57 |
 | vdem\_v2x\_polyarchy               |     969 |   0.29 | FALSE   |               0.09 |
+| vdem\_v2x\_polyarchy\_d1           |     969 |   0.04 | FALSE   |               0.10 |
+| vdem\_v2x\_polyarchy\_imputed      |     969 |   0.05 | TRUE    |               0.00 |
+| vdem\_v2x\_polyarchy\_sd           |     969 |   0.04 | FALSE   |               0.58 |
 | vdem\_v2x\_pubcorr                 |     969 |   0.30 | FALSE   |               0.08 |
+| vdem\_v2x\_pubcorr\_d1             |     969 |   0.04 | FALSE   |               0.08 |
+| vdem\_v2x\_pubcorr\_imputed        |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_pubcorr\_sd             |     969 |   0.04 | FALSE   |               0.25 |
 | vdem\_v2x\_rule                    |     969 |   0.31 | FALSE   |               0.09 |
+| vdem\_v2x\_rule\_d1                |     969 |   0.04 | FALSE   |               0.08 |
+| vdem\_v2x\_rule\_imputed           |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_rule\_sd                |     969 |   0.04 | FALSE   |               0.47 |
 | vdem\_v2x\_suffr                   |     969 |   0.19 | FALSE   |               0.00 |
+| vdem\_v2x\_suffr\_d1               |     969 |   0.05 | FALSE   |               0.00 |
+| vdem\_v2x\_suffr\_imputed          |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_suffr\_sd               |     969 |   0.05 | FALSE   |               0.01 |
 | vdem\_v2x\_veracc                  |     969 |   0.87 | FALSE   |               0.26 |
+| vdem\_v2x\_veracc\_d1              |     969 |   0.25 | FALSE   |               0.16 |
+| vdem\_v2x\_veracc\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
+| vdem\_v2x\_veracc\_sd              |     969 |   0.21 | FALSE   |               0.75 |
 | wdi\_infmort                       |    1094 |  50.02 | FALSE   |               0.21 |
 | wdi\_infmort\_imputed              |    1094 |   0.22 | TRUE    |               0.00 |
 | wdi\_infmort\_yearadj              |    1094 |   1.00 | FALSE   |               0.81 |
@@ -722,10 +860,10 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | vdem\_v2x\_corr                    |     969 |
 | vdem\_v2x\_execorr                 |     969 |
 | vdem\_v2x\_pubcorr                 |     969 |
-| vdem\_v2x\_gender                  |    1080 |
+| vdem\_v2x\_gender                  |     971 |
 | vdem\_v2x\_gencl                   |     969 |
 | vdem\_v2x\_gencs                   |     969 |
-| vdem\_v2x\_genpp                   |    1080 |
+| vdem\_v2x\_genpp                   |     971 |
 | vdem\_v2x\_rule                    |     969 |
 | vdem\_v2x\_elecreg                 |     969 |
 | vdem\_v2x\_EDcomp\_thick           |     969 |
@@ -733,8 +871,146 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | vdem\_v2x\_hosabort                |     969 |
 | vdem\_v2x\_hosinter                |     969 |
 | vdem\_v2x\_legabort                |     969 |
-| vdem\_v2x\_divparctrl              |    1007 |
-| vdem\_v2x\_feduni                  |     970 |
+| vdem\_v2x\_divparctrl              |     969 |
+| vdem\_v2x\_feduni                  |     969 |
+| vdem\_v2x\_polyarchy\_imputed      |     969 |
+| vdem\_v2x\_libdem\_imputed         |     969 |
+| vdem\_v2x\_partipdem\_imputed      |     969 |
+| vdem\_v2x\_delibdem\_imputed       |     969 |
+| vdem\_v2x\_egaldem\_imputed        |     969 |
+| vdem\_v2x\_api\_imputed            |     969 |
+| vdem\_v2x\_mpi\_imputed            |     969 |
+| vdem\_v2x\_freexp\_altinf\_imputed |     969 |
+| vdem\_v2x\_frassoc\_thick\_imputed |     969 |
+| vdem\_v2x\_suffr\_imputed          |     969 |
+| vdem\_v2x\_elecoff\_imputed        |     969 |
+| vdem\_v2x\_liberal\_imputed        |     969 |
+| vdem\_v2x\_jucon\_imputed          |     969 |
+| vdem\_v2x\_partip\_imputed         |     969 |
+| vdem\_v2x\_cspart\_imputed         |     969 |
+| vdem\_v2x\_egal\_imputed           |     969 |
+| vdem\_v2x\_accountability\_imputed |     969 |
+| vdem\_v2x\_veracc\_imputed         |     969 |
+| vdem\_v2x\_diagacc\_imputed        |     969 |
+| vdem\_v2x\_horacc\_imputed         |     969 |
+| vdem\_v2x\_ex\_confidence\_imputed |     969 |
+| vdem\_v2x\_ex\_direlect\_imputed   |     969 |
+| vdem\_v2x\_ex\_hereditary\_imputed |     969 |
+| vdem\_v2x\_ex\_military\_imputed   |     969 |
+| vdem\_v2x\_ex\_party\_imputed      |     969 |
+| vdem\_v2x\_neopat\_imputed         |     969 |
+| vdem\_v2x\_civlib\_imputed         |     969 |
+| vdem\_v2x\_clphy\_imputed          |     969 |
+| vdem\_v2x\_clpol\_imputed          |     969 |
+| vdem\_v2x\_clpriv\_imputed         |     969 |
+| vdem\_v2x\_corr\_imputed           |     969 |
+| vdem\_v2x\_execorr\_imputed        |     969 |
+| vdem\_v2x\_pubcorr\_imputed        |     969 |
+| vdem\_v2x\_gender\_imputed         |     969 |
+| vdem\_v2x\_gencl\_imputed          |     969 |
+| vdem\_v2x\_gencs\_imputed          |     969 |
+| vdem\_v2x\_genpp\_imputed          |     969 |
+| vdem\_v2x\_rule\_imputed           |     969 |
+| vdem\_v2x\_elecreg\_imputed        |     969 |
+| vdem\_v2x\_EDcomp\_thick\_imputed  |     969 |
+| vdem\_v2x\_freexp\_imputed         |     969 |
+| vdem\_v2x\_hosabort\_imputed       |     969 |
+| vdem\_v2x\_hosinter\_imputed       |     969 |
+| vdem\_v2x\_legabort\_imputed       |     969 |
+| vdem\_v2x\_divparctrl\_imputed     |     969 |
+| vdem\_v2x\_feduni\_imputed         |     969 |
+| vdem\_v2x\_polyarchy\_d1           |     969 |
+| vdem\_v2x\_libdem\_d1              |     969 |
+| vdem\_v2x\_partipdem\_d1           |     969 |
+| vdem\_v2x\_delibdem\_d1            |     969 |
+| vdem\_v2x\_egaldem\_d1             |     969 |
+| vdem\_v2x\_api\_d1                 |     969 |
+| vdem\_v2x\_mpi\_d1                 |     969 |
+| vdem\_v2x\_freexp\_altinf\_d1      |     969 |
+| vdem\_v2x\_frassoc\_thick\_d1      |     969 |
+| vdem\_v2x\_suffr\_d1               |     969 |
+| vdem\_v2x\_elecoff\_d1             |     969 |
+| vdem\_v2x\_liberal\_d1             |     969 |
+| vdem\_v2x\_jucon\_d1               |     969 |
+| vdem\_v2x\_partip\_d1              |     969 |
+| vdem\_v2x\_cspart\_d1              |     969 |
+| vdem\_v2x\_egal\_d1                |     969 |
+| vdem\_v2x\_accountability\_d1      |     969 |
+| vdem\_v2x\_veracc\_d1              |     969 |
+| vdem\_v2x\_diagacc\_d1             |     969 |
+| vdem\_v2x\_horacc\_d1              |     969 |
+| vdem\_v2x\_ex\_confidence\_d1      |     969 |
+| vdem\_v2x\_ex\_direlect\_d1        |     969 |
+| vdem\_v2x\_ex\_hereditary\_d1      |     969 |
+| vdem\_v2x\_ex\_military\_d1        |     969 |
+| vdem\_v2x\_ex\_party\_d1           |     969 |
+| vdem\_v2x\_neopat\_d1              |     969 |
+| vdem\_v2x\_civlib\_d1              |     969 |
+| vdem\_v2x\_clphy\_d1               |     969 |
+| vdem\_v2x\_clpol\_d1               |     969 |
+| vdem\_v2x\_clpriv\_d1              |     969 |
+| vdem\_v2x\_corr\_d1                |     969 |
+| vdem\_v2x\_execorr\_d1             |     969 |
+| vdem\_v2x\_pubcorr\_d1             |     969 |
+| vdem\_v2x\_gender\_d1              |     970 |
+| vdem\_v2x\_gencl\_d1               |     969 |
+| vdem\_v2x\_gencs\_d1               |     969 |
+| vdem\_v2x\_genpp\_d1               |     970 |
+| vdem\_v2x\_rule\_d1                |     969 |
+| vdem\_v2x\_elecreg\_d1             |     969 |
+| vdem\_v2x\_EDcomp\_thick\_d1       |     969 |
+| vdem\_v2x\_freexp\_d1              |     969 |
+| vdem\_v2x\_hosabort\_d1            |     969 |
+| vdem\_v2x\_hosinter\_d1            |     969 |
+| vdem\_v2x\_legabort\_d1            |     969 |
+| vdem\_v2x\_divparctrl\_d1          |     969 |
+| vdem\_v2x\_feduni\_d1              |     969 |
+| vdem\_v2x\_polyarchy\_sd           |     969 |
+| vdem\_v2x\_libdem\_sd              |     969 |
+| vdem\_v2x\_partipdem\_sd           |     969 |
+| vdem\_v2x\_delibdem\_sd            |     969 |
+| vdem\_v2x\_egaldem\_sd             |     969 |
+| vdem\_v2x\_api\_sd                 |     969 |
+| vdem\_v2x\_mpi\_sd                 |     969 |
+| vdem\_v2x\_freexp\_altinf\_sd      |     969 |
+| vdem\_v2x\_frassoc\_thick\_sd      |     969 |
+| vdem\_v2x\_suffr\_sd               |     969 |
+| vdem\_v2x\_elecoff\_sd             |     969 |
+| vdem\_v2x\_liberal\_sd             |     969 |
+| vdem\_v2x\_jucon\_sd               |     969 |
+| vdem\_v2x\_partip\_sd              |     969 |
+| vdem\_v2x\_cspart\_sd              |     969 |
+| vdem\_v2x\_egal\_sd                |     969 |
+| vdem\_v2x\_accountability\_sd      |     969 |
+| vdem\_v2x\_veracc\_sd              |     969 |
+| vdem\_v2x\_diagacc\_sd             |     969 |
+| vdem\_v2x\_horacc\_sd              |     969 |
+| vdem\_v2x\_ex\_confidence\_sd      |     969 |
+| vdem\_v2x\_ex\_direlect\_sd        |     969 |
+| vdem\_v2x\_ex\_hereditary\_sd      |     969 |
+| vdem\_v2x\_ex\_military\_sd        |     969 |
+| vdem\_v2x\_ex\_party\_sd           |     969 |
+| vdem\_v2x\_neopat\_sd              |     969 |
+| vdem\_v2x\_civlib\_sd              |     969 |
+| vdem\_v2x\_clphy\_sd               |     969 |
+| vdem\_v2x\_clpol\_sd               |     969 |
+| vdem\_v2x\_clpriv\_sd              |     969 |
+| vdem\_v2x\_corr\_sd                |     969 |
+| vdem\_v2x\_execorr\_sd             |     969 |
+| vdem\_v2x\_pubcorr\_sd             |     969 |
+| vdem\_v2x\_gender\_sd              |     971 |
+| vdem\_v2x\_gencl\_sd               |     969 |
+| vdem\_v2x\_gencs\_sd               |     969 |
+| vdem\_v2x\_genpp\_sd               |     971 |
+| vdem\_v2x\_rule\_sd                |     969 |
+| vdem\_v2x\_elecreg\_sd             |     969 |
+| vdem\_v2x\_EDcomp\_thick\_sd       |     969 |
+| vdem\_v2x\_freexp\_sd              |     969 |
+| vdem\_v2x\_hosabort\_sd            |     969 |
+| vdem\_v2x\_hosinter\_sd            |     969 |
+| vdem\_v2x\_legabort\_sd            |     969 |
+| vdem\_v2x\_divparctrl\_sd          |     969 |
+| vdem\_v2x\_feduni\_sd              |     969 |
 | wdi\_infmort                       |    1094 |
 | wdi\_infmort\_yearadj              |    1094 |
 | wdi\_infmort\_imputed              |    1094 |
@@ -777,13 +1053,13 @@ tbl %>%
 | Measure                  | Value       |
 | :----------------------- | :---------- |
 | N\_before\_drop          | 10297       |
-| N\_after\_drop           | 8852        |
+| N\_after\_drop           | 8991        |
 | Years                    | 1960 - 2019 |
-| Features                 | 116         |
-| Positive\_attempt\_lead1 | 324         |
-| Positive\_coup\_lead1    | 170         |
-| Positive\_failed\_lead1  | 171         |
-| N\_in\_forecast\_sets    | 1686        |
+| Features                 | 254         |
+| Positive\_attempt\_lead1 | 334         |
+| Positive\_coup\_lead1    | 179         |
+| Positive\_failed\_lead1  | 174         |
+| N\_in\_forecast\_sets    | 1687        |
 
 ``` r
 tbl %>%
@@ -977,7 +1253,7 @@ covered %>%
 |    812 | Laos                     | 2010 - 2019 |
 |    816 | Vietnam                  | 2010 - 2019 |
 |    820 | Malaysia                 | 2010 - 2019 |
-|    830 | Singapore                | 2010 - 2018 |
+|    830 | Singapore                | 2010 - 2019 |
 |    840 | Philippines              | 2010 - 2019 |
 |    850 | Indonesia                | 2010 - 2019 |
 |    860 | East Timor               | 2010 - 2019 |
@@ -1029,7 +1305,6 @@ not_covered %>%
 |    520 | Somalia               | 2010 - 2011 |
 |    591 | Seychelles            | 2010 - 2019 |
 |    713 | Taiwan                | 2010 - 2019 |
-|    830 | Singapore             | 2019        |
 |    835 | Brunei                | 2010 - 2019 |
 |    935 | Vanuatu               | 2010 - 2019 |
 |    970 | Kiribati              | 2010 - 2019 |

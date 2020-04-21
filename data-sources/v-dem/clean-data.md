@@ -8,11 +8,19 @@ V-Dem
   - [Add variable transformations](#add-variable-transformations)
   - [Done, save](#done-save)
 
-*Last updated on 20 April 2020*
+*Last updated on 21 April 2020*
 
 This script:
 
-  - 
+  - normalizes the V-Dem data to the G\&W statelist
+  - subsets the V-Dem core indices starting with “v2x\_” only
+  - imputes almost all missing values for countries with partial missing
+    data using a combination of linear imputation for gaps and
+    carry-back for leading sequences of NAs; countries that are entirely
+    missing are not imputed
+  - adds year to year diff ("\_d1“) and 5-year moving SD (”\_sd")
+    variable transformations
+
 ## Packages / functions
 
 ``` r
@@ -62,7 +70,83 @@ library(imputeTS)
 ``` r
 library(tidyr)
 library(ggplot2)
+
+# There are two patterns of missing values in the data here. One are short gaps,
+# for which it is more reasonable to use linear imputation. The other are long
+# series of missing values at the beginning of a series. Carry-back the first
+# observed value for those. 
+# 
+# I'm going to use imputesTS::na_interpolation(method = "linear") to impute
+# values. This uses stats::approx(rule = 2) under the hood, which almost does 
+# exactly what I need: 
+#   - for NA values that form gaps, i.e. are surrounded by non-missing values
+#     on both sides, linear interpolation is used
+#   - for NA values at the head or tail of a series, i.e. which only have a 
+#     non-missing value on one side, use that value.
+# I actually don't want to extrapolate missing values at the tail, e.g. if I 
+# have data through 2018 and need a value for 2019. The imputer() wrapper
+# below just makes sure I don't do that for ending NA values. 
+
+# The first two functions below implement a version of rle that treats 
+# consecutive NA values as equal. This is used to ID whether a sequence of 
+# missing values is a gap or whether it is at the head or tail of a series. 
+
+# Version of `==` for which NA==NA is TRUE and NA==1 is FALSE 
+na_equal <- function(x, y) {
+  stopifnot(is.vector(x),
+            is.vector(y),
+            length(x)==length(y))
+  z <- logical(length(x))
+  for (i in seq_along(x)) {
+    if (is.na(x[i]) & is.na(y[i])) z[i] <- TRUE; next
+    z[i] <- x[i]==y[i]
+  }
+  z
+}
+
+# Version of rle in which missing values are regarded as equal
+rle_na <- function (x) {
+  if (!is.vector(x) && !is.list(x)) 
+    stop("'x' must be a vector of an atomic type")
+  n <- length(x)
+  if (n == 0L) 
+    return(structure(list(lengths = integer(), values = x), 
+                     class = "rle"))
+  # the only change
+  #y <- x[-1L] != x[-n]
+  y <- !na_equal(x[-1L], x[-n])
+  i <- c(which(y | is.na(y)), n)
+  structure(list(lengths = diff(c(0L, i)), values = x[i]), 
+            class = "rle")
+}
+
+imputer <- function(x) {
+  
+  # escape na_interpolation error
+  if (sum(!is.na(x)) < 3) {
+    return(x)
+  }
+  
+  xrle <- rle_na(x)
+  xhat <- imputeTS::na_interpolation(x, option = "linear")
+  if (is.na(tail(xrle$values, 1))) {
+    tt <- tail(xrle$lengths, 1)
+    n  <- length(xhat)
+    xhat[(n - tt + 1):n] <- NA
+  }
+  xhat
+}
+
+
+# Check to make sure it's working; the final 2 NA values should still be NA
+x <- c(rep(NA, 10), 3, 3, NA, NA, 6, 6, 6, rep(NA, 2))
+xhat <- imputer(x)
+stopifnot(all(is.na(xhat[18:19])))
+plot(x, type = "l")
+points(xhat, col = "red")
 ```
+
+![](clean-data_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ## Clean raw data
 
@@ -332,14 +416,14 @@ sapply(v2x, function(x) sum(is.na(x))) %>%
 # 
 #   UPDATE: all of these will need manual rechecking during data updates
 #
+#   First, retain a copy of orig v2x so we can later mark imputed values
+#
 
-# Bahrain
-stopifnot(all(is.na(
-  filter(v2x, gwcode==692, year < 2002) %>%
-    select(v2x_libdem, v2x_liberal, v2x_jucon, v2x_corr) %>%
-    unlist()
-)))
+v2x_orig <- v2x %>%
+  select(-country_name) %>%
+  setNames(c("gwcode", "year", paste0("orig_", names(.)[3:ncol(.)])))
 
+# Bahrain is missing the early parts for several series
 filter(v2x, gwcode==692) %>%
   pivot_longer(-c(gwcode, year, country_name)) %>%
   # only keep variables with missing vals
@@ -358,9 +442,15 @@ filter(v2x, gwcode==692) %>%
     
     ## Warning: Removed 128 rows containing missing values (geom_path).
 
-![](clean-data_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](clean-data_files/figure-gfm/handle-missing-values-1.png)<!-- -->
 
 ``` r
+stopifnot(all(is.na(
+  filter(v2x, gwcode==692, year < 2002) %>%
+    select(v2x_libdem, v2x_liberal, v2x_jucon, v2x_corr) %>%
+    unlist()
+)))
+
 # carry back first observed value
 v2x[v2x$gwcode==692, ] <- v2x[v2x$gwcode==692, ] %>% 
   tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
@@ -372,32 +462,52 @@ v2x[v2x$gwcode==471 & v2x$year==1960, ] <- drop_in
 
 # Mozambique; missing several indices during civil war years; carry back first 
 # available value
-stopifnot(all(is.na(
-  filter(v2x, gwcode==541, year==1975) %>% select(v2x_polyarchy, v2x_libdem, v2x_partipdem,
-                                      v2x_delibdem, v2x_api) %>%
-    unlist()
-)))
-
-filter(v2x, gwcode==541) %>% 
+filter(v2x, gwcode==541) %>%
   pivot_longer(-c(gwcode, year, country_name)) %>%
   # only keep variables with missing vals
   group_by(name) %>%
   mutate(any_na = any(is.na(value))) %>%
   ungroup() %>%
   filter(any_na) %>%
-  ggplot(aes(x = year, y = value, color = name)) +
-  geom_line()
+  ggplot(aes(x = year, y = value, group = name)) +
+  geom_line(data = v2x %>% filter(gwcode==692) %>% 
+              select(-gwcode, -country_name) %>% pivot_longer(-year),
+  alpha = 0.2) +
+  geom_line(aes(color = name))
 ```
 
     ## Warning: Removed 152 rows containing missing values (geom_path).
 
-![](clean-data_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](clean-data_files/figure-gfm/handle-missing-values-2.png)<!-- -->
 
 ``` r
+stopifnot(all(is.na(
+  filter(v2x, gwcode==541, year==1975) %>% select(v2x_polyarchy, v2x_libdem, v2x_partipdem,
+                                      v2x_delibdem, v2x_api) %>%
+    unlist()
+)))
+
 v2x[v2x$gwcode==541, ] <- v2x[v2x$gwcode==541, ] %>% 
   tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
 
 # CAR; has a couple of gaps, so linear impute
+filter(v2x, gwcode==482) %>%
+  pivot_longer(-c(gwcode, year, country_name)) %>%
+  # only keep variables with missing vals
+  group_by(name) %>%
+  mutate(any_na = any(is.na(value))) %>%
+  ungroup() %>%
+  filter(any_na) %>%
+  ggplot(aes(x = year, y = value, group = name)) +
+  geom_line(data = v2x %>% filter(gwcode==692) %>% 
+              select(-gwcode, -country_name) %>% pivot_longer(-year),
+  alpha = 0.2) +
+  geom_line(aes(color = name))
+```
+
+![](clean-data_files/figure-gfm/handle-missing-values-3.png)<!-- -->
+
+``` r
 stopifnot(all(is.na(
   filter(v2x, gwcode==482, year %in% c(1964, 1965)) %>%
     select(v2x_libdem, v2x_liberal, v2x_gender, v2x_genpp) %>%
@@ -409,7 +519,7 @@ filter(v2x, gwcode==482) %>%
   plot(main = "CAR", type = "b")
 ```
 
-![](clean-data_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
+![](clean-data_files/figure-gfm/handle-missing-values-4.png)<!-- -->
 
 ``` r
 v2x$v2x_libdem[v2x$gwcode==482] <- na_interpolation(v2x$v2x_libdem[v2x$gwcode==482], "linear")
@@ -417,11 +527,7 @@ v2x$v2x_liberal[v2x$gwcode==482] <- na_interpolation(v2x$v2x_liberal[v2x$gwcode=
 v2x$v2x_gender[v2x$gwcode==482] <- na_interpolation(v2x$v2x_gender[v2x$gwcode==482], "linear")
 v2x$v2x_genpp[v2x$gwcode==482] <- na_interpolation(v2x$v2x_genpp[v2x$gwcode==482], "linear")
 
-# Saudi Arabia
-stopifnot(all(is.na(
-  filter(v2x, gwcode==670, year < 2000) %>% select(v2x_gender, v2x_genpp) %>% unlist()
-)))
-
+# Saudi Arabia is missing 2 gender vars for early part of series
 filter(v2x, gwcode==670) %>%
   pivot_longer(-c(gwcode, year, country_name)) %>%
   # only keep variables with missing vals
@@ -440,12 +546,119 @@ filter(v2x, gwcode==670) %>%
 
     ## Warning: Removed 88 rows containing missing values (geom_path).
 
-![](clean-data_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
+![](clean-data_files/figure-gfm/handle-missing-values-5.png)<!-- -->
 
 ``` r
+stopifnot(all(is.na(
+  filter(v2x, gwcode==670, year < 2000) %>% select(v2x_gender, v2x_genpp) %>% unlist()
+)))
+
 v2x[v2x$gwcode==670, ] <- v2x[v2x$gwcode==670, ] %>% 
   tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
 
+# Qatar is also missing a lot for 2 gender vars
+filter(v2x, gwcode==694) %>%
+  pivot_longer(-c(gwcode, year, country_name)) %>%
+  # only keep variables with missing vals
+  group_by(name) %>%
+  mutate(any_na = any(is.na(value))) %>%
+  ungroup() %>%
+  filter(any_na) %>%
+  ggplot(aes(x = year, y = value, group = name)) +
+  geom_line(data = v2x %>% filter(gwcode==694) %>% 
+              select(-gwcode, -country_name) %>% pivot_longer(-year),
+  alpha = 0.2) +
+  geom_line(aes(color = name))
+```
+
+    ## Warning: Removed 70 rows containing missing values (geom_path).
+
+    ## Warning: Removed 70 rows containing missing values (geom_path).
+
+![](clean-data_files/figure-gfm/handle-missing-values-6.png)<!-- -->
+
+``` r
+stopifnot(all(is.na(
+  filter(v2x, gwcode==694, year < 2002) %>%
+    select(v2x_gender, v2x_genpp) %>%
+    unlist()
+)))
+
+# carry back first observed value
+v2x[v2x$gwcode==694, ] <- v2x[v2x$gwcode==694, ] %>% 
+  tidyr::fill(-c(gwcode, year, country_name), .direction = "up")
+
+# Singapore is missing 2019 v2x_feduni (division of powers index) value
+# this will not get imputed below since it is at the tail of a series; all other
+# values are 0, so safe to use this again
+v2x %>% 
+  filter(gwcode==830) %>%
+  pull(v2x_feduni) %>% 
+  table()
+```
+
+    ## .
+    ##  0 
+    ## 54
+
+``` r
+stopifnot(is.na(v2x$v2x_feduni[v2x$gwcode==830 & v2x$year==2019]))
+v2x$v2x_feduni[v2x$gwcode==830 & v2x$year==2019] <- 0
+
+
+# 
+#   The remaining gaps are all N < 20; apply the same imputation logic to 
+#   all of them
+#   _______________________________
+#
+#   UPDATE: make sure in check below that there are no cells with > 20
+#
+
+check <- v2x %>% 
+  group_by(gwcode) %>% 
+  mutate(n = n(), year = NULL) %>% 
+  group_by(gwcode, n, country_name) %>% 
+  # for each column we will now have # of missing vals
+  summarize_all(~sum(is.na(.))) %>%
+  # only check ones with at least 1 missing value
+  filter_at(vars(starts_with("v2x")), any_vars(. > 0)) %>%
+  # select only vars that have missing vals
+  pivot_longer(-c(gwcode, n, country_name)) %>%
+  group_by(name) %>%
+  mutate(any_na = any(value > 0)) %>%
+  filter(any_na) %>%
+  select(-any_na) %>%
+  pivot_wider()
+check
+```
+
+    ## # A tibble: 18 x 6
+    ##    gwcode     n country_name        v2x_gender v2x_genpp v2x_divparctrl
+    ##     <dbl> <int> <chr>                    <int>     <int>          <int>
+    ##  1     51    58 Jamaica                      5         5              0
+    ##  2    110    54 Guyana                       2         2              0
+    ##  3    155    61 Chile                        0         0             16
+    ##  4    160    61 Argentina                    0         0             12
+    ##  5    165    61 Uruguay                      0         0             10
+    ##  6    347    12 Kosovo                       6         6              0
+    ##  7    367    29 Latvia                       2         2              0
+    ##  8    451    59 Sierra Leone                 7         7              0
+    ##  9    461    60 Togo                         1         1              0
+    ## 10    475    60 Nigeria                      9         9              0
+    ## 11    510    59 Tanzania                     4         4              0
+    ## 12    511     2 Zanzibar                     2         2              0
+    ## 13    698    61 Oman                        12        12              0
+    ## 14    770    61 Pakistan                     6         6              0
+    ## 15    781    55 Maldives                    14        14              0
+    ## 16    817    17 Republic of Vietnam          4         4              0
+    ## 17    860    18 Timor-Leste                  1         1              0
+    ## 18    950    50 Fiji                         2         2              0
+
+``` r
+v2x <- v2x %>%
+  group_by(gwcode) %>%
+  arrange(gwcode, year) %>%
+  mutate_at(vars(-c(gwcode, year, country_name)), imputer)
 
 # How many missing values are there for each variable?
 sapply(v2x, function(x) sum(is.na(x))) %>%
@@ -455,12 +668,115 @@ sapply(v2x, function(x) sum(is.na(x))) %>%
   knitr::kable()
 ```
 
-| variable        | missing |
-| :-------------- | ------: |
-| v2x\_gender     |     112 |
-| v2x\_genpp      |     112 |
-| v2x\_divparctrl |      38 |
-| v2x\_feduni     |       1 |
+| variable    | missing |
+| :---------- | ------: |
+| v2x\_gender |       2 |
+| v2x\_genpp  |       2 |
+
+``` r
+# Mark imputed values 
+# This is some helper code below to set up this big blog of text
+# cat(paste0(names(v2x), "_imputed = as.integer(!is.na(", names(v2x), ") &\n is.na(orig_", names(v2x), "))"), sep = ",\n")
+# 
+# There's probably a way to do this with mutate_at but I'm not going to mess 
+# around with quosures
+v2x <- left_join(v2x, v2x_orig, by = c("gwcode", "year")) %>%
+  mutate(
+    v2x_polyarchy_imputed = as.integer(!is.na(v2x_polyarchy) &
+                                         is.na(orig_v2x_polyarchy)),
+    v2x_libdem_imputed = as.integer(!is.na(v2x_libdem) &
+                                      is.na(orig_v2x_libdem)),
+    v2x_partipdem_imputed = as.integer(!is.na(v2x_partipdem) &
+                                         is.na(orig_v2x_partipdem)),
+    v2x_delibdem_imputed = as.integer(!is.na(v2x_delibdem) &
+                                        is.na(orig_v2x_delibdem)),
+    v2x_egaldem_imputed = as.integer(!is.na(v2x_egaldem) &
+                                       is.na(orig_v2x_egaldem)),
+    v2x_api_imputed = as.integer(!is.na(v2x_api) &
+                                   is.na(orig_v2x_api)),
+    v2x_mpi_imputed = as.integer(!is.na(v2x_mpi) &
+                                   is.na(orig_v2x_mpi)),
+    v2x_freexp_altinf_imputed = as.integer(!is.na(v2x_freexp_altinf) &
+                                             is.na(orig_v2x_freexp_altinf)),
+    v2x_frassoc_thick_imputed = as.integer(!is.na(v2x_frassoc_thick) &
+                                             is.na(orig_v2x_frassoc_thick)),
+    v2x_suffr_imputed = as.integer(!is.na(v2x_suffr) &
+                                     is.na(orig_v2x_suffr)),
+    v2x_elecoff_imputed = as.integer(!is.na(v2x_elecoff) &
+                                       is.na(orig_v2x_elecoff)),
+    v2x_liberal_imputed = as.integer(!is.na(v2x_liberal) &
+                                       is.na(orig_v2x_liberal)),
+    v2x_jucon_imputed = as.integer(!is.na(v2x_jucon) &
+                                     is.na(orig_v2x_jucon)),
+    v2x_partip_imputed = as.integer(!is.na(v2x_partip) &
+                                      is.na(orig_v2x_partip)),
+    v2x_cspart_imputed = as.integer(!is.na(v2x_cspart) &
+                                      is.na(orig_v2x_cspart)),
+    v2x_egal_imputed = as.integer(!is.na(v2x_egal) &
+                                    is.na(orig_v2x_egal)),
+    v2x_accountability_imputed = as.integer(!is.na(v2x_accountability) &
+                                              is.na(orig_v2x_accountability)),
+    v2x_veracc_imputed = as.integer(!is.na(v2x_veracc) &
+                                      is.na(orig_v2x_veracc)),
+    v2x_diagacc_imputed = as.integer(!is.na(v2x_diagacc) &
+                                       is.na(orig_v2x_diagacc)),
+    v2x_horacc_imputed = as.integer(!is.na(v2x_horacc) &
+                                      is.na(orig_v2x_horacc)),
+    v2x_ex_confidence_imputed = as.integer(!is.na(v2x_ex_confidence) &
+                                             is.na(orig_v2x_ex_confidence)),
+    v2x_ex_direlect_imputed = as.integer(!is.na(v2x_ex_direlect) &
+                                           is.na(orig_v2x_ex_direlect)),
+    v2x_ex_hereditary_imputed = as.integer(!is.na(v2x_ex_hereditary) &
+                                             is.na(orig_v2x_ex_hereditary)),
+    v2x_ex_military_imputed = as.integer(!is.na(v2x_ex_military) &
+                                           is.na(orig_v2x_ex_military)),
+    v2x_ex_party_imputed = as.integer(!is.na(v2x_ex_party) &
+                                        is.na(orig_v2x_ex_party)),
+    v2x_neopat_imputed = as.integer(!is.na(v2x_neopat) &
+                                      is.na(orig_v2x_neopat)),
+    v2x_civlib_imputed = as.integer(!is.na(v2x_civlib) &
+                                      is.na(orig_v2x_civlib)),
+    v2x_clphy_imputed = as.integer(!is.na(v2x_clphy) &
+                                     is.na(orig_v2x_clphy)),
+    v2x_clpol_imputed = as.integer(!is.na(v2x_clpol) &
+                                     is.na(orig_v2x_clpol)),
+    v2x_clpriv_imputed = as.integer(!is.na(v2x_clpriv) &
+                                      is.na(orig_v2x_clpriv)),
+    v2x_corr_imputed = as.integer(!is.na(v2x_corr) &
+                                    is.na(orig_v2x_corr)),
+    v2x_execorr_imputed = as.integer(!is.na(v2x_execorr) &
+                                       is.na(orig_v2x_execorr)),
+    v2x_pubcorr_imputed = as.integer(!is.na(v2x_pubcorr) &
+                                       is.na(orig_v2x_pubcorr)),
+    v2x_gender_imputed = as.integer(!is.na(v2x_gender) &
+                                      is.na(orig_v2x_gender)),
+    v2x_gencl_imputed = as.integer(!is.na(v2x_gencl) &
+                                     is.na(orig_v2x_gencl)),
+    v2x_gencs_imputed = as.integer(!is.na(v2x_gencs) &
+                                     is.na(orig_v2x_gencs)),
+    v2x_genpp_imputed = as.integer(!is.na(v2x_genpp) &
+                                     is.na(orig_v2x_genpp)),
+    v2x_rule_imputed = as.integer(!is.na(v2x_rule) &
+                                    is.na(orig_v2x_rule)),
+    v2x_elecreg_imputed = as.integer(!is.na(v2x_elecreg) &
+                                       is.na(orig_v2x_elecreg)),
+    v2x_EDcomp_thick_imputed = as.integer(!is.na(v2x_EDcomp_thick) &
+                                            is.na(orig_v2x_EDcomp_thick)),
+    v2x_freexp_imputed = as.integer(!is.na(v2x_freexp) &
+                                      is.na(orig_v2x_freexp)),
+    v2x_hosabort_imputed = as.integer(!is.na(v2x_hosabort) &
+                                        is.na(orig_v2x_hosabort)),
+    v2x_hosinter_imputed = as.integer(!is.na(v2x_hosinter) &
+                                        is.na(orig_v2x_hosinter)),
+    v2x_legabort_imputed = as.integer(!is.na(v2x_legabort) &
+                                        is.na(orig_v2x_legabort)),
+    v2x_divparctrl_imputed = as.integer(!is.na(v2x_divparctrl) &
+                                          is.na(orig_v2x_divparctrl)),
+    v2x_feduni_imputed = as.integer(!is.na(v2x_feduni) &
+                                      is.na(orig_v2x_feduni))
+  ) %>% 
+  select(-starts_with("orig_"))
+```
 
 ## Add variable transformations
 
@@ -472,17 +788,40 @@ sapply(v2x, function(x) sum(is.na(x))) %>%
 # first we need to identify country-spells, to make sure gaps don't accidentally
 # cross over into what are supposed to be year to year changes
 v2x = v2x %>%
-  group_by(country_name) %>%
+  group_by(gwcode) %>%
   arrange(year) %>%
   mutate(spell_id = id_date_sequence(year))
 
+# modified version of rolling SD with 0 values for first value in series 
+# instead of NA
+rolling_sd <- function(x) {
+  z <- zoo::rollapplyr(x, FUN = sd, width = 5, partial = TRUE)
+  if (!is.na(x[1])) z[1] <- 0
+  z
+}
+
 v2x_feats = v2x %>%
-  group_by(country_name) %>%
-  mutate_at(vars(starts_with("v2x_")), list(diff = ~c(0, diff(.))))
+  group_by(gwcode, spell_id) %>%
+  arrange(gwcode, spell_id, year) %>% 
+  mutate_at(vars(-c(gwcode, year, spell_id, country_name, ends_with("imputed"))), 
+            list(d1 = ~c(0, diff(.)), 
+                 sd = ~rolling_sd(.))
+            )
+
+
+
+v2x <- v2x_feats
 ```
 
 ## Done, save
 
 ``` r
+# Take out 1959, which we had to avoid initial first year missing values, e.g.
+# for the diff transformations above. 
+v2x <- v2x %>% 
+  ungroup() %>%
+  filter(year > 1959) %>%
+  select(-spell_id)
+
 write_csv(v2x, "output/v-dem.csv")
 ```
