@@ -22,6 +22,7 @@ library(readr)
 library(future)
 library(doFuture)
 library(tibble)
+library(yaml)
 
 lgr$info("Start study models")
 t0 <- proc.time()

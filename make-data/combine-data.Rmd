@@ -306,6 +306,7 @@ drop_idx <- !complete.cases(no_dv)
 tbl <- list(
   N_before_drop = nrow(states),
   N_after_drop  = sum(drop_idx==FALSE),
+  N_in_forecast_sets = nrow(states[!drop_idx & states$year %in% 2010:2019, ]),
   Years = format_years(states[!drop_idx, ][["year"]]),
   Features = as.integer(ncol(no_dv) - 2),
   Positive_attempt_lead1 = as.integer(
@@ -316,8 +317,7 @@ tbl <- list(
   ),
   Positive_failed_lead1 = as.integer(
     sum(states[!drop_idx, ][["pt_failed_lead1"]], na.rm = TRUE)
-  ),
-  N_in_forecast_sets = nrow(states[!drop_idx & states$year %in% 2010:2019, ])
+  )
 )
 
 tbl %>% 

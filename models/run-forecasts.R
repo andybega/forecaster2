@@ -21,6 +21,7 @@ library(future)
 library(doFuture)
 library(ranger)
 library(future.apply)
+library(yaml)
 
 lgr$info("Start forecast models")
 t0 <- proc.time()
