@@ -65,7 +65,7 @@ tune_resampling$param_set$values = list(repeats = CV_REPEATS, folds = CV_FOLDS)
 tune_measures   = msr("classif.auc")
 tune_ps = ParamSet$new(list(
   ParamInt$new("num.trees", lower = 500, upper = 2500),
-  ParamInt$new("mtry", lower = 1, upper = 25),
+  ParamInt$new("mtry", lower = 1, upper = 30),
   ParamInt$new("min.node.size", lower = 1, upper = 400)
 ))
 tune_terminator = term("evals", n_evals = TUNE_N)
