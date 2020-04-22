@@ -2,7 +2,7 @@
 #   Run a model on full data to study tuning results and variable importance
 #
 #   This script only runs one set of models using all available data, but,
-#   it runs a larger number of tuning samples. 
+#   it runs a larger number of tuning samples with more robust rCV. 
 #
 
 CV_FOLDS   = 16
@@ -65,7 +65,7 @@ tune_resampling$param_set$values = list(repeats = CV_REPEATS, folds = CV_FOLDS)
 tune_measures   = msr("classif.auc")
 tune_ps = ParamSet$new(list(
   ParamInt$new("num.trees", lower = 500, upper = 2500),
-  ParamInt$new("mtry", lower = 1, upper = 30),
+  ParamInt$new("mtry", lower = 1, upper = 40),
   ParamInt$new("min.node.size", lower = 1, upper = 400)
 ))
 tune_terminator = term("evals", n_evals = TUNE_N)
@@ -126,6 +126,29 @@ chunk_files <- dir("output/full-model", pattern = "variable\\-importance\\-[a-z]
 chunks <- lapply(chunk_files, readr::read_csv)
 imp <- bind_rows(chunks)
 write_csv(imp, "output/full-model/variable-importance.csv")
+
+# Track summary stats for the data this was run with; I had trouble keeping
+# track when I was concurrently running models and changing data
+tbl <- list(
+  date = Sys.Date(),
+  N = nrow(states),
+  N_in_forecast_sets = nrow(states[states$year %in% 2010:2019, ]),
+  Years = paste0(range(states[["year"]]), collapse = " - "),
+  Features = ncol(states) - 2 - sum(str_detect(names(states), "lead[0-9]")),
+  Positive_attempt_lead1 = as.integer(
+    sum(states[["pt_attempt_lead1"]]=="1", na.rm = TRUE)
+  ),
+  Positive_coup_lead1 = as.integer(
+    sum(states[["pt_coup_lead1"]]=="1", na.rm = TRUE)
+  ),
+  Positive_failed_lead1 = as.integer(
+    sum(states[["pt_failed_lead1"]]=="1", na.rm = TRUE)
+  )
+) 
+
+tbl %>%
+  yaml::as.yaml() %>%
+  writeLines("output/study-models-last-run.yml")
 
 lgr$info("Study models finished, total time: %ss", round((proc.time() - t0)["elapsed"]))
 
