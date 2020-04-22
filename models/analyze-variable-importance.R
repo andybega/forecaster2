@@ -16,10 +16,17 @@ var_imp <- var_imp %>%
   group_by(outcome) %>%
   mutate(value = value / max(value))
 
-var_imp %>% 
+top10 <- var_imp %>% 
   arrange(outcome, desc(value)) %>%
   group_by(outcome) %>% 
   slice(1:10)
+top10
+
+# Save a summary of the top vars for git
+top10 %>%
+  ungroup() %>%
+  arrange(desc(value)) %>%
+  write_csv("output/var-importance-top10.csv")
 
 var_imp %>%
   ggplot(aes(x = value, y = reorder(variable, value), color = outcome)) +
