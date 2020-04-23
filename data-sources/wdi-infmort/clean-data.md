@@ -15,7 +15,7 @@ WDI Infant mortality
   - [Add year-normalized version](#add-year-normalized-version)
   - [Done, save](#done-save)
 
-*Last updated on 11 April 2020*
+*Last updated on 23 April 2020*
 
 Note that places that require attention during data updates are marked
 with *UPDATE:*
@@ -27,7 +27,7 @@ library(WDI)
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ─────────────────────────────────────────────── tidyverse 1.2.1 ──
+    ## ── Attaching packages ──────────────────────────────────────────────── tidyverse 1.2.1 ──
 
     ## ✓ ggplot2 3.2.1     ✓ purrr   0.3.3
     ## ✓ tibble  3.0.0     ✓ dplyr   0.8.5
@@ -36,7 +36,7 @@ library(tidyverse)
 
     ## Warning: package 'tibble' was built under R version 3.6.2
 
-    ## ── Conflicts ────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ─────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -69,6 +69,12 @@ library(lubridate)
 ``` r
 library(stringr)
 
+# Convert a WDI data frame to G&W statelist
+# This will add a gwcode column. It also adds a row for Yugo/Serbia 2006,
+# which is why this cannot be a function that creates a G&W column in the 
+# existing data frame.
+# @param x a data frame genereated by WDI::WDI()
+# @returns a data frame like x, but with a gwcode column and extra row
 wdi_to_gw <- function(x, iso2c = "iso2c", country = "country", year = "year") {
   
   # In case the ID columns don't match the WDI default, create them here. 
