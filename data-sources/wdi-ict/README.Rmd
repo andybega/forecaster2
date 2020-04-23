@@ -1,0 +1,40 @@
+---
+title: "WDI: ICT"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Last updated on: `r Sys.Date()`*
+
+Cellphone and internet adoptions rates for all countries, 1960 on. 
+
+- The WDI indicators used for this are ... 
+- The data were changed to conform as much as possible to the Gleditsch & Ward state list. 
+- The data are lagged 1 year so that there are 2019 values
+- All missing values for series that were not completely missing for a country have been imputed. The strategy was:
+  + ...
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+df <- read.csv("output/wdi-ict.csv")
+
+glimpse(df)
+
+ggplot(df, aes(x = year, y = internet_users_pct, group = gwcode)) +
+  geom_line(alpha = 0.5) +
+  theme_light()
+
+# Scaled version that is adjusted for annual mean and sd
+ggplot(df, aes(x = year, y = cellphones_per100, group = gwcode)) +
+  geom_line(alpha = 0.5) +
+  theme_light()
+```
+
+## Data cleaning
+
+See [clean-data.md](clean-data.md) for results of the data cleaning script. 
