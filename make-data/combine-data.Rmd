@@ -174,10 +174,10 @@ vdem <- read_csv("input/v-dem.csv",
 states <- left_join(states, vdem)
 ```
 
-## Infant mortality
+## WDI Infant mortality
 
 ```{r}
-wdi <- read_csv("input/wdi-infmort.csv",
+wdi_infmort <- read_csv("input/wdi-infmort.csv",
                  col_types = cols(
                    .default = col_double(),
                    year = col_integer(),
@@ -186,7 +186,23 @@ wdi <- read_csv("input/wdi-infmort.csv",
   mutate(infmort_imputed = as.integer(infmort_imputed)) %>%
   setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
 
-states <- left_join(states, wdi)
+states <- left_join(states, wdi_infmort)
+```
+
+## WDI ICT
+
+```{r}
+wdi_ict <- read_csv("input/wdi-ict.csv",
+                 col_types = cols(
+                   .default = col_double(),
+                   year = col_integer(),
+                   cellphones_per100_imputed = col_logical(),
+                   internet_users_pct_imputed = col_logical()
+                 )) %>%
+  mutate_at(vars(ends_with("imputed")), as.integer) %>%
+  setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
+
+states <- left_join(states, wdi_ict)
 ```
 
 ## Oil prices

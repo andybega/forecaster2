@@ -20,6 +20,12 @@ file.copy(
 )
 
 file.copy(
+  from = "../data-sources/wdi-ict/output/wdi-ict.csv",
+  to = "input/wdi-ict.csv",
+  overwrite = TRUE
+)
+
+file.copy(
   from = "../data-sources/epr/output/epr.csv",
   to = "input/epr.csv",
   overwrite = TRUE

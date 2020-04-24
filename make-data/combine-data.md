@@ -9,7 +9,8 @@ Combine data into states.rds
   - [EPR](#epr)
   - [REIGN data](#reign-data)
   - [V-Dem](#v-dem)
-  - [Infant mortality](#infant-mortality)
+  - [WDI Infant mortality](#wdi-infant-mortality)
+  - [WDI ICT](#wdi-ict)
   - [Oil prices](#oil-prices)
   - [Summarize and write output](#summarize-and-write-output)
       - [Variables in data](#variables-in-data)
@@ -375,10 +376,10 @@ states <- left_join(states, vdem)
 
     ## Joining, by = c("gwcode", "year")
 
-## Infant mortality
+## WDI Infant mortality
 
 ``` r
-wdi <- read_csv("input/wdi-infmort.csv",
+wdi_infmort <- read_csv("input/wdi-infmort.csv",
                  col_types = cols(
                    .default = col_double(),
                    year = col_integer(),
@@ -387,7 +388,25 @@ wdi <- read_csv("input/wdi-infmort.csv",
   mutate(infmort_imputed = as.integer(infmort_imputed)) %>%
   setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
 
-states <- left_join(states, wdi)
+states <- left_join(states, wdi_infmort)
+```
+
+    ## Joining, by = c("gwcode", "year")
+
+## WDI ICT
+
+``` r
+wdi_ict <- read_csv("input/wdi-ict.csv",
+                 col_types = cols(
+                   .default = col_double(),
+                   year = col_integer(),
+                   cellphones_per100_imputed = col_logical(),
+                   internet_users_pct_imputed = col_logical()
+                 )) %>%
+  mutate_at(vars(ends_with("imputed")), as.integer) %>%
+  setNames(c("gwcode", "year", paste0("wdi_", names(.)[3:ncol(.)])))
+
+states <- left_join(states, wdi_ict)
 ```
 
     ## Joining, by = c("gwcode", "year")
@@ -753,9 +772,13 @@ knitr::kable(var_summary, digits = 2)
 | vdem\_v2x\_veracc\_d1              |     969 |   0.25 | FALSE   |               0.16 |
 | vdem\_v2x\_veracc\_imputed         |     969 |   0.01 | TRUE    |               0.00 |
 | vdem\_v2x\_veracc\_sd              |     969 |   0.21 | FALSE   |               0.75 |
+| wdi\_cellphones\_per100            |     976 |  44.31 | FALSE   |               0.45 |
+| wdi\_cellphones\_per100\_imputed   |     976 |   0.40 | TRUE    |               0.00 |
 | wdi\_infmort                       |    1094 |  50.02 | FALSE   |               0.21 |
 | wdi\_infmort\_imputed              |    1094 |   0.22 | TRUE    |               0.00 |
 | wdi\_infmort\_yearadj              |    1094 |   1.00 | FALSE   |               0.81 |
+| wdi\_internet\_users\_pct          |     976 |  22.73 | FALSE   |               0.36 |
+| wdi\_internet\_users\_pct\_imputed |     976 |   0.50 | TRUE    |               0.00 |
 | year                               |       0 |  16.84 | TRUE    |               0.01 |
 | years\_since\_last\_pt\_attempt    |       0 |  54.78 | TRUE    |               0.02 |
 | years\_since\_last\_pt\_coup       |       0 |  56.82 | TRUE    |               0.02 |
@@ -1014,6 +1037,10 @@ sapply(states, function(x) sum(is.na(x))) %>%
 | wdi\_infmort                       |    1094 |
 | wdi\_infmort\_yearadj              |    1094 |
 | wdi\_infmort\_imputed              |    1094 |
+| wdi\_cellphones\_per100            |     976 |
+| wdi\_internet\_users\_pct          |     976 |
+| wdi\_cellphones\_per100\_imputed   |     976 |
+| wdi\_internet\_users\_pct\_imputed |     976 |
 
 ### Track overall cases and missing cases
 
@@ -1030,6 +1057,7 @@ drop_idx <- !complete.cases(no_dv)
 tbl <- list(
   N_before_drop = nrow(states),
   N_after_drop  = sum(drop_idx==FALSE),
+  N_in_forecast_sets = nrow(states[!drop_idx & states$year %in% 2010:2019, ]),
   Years = format_years(states[!drop_idx, ][["year"]]),
   Features = as.integer(ncol(no_dv) - 2),
   Positive_attempt_lead1 = as.integer(
@@ -1040,8 +1068,7 @@ tbl <- list(
   ),
   Positive_failed_lead1 = as.integer(
     sum(states[!drop_idx, ][["pt_failed_lead1"]], na.rm = TRUE)
-  ),
-  N_in_forecast_sets = nrow(states[!drop_idx & states$year %in% 2010:2019, ])
+  )
 )
 
 tbl %>% 
@@ -1054,12 +1081,12 @@ tbl %>%
 | :----------------------- | :---------- |
 | N\_before\_drop          | 10297       |
 | N\_after\_drop           | 8991        |
+| N\_in\_forecast\_sets    | 1687        |
 | Years                    | 1960 - 2019 |
-| Features                 | 254         |
+| Features                 | 258         |
 | Positive\_attempt\_lead1 | 334         |
 | Positive\_coup\_lead1    | 179         |
 | Positive\_failed\_lead1  | 174         |
-| N\_in\_forecast\_sets    | 1687        |
 
 ``` r
 tbl %>%
