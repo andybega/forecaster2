@@ -14,15 +14,17 @@ Ingest WDI ICT (Internet and mobile use)
       - [Impute missing final year
         values](#impute-missing-final-year-values)
       - [Impute problem cases](#impute-problem-cases)
-      - [Impute internet users](#impute-internet-users)
-  - [Imputation](#imputation)
-      - [Impute internet users](#impute-internet-users-1)
-  - [PICK UP HERE AGAIN](#pick-up-here-again)
-      - [Spot check imputed series](#spot-check-imputed-series)
       - [Mark imputed values](#mark-imputed-values)
+      - [Spot check imputed series](#spot-check-imputed-series)
   - [Done, save](#done-save)
 
-*Last updated on 23 April 2020*
+*Last updated on 24 April 2020*
+
+UPDATE: there is a LOT of boutique imputation going on here. This might
+take a while to update. The last time in 2020 took 12 hours. However,
+this includes extra work by switching from the previous approach relying
+more heavily on logistic growth models to more case-specific
+imputations.
 
 ## Packages / functions
 
@@ -174,7 +176,101 @@ wdi_to_gw <- function(x, iso2c = "iso2c", country = "country", year = "year") {
   
   x
 }
+
+#
+#   Imputation-related functions
+#   ____________________________
+#
+#   The imputation functions below are for parametric, curve-fitting growth
+#   models. This .Rmd file has more custom ad-hoc imputation functions 
+#   throughout.
+#
+#   I put these here at the top because the 2019 version of this script relied
+#   heavily on logistic growth curve imputation, and because these imputation
+#   functions are actually principled and maybe will be useful in the future
+#   somewhere else (thus making it nice if they are easier to find...).
+#
+#   One side note (from 2020): I initially thought that for internet users
+#   in percent it would make sense to run versions of these models that use
+#   100 as Asym (the asymptote). That turned out to not work very well in that 
+#   it produced a lot of estimation problems. Looking at series like that for 
+#   the US for example, it also seems that this is not a valid assumption, and
+#   that internet usage may plateau below 100%. 
+#
+
+growth_logistic <- function(x, year) {
+  df <- tibble(x = x,
+               # normalize year so that 1960 is 1; this helps with estimation
+               time = year - 1959)
+  fit <- tryCatch({
+    nls(x ~ SSlogis(time, Asym, xmid, scal), data = df)
+  }, error = function(e) {
+    NULL
+  })
+  fit
+}
+
+growth_gompertz <- function(x, year) {
+  df <- tibble(x = x,
+               # normalize year so that 1960 is 1; this helps with estimation
+               time = year - 1959)
+  # gompertz doesn't work with 0 values
+  df <- df[df$x > 0, ]
+  fit <- tryCatch({
+    nls(x ~ SSgompertz(time, Asym, b2, b3), data = df)
+  }, error = function(e) {
+    NULL
+  })
+  fit
+}
+
+# The functions below calculate MSE cost for each model.
+# Importantly, because Gompertz does not work on 0 values in x, 
+# the cost for both Gompertz and Logistic is only for the subset of x that 
+# works with both models.
+
+cost_gompertz <- function(x, year) {
+  fit <- growth_gompertz(x, year)
+  if (is.null(fit)) return(NA_real_)
+  # calculate MSE
+  mean(residuals(fit)^2)
+}
+
+cost_logistic <- function(x, year) {
+  fit <- growth_logistic(x, year)
+  if (is.null(fit)) return(NA_real_)
+  # Gompertz does not work with 0 values, so only consider cost for > 0 x values
+  resid <- residuals(fit)[which(x[!is.na(x)] > 0)]
+  mean(resid^2)
+}
+
+impute_growth_logistic <- function(x, year) {
+  fit  <- growth_logistic(x, year)
+  xhat <- x
+  if (is.null(fit)) return(xhat)
+  xhat <- predict(fit, newdata = list(time = year - 1959))
+  as.vector(xhat)
+}
+
+impute_growth_gompertz <- function(x, year) {
+  fit  <- growth_gompertz(x, year)
+  xhat <- x
+  if (is.null(fit)) return(xhat)
+  xhat <- predict(fit, newdata = list(time = year - 1959))
+  as.vector(xhat)
+}
+
+# example, using internet users in South Sudan (unlagged year)
+x <- c(NA, NA, NA, 3.829969245, 4.51615373, 5.5, 6.6797280510287, 
+7.97742890716027, NA, NA, NA)
+year <- 2010:2020
+xhat <- impute_growth_logistic(x, year)
+plot(year, x, xlab = "", ylab = "Internet users, %", ylim = c(0, max(xhat)*1.1),
+     main = "Imputed internet users in South Sudan (red line)")
+lines(year, xhat, col = "red")
 ```
+
+![](clean-data_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ## Explore possible indicators
 
@@ -830,7 +926,7 @@ wdi <- wdi %>%
 serbia2006 <- wdi$gwcode==340 & wdi$year==2006
 yugo2006   <- wdi$gwcode==345 & wdi$year==2006
 wdi$cellphones_per100[serbia2006] <- wdi$cellphones_per100[yugo2006]
-wdi$internet_users_pct[serbia2006] <- wdi$cellphones_per100[yugo2006]
+wdi$internet_users_pct[serbia2006] <- wdi$internet_users_pct[yugo2006]
 
 inet_gaps <- wdi %>%
   group_by(gwcode) %>% 
@@ -863,185 +959,341 @@ wdi %>%
 
     ## Warning: Removed 34 rows containing missing values (geom_path).
 
-![](clean-data_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+<img src="clean-data_files/figure-gfm/unnamed-chunk-8-1.png" height="8" />
+
+#### Linear impute gaps with \< 9 NAs and values on either side
 
 ``` r
-# Serbia has leading missing values 
+# Many of these are gaps with complete series on either side and length >1 but 
+# less than 5 or so. Linear impute these.
+linear_impute_countries <- all_gaps %>% 
+  filter(!is.na(yleft), !is.na(yright), n < 10) 
+
+linear_impute <- function(x) {
+  n <- length(x)
+  indx <- (1:n)[!is.na(x)]
+  xhat <- stats::approx(indx, x[indx], 1:n, rule = 1)$y
+  xhat
+}
+
+# test it out with 232
+x <- wdi$internet_users_pct[wdi$gwcode==232]
+x[c(1:2, length(x))] <- NA  # this should not be imputed
+xhat <- linear_impute(x)
+stopifnot(all(is.na(x[c(1:2, length(x))])))
+plot(x, xlab = "", ylab = "")
+lines(xhat, col = "red")
 ```
 
-Pull out check gaps. What are the left and right values? If they are 0
-and 0-1, then linear impute.
-
-If there are any gaps that end with a value \< 1, set those to 0. No
-need to bother about that level of accuracy.
-
-Since internet users is expressed in terms of percent, it has a natural
-asymptote at 100. Cell phones per 100 does not have an asymptote. The
-maximum value is over 200.
+![](clean-data_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-growth_logistic <- function(x, year) {
-  df <- tibble(x = x,
-               # normalize year so that 1960 is 1; this helps with estimation
-               time = year - 1959)
-  fit <- tryCatch({
-    nls(x ~ SSlogis(time, Asym, xmid, scal), data = df)
-  }, error = function(e) {
-    NULL
-  })
-  fit
-}
-
-growth_gompertz <- function(x, year) {
-  df <- tibble(x = x,
-               # normalize year so that 1960 is 1; this helps with estimation
-               time = year - 1959)
-  # gompertz doesn't work with 0 values
-  df <- df[df$x > 0, ]
-  fit <- tryCatch({
-    nls(x ~ SSgompertz(time, Asym, b2, b3), data = df)
-  }, error = function(e) {
-    NULL
-  })
-  fit
-}
-
-# The functions below calculate MSE cost for each model.
-# Importantly, because Gompertz does not work on 0 values in x, 
-# the cost for both Gompertz and Logistic is only for the subset of x that 
-# works with both models.
-
-cost.growth_gompertz <- function(x, year, fit) {
-  df <- tibble(x = x, year = year)
-  if (is.null(fit)) return(NA_real_)
-  # calculate MSE
-  mean(residuals(fit)^2)
-}
-
-cost.growth_logistic <- function(x, year, fit) {
-  df <- tibble(x = x, year = year)
-  if (is.null(fit)) return(NA_real_)
-  # Gompertz does not work with 0 values, so only consider cost for > 0 x values
-  resid <- residuals(fit)[which(x[!is.na(x)] > 0)]  # %in% cheat so NA is FALSE
-  mean(resid^2)
-}
-
-# Example of how this works
-x <- wdi$cellphones_per100[wdi$gwcode==200]
-years <- wdi$year[wdi$gwcode==200]
-
-fit_logistic <- growth_logistic(x, years)
-fit_gompertz <- growth_gompertz(x, years)
-
-plot(years, predict(fit_logistic), type = "l", col = "blue",
-     main = "UK")
-lines(years[x > 0], predict(fit_gompertz), col = "red")
-points(years, x)
-text(1970, 110, label = "Cost (MSE)", adj = 0)
-text(1970, 100, adj = 0, col = "blue",
-     label = sprintf("Logistic: %.1f", cost_growth_logistic(x, years, fit_logistic)))
-text(1970, 90, adj = 0, col = "red",
-     label = sprintf("Gompertz: %.1f", cost_growth_gompertz(x, years, fit_gompertz)))
-
-x <- wdi$cellphones_per100[wdi$gwcode==2]
-years <- wdi$year[wdi$gwcode==2]
-
-fit_logistic <- growth_logistic(x, years)
-fit_gompertz <- growth_gompertz(x, years)
-
-plot(years[!is.na(x)], predict(fit_logistic), type = "l", col = "blue",
-     main = "USA", ylim = c(0, 130))
-lines(years[which(x > 0)], predict(fit_gompertz), col = "red")
-points(years, x)
-text(1970, 110, label = "Cost (MSE)", adj = 0)
-text(1970, 100, adj = 0, col = "blue",
-     label = sprintf("Logistic: %.1f", cost_growth_logistic(x, years)))
-text(1970, 90, adj = 0, col = "red",
-     label = sprintf("Gompertz: %.1f", cost_growth_gompertz(x, years)))
-```
-
-### Impute internet users
-
-You’d think that I could just set the asymptote to 100 since internet
-users is expressed as percent. But…this does not work very well. The
-Gompertz version fails to estimate most of the time.
-
-``` r
-# Apply this to all series
-models <- wdi %>%
+# Apply the linear imputation
+wdi <- wdi %>%
   group_by(gwcode) %>%
-  nest() %>%
-  ungroup() %>%
-  slice(1:20) %>%
-  mutate(
-    ending_cellphones_per100 = map_dbl(data, function(x) tail(x$cellphones_per100, 1)),
-    ending_internet_users_pct = map_dbl(data, function(x) tail(x$internet_users_pct, 1)),
-    cell_fit_logistic = purrr::map(data, function(x) {
-      growth_logistic(x$cellphones_per100, x$year)
-    }),
-    
-    cell_fit_gompertz = purrr::map(data, function(x) {
-      growth_gompertz(x$cellphones_per100, x$year)
-    }),
-    inet_fit_logistic = purrr::map(data, function(x) {
-      growth_logistic(x$internet_users_pct, x$year)
-    }),
-    inet_fit_gompertz = purrr::map(data, function(x) {
-      growth_gompertz(x$internet_users_pct, x$year)
-    })
-  )
-
-cost <- models %>%
-  mutate(
-    cell_cost_logistic = purrr::map2_dbl(data, cell_fit_logistic, function(df, fit) {
-      cost.growth_logistic(df$cellphones_per100, df$year, fit)
-    }),
-    cell_cost_gompertz = purrr::map2_dbl(data, cell_fit_gompertz, function(df, fit) {
-      cost.growth_gompertz(df$cellphones_per100, df$year, fit)
-    }),
-    inet_cost_logistic = purrr::map2_dbl(data, inet_fit_logistic, function(df, fit) {
-      cost.growth_logistic(df$internet_users_pct, df$year, fit)
-    }),
-    inet_cost_gompertz = purrr::map2_dbl(data, inet_fit_gompertz, function(df, fit) {
-      cost.growth_gompertz(df$internet_users_pct, df$year, fit)
-    })
-  ) %>%
-  select(gwcode, contains("cost"))
+  arrange(gwcode, year)
+for (i in 1:nrow(linear_impute_countries)) {
+  gwc <- linear_impute_countries$gwcode[i]
+  var <- linear_impute_countries$variable[i]
+  
+  # subscript with `[[` so we get a vector, not a 1-column tibble
+  wdi[wdi$gwcode==gwc, ][[var]] <- linear_impute(wdi[wdi$gwcode==gwc, ][[var]])
+}
 ```
 
-## Imputation
+#### Country-specific imputations
 
-### Impute internet users
-
-1.  Set values before 1990 to 0.
-2.  If the first non-zero value is 0.2 or below, set all preceding
-    values to 0.
-3.  Attempt to fit a logistic growth curve model and use it to impute
-    missing values; default starts with midpoint 2020 and scale 4.
-
-This is sufficient to fill in all missing values, but probably is not a
-good solution for completely missing countries, like Kosovo.
-
-Serbia has enough non-missing values to make a reasonable guess; Kosovo
-is missing completely. A better solution to explore would be to track
-estimated midpoints and scale for other countries where the initial
-value model and impute model work out of the box without the fallback
-init value, and use a predictive model to estimate them.
+UPDATE: next are all country-specific imputations. This might all need
+manual checking.
 
 ``` r
-filter(wdi2, iso2c=="SR") %>% { plot(.$year, .$IT.NET.USER.ZS_imputed_values, main = "Serbia", ylim = c(0, 100), ylab = "y", xlab = "") }
-filter(wdi2, iso2c=="XK") %>% { plot(.$year, .$IT.NET.USER.ZS_imputed_values, main = "Kosovo", ylim = c(0, 100), ylab = "y", xlab = "") }
+# East Timor cellphones; missing first 2 values for 2002-2003
+x <- wdi$cellphones_per100[wdi$gwcode==860]
+stopifnot(sum(is.na(x))==2)
+# the growth factor year on year for 2004 and 2005 was ~1.25; project that back
+x[2] <- x[3]/1.25
+x[1] <- x[2]/1.25
+wdi$cellphones_per100[wdi$gwcode==860] <- x
+
+# Internet users in North Korea; it's 0 until 2012 (unlagged) and NA after that
+# this place, https://www.internetworldstats.com/asia/kp.htm, sourced from 
+# a UN office, claims 14,000 for 2016 and 2017. That's ~0.056 percent. So, keep
+# it at 0.
+x <- wdi$internet_users_pct[wdi$gwcode==731]
+x[is.na(x)] <- 0
+wdi$internet_users_pct[wdi$gwcode==731] <- x
+
+# South Sudan, internet users
+# Try logistic growth model
+x <- wdi$internet_users_pct[wdi$gwcode==626]
+year <- wdi$year[wdi$gwcode==626]
+xhat <- impute_growth_logistic(x, year)
+plot(year, x, xlab = "", ylab = "%", main = "Internet users, South Sudan",
+     ylim = c(0, max(xhat)*1.1))
+lines(year, xhat, col = "red")
 ```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-1.png)<!-- -->
 
 ``` r
-wdi <- wdi2 %>%
-  dplyr::mutate(IT.NET.USER.ZS = IT.NET.USER.ZS_imputed_values,
-                IT.NET.USER.ZS_imputed_values = NULL) 
+# looks good
+wdi$internet_users_pct[wdi$gwcode==626] <- xhat
+
+# 
+#   Cell phone and internet users in Yugoslavia
+#   ______________
+#
+#   This one is special because we have post-2006 series for Serbia and Montenegro
+#
+vars <- c("gwcode", "year", "cellphones_per100", "internet_users_pct")
+yu <- wdi[wdi$gwcode==345, vars]
+rs <- wdi[wdi$gwcode==340, vars]
+me <- wdi[wdi$gwcode==341, vars]
+
+all <- bind_rows(yu, rs, me) %>% pivot_longer(-c(gwcode, year))
+all %>% ggplot(aes(x = year, y = value, color = factor(gwcode))) + 
+  facet_wrap(~ name, ncol = 1, scales = "free_y") + geom_line()
 ```
 
-## PICK UP HERE AGAIN
+![](clean-data_files/figure-gfm/country-specific-imputations-2.png)<!-- -->
 
-### Spot check imputed series
+``` r
+# Ok. Since Serbia has ~10 times the population of Montenegro, I'm goning to 
+# use Serbia's cellphones series as a target; internet are both similar. 
+# 
+#   Start with internet 
+#   ___________
+#
+year <- c(yu$year, rs$year[rs$year > max(yu$year)])
+# Make sure 2006 is not double
+stopifnot(sum(year==2006)==1)
+
+x <- c(yu$internet_users_pct, rs$internet_users_pct[rs$year > max(yu$year)])
+
+cost_logistic(x, year)
+```
+
+    ## [1] 4.014495
+
+``` r
+cost_gompertz(x, year)
+```
+
+    ## [1] 3.651581
+
+``` r
+# Looks like Gompertz has better fit; what do they look like visually?
+
+x_log <- impute_growth_logistic(x, year)
+x_gom <- impute_growth_gompertz(x, year)
+
+plot(year, x, xlab = "", ylab = "%", main = "Internet in Yugoslavia, red = logistic, blue = gompertz")
+lines(year, x_log, col = "red")
+lines(year, x_gom, col = "blue")
+```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-3.png)<!-- -->
+
+``` r
+# Ok, let's do Gompertz. It seems to fit better with the 0's for 1989 and before.
+x <- wdi$internet_users_pct[wdi$gwcode==345]
+x[is.na(x)] <- x_gom[1:length(x)][is.na(x)]
+wdi$internet_users_pct[wdi$gwcode==345] <- x
+
+#
+#   Cellphones
+#   _________
+
+x <- c(yu$cellphones_per100, rs$cellphones_per100[rs$year > max(yu$year)])
+
+cost_logistic(x, year)
+```
+
+    ## [1] 36.03937
+
+``` r
+cost_gompertz(x, year)
+```
+
+    ## [1] NA
+
+``` r
+# Logistic it is (Gompertz doesn't estimate)
+
+xhat <- impute_growth_logistic(x, year)
+
+plot(year, x, xlab = "", ylab = "%", main = "Cell phones in Yugoslavia, red = logistic")
+lines(year, xhat, col = "red")
+```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-4.png)<!-- -->
+
+``` r
+# Replace NA values
+x <- wdi$cellphones_per100[wdi$gwcode==345]
+x[is.na(x)] <- xhat[1:length(x)][is.na(x)]
+wdi$cellphones_per100[wdi$gwcode==345] <- x
+
+#
+#   Cell phone and internet users in Kosovo
+#   ______________________________________
+# 
+#   This is tricky because there very few data points. I'm going to guess 
+#   some logistic growth based on values from Serbia and Albania. In 1999
+#   there was also conflict, so I'm going to use reference values for those
+#   years too.
+#
+
+# Internet usage
+x <- wdi$internet_users_pct[wdi$gwcode==347]
+year <- wdi$year[wdi$gwcode==347]
+
+# Starting values for 1999 and 2008 (unlagged) in Serbia and Albania
+wdi$internet_users_pct[wdi$gwcode==345 & wdi$year==(1999 + LAG)]
+```
+
+    ## [1] 11.54035
+
+``` r
+wdi$internet_users_pct[wdi$gwcode==340 & wdi$year==(2008 + LAG)]
+```
+
+    ## [1] 35.6
+
+``` r
+wdi$internet_users_pct[wdi$gwcode==339 & wdi$year %in% (c(1999, 2008)+LAG)]
+```
+
+    ## [1]  0.08143704 23.86000000
+
+``` r
+#             1999    2008
+# Serbia/YU   11.5    35.6
+# Albania      0.1    23.9
+#
+# Extend the series so we can drop some reference values in
+# adjust this if LAG changes
+stopifnot(LAG==1)
+year <- 1999:2018+LAG
+x <- c(rep(NA, length(year) - length(x)), x)
+# There are some news articles suggesting a boom in ICT in Kosovo after 1999
+# So low-ball the 1999 and high-ball 2008 value
+x[year==(1999+LAG)] <- 1  
+x[year==(2008+LAG)] <- 35 
+
+# The estimated asymptote is ~90, this is reasonable. 
+growth_logistic(x, year)
+```
+
+    ## Nonlinear regression model
+    ##   model: x ~ SSlogis(time, Asym, xmid, scal)
+    ##    data: df
+    ##   Asym   xmid   scal 
+    ## 91.580 51.382  2.802 
+    ##  residual sum-of-squares: 9.218
+    ## 
+    ## Number of iterations to convergence: 0 
+    ## Achieved convergence tolerance: 9.006e-06
+
+``` r
+xhat <- impute_growth_logistic(x, year)
+plot(year, x, main = "Kosovo internet usage", ylab = "%", xlab = "")
+lines(year, xhat, col = "red")
+```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-5.png)<!-- -->
+
+``` r
+orig_year <- wdi$year[wdi$gwcode==347]
+wdi$internet_users_pct[wdi$gwcode==347] <- xhat[year %in% orig_year]
+
+# Cell phones
+x <- wdi$cellphones_per100[wdi$gwcode==347]
+year <- wdi$year[wdi$gwcode==347]
+
+# Starting values for 1999 and 2018 (unlagged) in Serbia and Albania
+wdi$cellphones_per100[wdi$gwcode==345 & wdi$year==(1999 + LAG)]
+```
+
+    ## [1] 1.707074
+
+``` r
+wdi$cellphones_per100[wdi$gwcode==340 & wdi$year==(2018 + LAG)]
+```
+
+    ## [1] 95.78099
+
+``` r
+wdi$cellphones_per100[wdi$gwcode==339 & wdi$year %in% (c(1999, 2018)+LAG)]
+```
+
+    ## [1]  0.3525158 94.1769983
+
+``` r
+#             1999    2018
+# Serbia/YU    1.7    95.8
+# Albania      0.4    94.2
+#
+# Extend the series so we can drop some reference values in
+# adjust this if LAG changes
+stopifnot(LAG==1)
+year <- 1999:2018+LAG
+x <- c(rep(NA, length(year) - length(x)), x)
+# There are some news articles suggesting a boom in ICT in Kosovo after 1999
+# So low-ball the 1999 and high-ball 2008 value
+x[year==(1999+LAG)] <- 1  
+x[year==(2018+LAG)] <- 95
+
+# The estimated asymptote is ~90, this is reasonable. 
+growth_logistic(x, year)
+```
+
+    ## Nonlinear regression model
+    ##   model: x ~ SSlogis(time, Asym, xmid, scal)
+    ##    data: df
+    ##    Asym    xmid    scal 
+    ## 200.844  60.687   6.002 
+    ##  residual sum-of-squares: 139.3
+    ## 
+    ## Number of iterations to convergence: 3 
+    ## Achieved convergence tolerance: 6.567e-06
+
+``` r
+xhat <- impute_growth_logistic(x, year)
+plot(year, x, main = "Kosovo cell phones", ylab = "per 100", xlab = "")
+lines(year, xhat, col = "red")
+```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-6.png)<!-- -->
+
+``` r
+# This isn't working very well. 
+df <- tibble(x = x,
+             # normalize year so that 1960 is 1; this helps with estimation
+             time = year - 1959)
+fit <- SSlogis(df$time, Asym = 110, xmid = 52, scal = 2)
+plot(year, x, xlab = "", ylab = "per 100", main = "Kosovo cell phones", 
+     ylim = c(0, max(fit)*1.1))
+lines(year, fit, col = "red")
+```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-7.png)<!-- -->
+
+``` r
+# this kind of works but we get a sudden jump from the first imputed value
+# ...just linear impute with the assumed ending value
+xhat <- linear_impute(x)
+plot(year, x, xlab = "", ylab = "per 100", main = "Kosovo cell phones, linear impute", 
+     ylim = c(0, max(fit)*1.1))
+lines(year, xhat, col = "red")
+```
+
+![](clean-data_files/figure-gfm/country-specific-imputations-8.png)<!-- -->
+
+``` r
+n <- length(wdi$cellphones_per100[wdi$gwcode==347])
+wdi$cellphones_per100[wdi$gwcode==347] <- tail(xhat, n)
+```
 
 ### Mark imputed values
 
@@ -1061,6 +1313,24 @@ wdi <- left_join(wdi, wdi_orig, by = c("gwcode", "year")) %>%
   ) %>%
   select(-starts_with("orig_"))
 ```
+
+### Spot check imputed series
+
+``` r
+check <- c(110, 345, 347, 626, 40)
+check_data <- wdi %>%
+  filter(gwcode %in% check) %>%
+  pivot_longer(-c(gwcode, year, iso2c, country)) %>%
+  mutate(value_type = ifelse(stringr::str_detect(name, "imputed"), "imputed", "value"),
+         name = str_remove(name, "_imputed")) %>%
+  pivot_wider(names_from = value_type, values_from = value)
+ggplot(check_data, aes(x = year, y = value)) +
+  facet_grid(factor(gwcode) ~ name) +
+  geom_line() +
+  geom_point(data = check_data %>% filter(imputed==TRUE), color = "red")
+```
+
+![](clean-data_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ## Done, save
 
