@@ -23,6 +23,12 @@ library(states)
 library(lubridate)
 library(stringr)
 
+# Convert a WDI data frame to G&W statelist
+# This will add a gwcode column. It also adds a row for Yugo/Serbia 2006,
+# which is why this cannot be a function that creates a G&W column in the 
+# existing data frame.
+# @param x a data frame genereated by WDI::WDI()
+# @returns a data frame like x, but with a gwcode column and extra row
 wdi_to_gw <- function(x, iso2c = "iso2c", country = "country", year = "year") {
   
   # In case the ID columns don't match the WDI default, create them here. 
@@ -447,7 +453,6 @@ wdi <- wdi %>%
 ```
 
 ## Done, save
-
 
 ```{r}
 wdi <- wdi %>% 

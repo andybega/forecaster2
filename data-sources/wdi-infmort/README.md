@@ -1,7 +1,7 @@
 WDI Infant mortality
 ================
 
-*Last updated on: 2020-04-11*
+*Last updated on: 2020-04-23*
 
 Infant mortality data for all countries, 1960 on.
 

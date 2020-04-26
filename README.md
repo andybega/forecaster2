@@ -4,10 +4,8 @@ Coup forecasts
 mini TODO:
 
 - add updated ptcoups (with new counter), oil prices, EPR vars to states and re-run models
-- work on fixing up V-Dem missing vars for existing indicators
-- formalize imputer in V-Dem: carry back if initial miss, if gap linear impute; add _imputed variable flag too
 - V-Dem cautiously add v2x[a-z]{2} indicators if they don't add missing cases
-- work on adding WDI cell phone data
+- add WDI ICT to data
 
 TODO:
 
@@ -15,13 +13,12 @@ TODO:
 - add data source modules for gw-state-age, reign-cy
 - for V-Dem:
   + add "v2x[a-z]{2}" form indices
-  + add variable transformations, e.g. y2y diff, volatility
   + this is a fucking nightmare; impute missing values as they currently are
     before adding var transforms without missing values; then add more indices
 - add sources:
   - [x] V-Dem
   - [x] Inf mort
-  - WDI cell phones
+  - [x] WDI cell phones
   - [x] oil prices
   - UCDP ACD
   - GDP, pop

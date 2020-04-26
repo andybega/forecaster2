@@ -1,9 +1,9 @@
 N_before_drop: 10297
 N_after_drop: 8991
+N_in_forecast_sets: 1687
 Years: 1960 - 2019
-Features: 254
+Features: 258
 Positive_attempt_lead1: 334
 Positive_coup_lead1: 179
 Positive_failed_lead1: 174
-N_in_forecast_sets: 1687
 
