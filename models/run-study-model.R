@@ -131,7 +131,7 @@ write_csv(imp, "output/full-model/variable-importance.csv")
 # Track summary stats for the data this was run with; I had trouble keeping
 # track when I was concurrently running models and changing data
 tbl <- list(
-  date = Sys.Date(),
+  date = as.character(Sys.Date()),
   N = nrow(states),
   N_in_forecast_sets = nrow(states[states$year %in% 2010:2019, ]),
   Years = paste0(range(states[["year"]]), collapse = " - "),

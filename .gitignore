@@ -5,6 +5,7 @@
 
 *.DS_Store
 
+# the models on the full data are >100MB
 models/output/full-model/model-*.rds
 
 # Compiled website
