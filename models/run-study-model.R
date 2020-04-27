@@ -66,7 +66,7 @@ tune_resampling$param_set$values = list(repeats = CV_REPEATS, folds = CV_FOLDS)
 tune_measures   = msr("classif.auc")
 tune_ps = ParamSet$new(list(
   ParamInt$new("num.trees", lower = 500, upper = 2500),
-  ParamInt$new("mtry", lower = 1, upper = 40),
+  ParamInt$new("mtry", lower = 1, upper = 60),
   ParamInt$new("min.node.size", lower = 1, upper = 400)
 ))
 tune_terminator = term("evals", n_evals = TUNE_N)
@@ -135,7 +135,7 @@ tbl <- list(
   N = nrow(states),
   N_in_forecast_sets = nrow(states[states$year %in% 2010:2019, ]),
   Years = paste0(range(states[["year"]]), collapse = " - "),
-  Features = ncol(states) - 2 - sum(str_detect(names(states), "lead[0-9]")),
+  Features = as.integer(ncol(states) - 2 - sum(str_detect(names(states), "lead[0-9]"))),
   Positive_attempt_lead1 = as.integer(
     sum(states[["pt_attempt_lead1"]]=="1", na.rm = TRUE)
   ),
