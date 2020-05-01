@@ -9,6 +9,8 @@ library(gstat)
 library(earth)
 library(tidyr)
 library(viridis)
+library(readr)
+library(purrr)
 
 #
 #   Full study model ----
