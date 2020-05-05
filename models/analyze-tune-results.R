@@ -11,6 +11,9 @@ library(tidyr)
 library(viridis)
 library(readr)
 library(purrr)
+library(here)
+
+setwd(here::here("models"))
 
 #
 #   Full study model ----

@@ -32,7 +32,8 @@ registerDoFuture()
 plan(multiprocess(workers = availableCores()))
 
 states <- readRDS("input/states.rds") %>%
-  as_tibble() 
+  as_tibble() %>%
+  select(-ends_with("_imputed"))
 
 # mlr3 needs DV to be factors
 states <- states %>%

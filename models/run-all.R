@@ -8,3 +8,4 @@ setwd(here::here("models"))
 
 source("run-study-model.R", echo = TRUE)
 source("run-forecasts.R", echo = TRUE)
+source("add-bottom-up-attempt.R", echo = TRUE)
