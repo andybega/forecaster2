@@ -1,4 +1,6 @@
-
+#
+#   Creates World.rds, separation plots
+#
 
 library(leaflet)
 library(leaflet.providers)
@@ -48,9 +50,11 @@ saveRDS(World, "World.rds")
 
 # Separation plots --------------------------------------------------------
 
-
-fcasts <- read_rds("fcasts.rds")%>%
+fcasts <- read_rds("fcasts.rds") %>%
   filter(!is.na(observed)) %>%
+  # use bottom up attempt
+  filter(outcome!="attempt") %>%
+  mutate(outcome = ifelse(outcome=="attempt2", "attempt", outcome)) %>%
   group_by(outcome) %>%
   arrange(p) %>%
   # the data are grouped by outcome and ordered by p; the index will become
@@ -91,4 +95,3 @@ p <- ggplot(fcasts, aes(x = index, y = 1)) +
   labs(x = "", y = "")
 
 ggsave(plot = p, filename = "../img/sepplot.png", height = 4, width = 5)
-
