@@ -45,3 +45,6 @@ Variable importance from 2018 forecasts:
 ## v2xdl_delib              2.353
 ```
 
+## License
+
+The forecasts are licensed under the [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) license (CC BY 4.0). The underlying code and data transformations are licensed under a [MIT license](https://github.com/andybega/forecaster2/LICENSE.md).
