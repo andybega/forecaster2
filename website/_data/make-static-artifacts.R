@@ -95,3 +95,23 @@ p <- ggplot(fcasts, aes(x = index, y = 1)) +
   labs(x = "", y = "")
 
 ggsave(plot = p, filename = "../img/sepplot.png", height = 4, width = 5)
+
+
+
+# Update downloadable CSV -------------------------------------------------
+
+fcasts <- read_rds("fcasts.rds")
+fcasts <- fcasts %>%
+  filter(year==max(year), 
+         outcome!="attempt") %>%
+  select(-observed, -year) %>%
+  pivot_wider(names_from = outcome, values_from = p) %>%
+  mutate(Country = countrycode(gwcode, "gwn", "country.name"),
+         Country = ifelse(gwcode==816, "Vietnam", Country)) %>%
+  rename(GWcode = gwcode, Year = for_year, Attempt = attempt2, Coup = coup, 
+         Failed = failed)  %>% 
+  select(Country, Year, GWcode, everything())
+
+write_csv(fcasts, "../../forecasts/coup-2020.csv")
+
+
