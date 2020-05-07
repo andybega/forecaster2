@@ -18,5 +18,5 @@ rmarkdown::render_site()
 
 The output will be in the `_site` folder. 
 
-The data going into the website, i.e. the coup forecast and map data, are setup and cleaned in [`_data/prepare-data.R`](/_data/prepare-data.R). 
+The data going into the website, i.e. the coup forecast and map data, are setup and cleaned in [`_data/prepare-data.R`](_data/prepare-data.R). 
 
