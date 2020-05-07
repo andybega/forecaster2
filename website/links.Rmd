@@ -2,18 +2,41 @@
 title: "Links to other public forecasting projects"
 ---
 
-ViEWS
+There are several projects that produce public forecasts of different forms of political instability and violence:
 
-Holocaust EWP
+## ViEWS 
 
-Atrocities Forecasting Project
+Political Violence Early Warning System for Africa by the Uppsala University Department of Peace and Conflict Research. 
 
-5-year ahead forecasts for the onset of genocide or politicide.
+[www.pcr.uu.se/research/views/](https://www.pcr.uu.se/research/views/){target="_blank"}
 
-https://politicsir.cass.anu.edu.au/research/projects/atrocity-forecasting
+## Early Warning Project 
 
-CoupCast
+One-year ahead forecasts for the risk of mass atrocities, including genocide, by the United States Holocaust Memorial Museum. 
 
-1-month and 1-year ahead forecasts of the risk of coup attempts
+[earlywarningproject.ushmm.org](https://earlywarningproject.ushmm.org){target="_blank"}
 
-https://oefresearch.org/activities/coup-cast
+## Atrocities Forecasting Project
+
+Five-year ahead forecasts (currently covering 2016-2020) for the onset of genocide or politicide campaigns. 
+
+[politicsir.cass.anu.edu.au/research/projects/atrocity-forecasting](https://politicsir.cass.anu.edu.au/research/projects/atrocity-forecasting){target="_blank"}
+
+## CoupCast
+
+One-month and one-year ahead forecasts for the risk of coup attempts, by OEF Research.
+
+[oefresearch.org/activities/coup-cast](https://oefresearch.org/activities/coup-cast){target="_blank"}
+
+## PART and the Democratic Space Barometer
+
+The Predicting Adverse Regime Transitions and Democratic Space Barometer are two related projects we did with the V-Dem Institute at the University of Gothenburg. 
+
+PART provides 2-year forecasts (currently covering 2019-2020) for the risk that a country will be more autocratic, using V-Dem's four-category regimes of the world index. 
+
+The Democratic Spaces Barometer produces 2-year forecasts for the probability of substantial improvement or worsening on six different facets of democratic governance.
+
+PART: [www.v-dem.net/en/analysis/Forecast/](https://www.v-dem.net/en/analysis/Forecast/){target="_blank"}
+
+Democratic Spaces Barometer: [www.v-dem.net/en/analysis/DemSpace/](https://www.v-dem.net/en/analysis/DemSpace/){target="_blank"}
+

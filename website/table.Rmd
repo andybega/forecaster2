@@ -4,11 +4,11 @@ title: "Table of forecasts"
 
 The table below lists all countries for which there are forecasts. The columns correspond to different outcomes:
 
-- "Attempt": Any coup attempt, regardless of whether it was successful or failed. 
-- "Coup": A successful coup that results in overthrow of the government.
-- "Failed": A failed coup attempt that does not result in overthrow of the government.
+- Attempt: Any coup attempt, regardless of whether it was successful or failed. 
+- Coup: A successful coup that results in overthrow of the government.
+- Failed: A failed coup attempt that does not result in overthrow of the government.
 
-The risk values shown are percentages that can theoretically can range from 0% to 100%. These were created from raw risk probabilities that range from 0 to 1 and then are rounded to one decimal digit. 
+The risk values shown are percentages that can theoretically can range from 0% to 100%. These were created from raw risk probabilities that range from 0 to 1 and then are rounded to one decimal point. 
 
 ```{r setup, include = FALSE}
 library(dplyr)

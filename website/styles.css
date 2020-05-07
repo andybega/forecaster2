@@ -1,0 +1,26 @@
+blockquote {
+  font-style: italic
+}
+
+a[target="_blank"]:after {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900; /* 900 (Solid), 400 (Regular or Brands), 300 (Light) */
+  font-size: 10px;
+  content: " \f35d"; /* fa-external-link-alt */
+}
+
+.leaflet-popup-body p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.leaflet-popup-body span:nth-of-type(2) {
+  flex: 1;
+  padding-left: 10px; 
+  height: 12px;
+  margin-left: 2px;
+  margin-right: 4px;
+  display:inline-block;
+  border-bottom: 1.4px dotted #999;
+}

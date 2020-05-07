@@ -25,7 +25,7 @@ EPR - Ethnic Power Relations dataset, https://icr.ethz.ch/data/epr/
 
 V-Dem - Varieties of Democracy data project, https://www.v-dem.net/en/
 
-WDI - the World Bank's World Development Indicators, and specifically infant mortality, cell phones per capita, and interet users percent; https://databank.worldbank.org/source/world-development-indicators
+WDI - the World Bank's World Development Indicators, and specifically infant mortality, cell phones per capita, and internet users percent; https://databank.worldbank.org/source/world-development-indicators
 
 More details are available at the project GitHub repo at https://github.com/andybega/forecaster2.
 
@@ -33,7 +33,7 @@ More details are available at the project GitHub repo at https://github.com/andy
 
 Although the 2020 forecasts are created using models that use data through 2019, we also conduct test forecasts for 2010 to 2019. Since we already know what the record of coups was for this period, we can calculate fit measures. The table below shows the AUC-ROC and AUC-PR for the test forecasts. 
 
-For the AUC-ROC measure, the basic skill threshold to beat is 0.5. Any model below this value is worse, on average, than a random forecast. For the AUC-PR measure, the skill threshold is equal to the positive rate in the data. For that reason we have added this to the table as well. 
+For the AUC-ROC measure, the basic skill threshold to beat is 0.5. Any model below this value is worse, on average, than a random forecast. For the AUC-PR measure, the skill threshold is equal to the positive rate in the data. This is shown in the "Pos. Rate" column. 
 
 <div style = "text-align: center">
 <div style = "max-width: 600px; display: inline-block;">
@@ -68,7 +68,7 @@ fcasts %>%
 </div>
 </div>
 
-Another way to visualize performance is with separation plots. In an ideal model, the red lines, which correspond to coup attempts, etc., will be all the way on the right. 
+Another way to visualize performance is with separation plots. These arrange all predictions by their predicted probability, which is shown by the black line, and then mark cases in which an event actually occurred with a red line. In an ideal model, the red lines, which correspond to coup attempts, etc., will be all the way on the right and the black line would be near 0 for the sand-colored area and near 1 for the red colored area of the plot. 
 
 <div style = "text-align: center">
 <div style = "max-width: 600px; display: inline-block;">
@@ -78,13 +78,13 @@ Another way to visualize performance is with separation plots. In an ideal model
 
 ## Citation
 
-If you would like to refer to our forecasts in academic work, we would appreciate if you cite:
+If you would like to refer to our forecasts in academic work, we would appreciate it if you cite:
 
-Andreas Beger and Michael D. Ward, 2020, "Coup forecasts for 2020", <URL>. 
+Andreas Beger and Michael D. Ward, 2020, "Coup forecasts for 2020", <https://www.predictiveheuristics.com/forecasts>. 
 
 ## License
 
-The forecasts are licensed under the [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) license (CC BY 4.0). The underlying code and data transformations are licensed under a [MIT license](https://github.com/andybega/forecaster2/LICENSE.md).
+The forecasts are licensed under the [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) license (CC BY 4.0). The underlying code and data transformations are licensed under the [MIT license](https://github.com/andybega/forecaster2/blob/master/LICENSE.md).
 
 
 

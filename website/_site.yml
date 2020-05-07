@@ -1,5 +1,5 @@
 name: "coup-forecasts"
-exclude: ["Makefile", "data/*"]
+exclude: ["Makefile"]
 navbar:
   title: "Coup forecasts"
   left:
@@ -16,3 +16,10 @@ navbar:
   right:
     - icon: fa-github-square fa-lg
       href: https://www.github.com/andybega/forecaster2
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    include:
+      after_body: footer.html
+    css: styles.css
