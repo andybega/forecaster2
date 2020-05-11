@@ -24,3 +24,20 @@ a[target="_blank"]:after {
   display:inline-block;
   border-bottom: 1.4px dotted #999;
 }
+
+/* override rounded corners in pop up */
+.leaflet-popup-content-wrapper {
+   -webkit-border-radius: 5px !important;
+   -moz-border-radius: 5px !important;
+    border-radius: 5px !important;
+    margin: 0;
+ }
+ 
+ .leaflet-popup-content {
+   -webkit-border-radius: 0 !important;
+   -moz-border-radius: 0 !important;
+    border-radius: 0 !important;
+    margin: 10px;
+ }
+ 
+ 
