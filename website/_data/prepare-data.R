@@ -24,6 +24,8 @@ setwd(here::here("website/_data"))
 fcasts <- read_rds("fcasts.rds")
 fcasts <- fcasts %>% dplyr::filter(year==max(year))
 fcasts$iso_a3 <- countrycode(fcasts[["gwcode"]], "gwn", "iso3c")
+fcasts$iso_a3[fcasts$gwcode==678] <- "YEM"
+fcasts$iso_a3[fcasts$gwcode==816] <- "VNM"
 fcasts <- fcasts %>% 
   mutate(p = 100*p) %>%
   tidyr::pivot_wider(names_from = "outcome", values_from = "p") %>%
@@ -38,18 +40,28 @@ world <- suppressWarnings(cshp(date = as.Date("2016-01-01"))) %>%
   dplyr::rename(iso_a3 = ISO1AL3, name = CNTRY_NAME) %>%
   mutate(iso_a3 = as.character(iso_a3), name = as.character(name))
 
+# Base layer from natural earth. This incluces some territories like French
+# Guiana that cshapes does not have. 
+ne_world <- st_read("ne_10m_admin_0_countries") %>%
+  select(NAME, ADM0_A3)
+ne_world_simple <- ne_world %>%
+  st_simplify(dTolerance = 0.1, preserveTopology = TRUE) %>%
+  st_transform(crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") 
+
+saveRDS(ne_world_simple, "world-base-layer.rds")
+
 # cshapes does not have Antarctica and Greenland, add those in
 # But use natural earth for shapes; cshapes does not have Greenland and 
 # Antarctica polygons. 
-add_in <- st_read("ne_10m_admin_0_countries") %>%
-  filter(NAME %in% c("Greenland", "Antarctica")) %>%
+add_in <- ne_world %>%
+  filter(NAME %in% c("Greenland", "Antarctica", "New Caledonia")) %>%
   dplyr::rename(iso_a3 = ADM0_A3, name = NAME) %>%
   select(iso_a3, name) 
 
-# combine
-world <- world %>%
-  st_transform(4326) %>%
-  rbind(add_in)
+# # combine
+# world <- world %>%
+#   st_transform(4326) %>%
+#   rbind(add_in)
 
 # fix country names
 world <- world %>%
@@ -72,7 +84,7 @@ world <- world %>%
 
 world_simple <- world %>%
   st_transform(crs = "+proj=cea +lon_0=0 +lat_ts=45 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs") %>%
-  st_simplify(dTolerance = 15000, preserveTopology = FALSE) %>%
+  st_simplify(dTolerance = 5000, preserveTopology = TRUE) %>%
   st_transform(crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") 
 
 

@@ -16,6 +16,7 @@ The risk values shown are percentages that can theoretically range from 0% to 10
 
 ```{r, include = TRUE}
 World <- readRDS("_data/World.rds")
+world_base_layer <- readRDS("_data/world-base-layer.rds")
 
 # x is the input probability, 0-1
 format_prob <- function(x) {
@@ -54,10 +55,11 @@ labels = sprintf(label_html,
 
 # I previously used colorQuantile for this, but this distorts how high the risk
 # really is in some countries. Better to use explicit bins. 
-pal_p <- colorBin("viridis", bins = c(0, 0.5, 1, 2, 5, Inf))
+pal_p <- colorBin("viridis", bins = c(0, 0.5, 1, 2, 5, 100))
 
 leaflet(width = "100%", height = "550px", options = leafletOptions(maxZoom = 5, minZoom = 2)) %>%
   #addProviderTiles("Esri.WorldGrayCanvas", group = "Esri.WorldGrayCanvas") %>%
+  addPolygons(data = world_base_layer, weight = 0, fillColor = "gray50") %>%
   addPolygons(data = World, weight = 1, color = "black", smoothFactor = 0.3,
               fillOpacity = 0.8, fillColor = ~pal_p(attempt),
               popup = labels,
@@ -80,7 +82,7 @@ leaflet(width = "100%", height = "550px", options = leafletOptions(maxZoom = 5, 
               ) %>% 
   addLegend(pal = pal_p, values = World$coup, opacity = 0.8,
             labFormat = labelFormat(big.mark = "'"),
-            title = "Statistical Risk (%)") %>%
+            title = "Statistical Risk (%)", na.label = "No Data") %>%
   addLayersControl(
     baseGroups = c("Any Coup Attempt", "Successful Coup", "Failed Attempt"),
                    position = "topleft",
@@ -89,5 +91,5 @@ leaflet(width = "100%", height = "550px", options = leafletOptions(maxZoom = 5, 
   setView(lng = 0, lat = 20, zoom = 2) 
 ```
 
-You can download these forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coup-2020.csv).
+You can download the forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coup-2020.csv).
 
