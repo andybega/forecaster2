@@ -20,3 +20,6 @@ The output will be in the `_site` folder.
 
 The data going into the website, i.e. the coup forecast and map data, are setup and cleaned in [`_data/prepare-data.R`](_data/prepare-data.R). 
 
+Deploying the website: I just manually uploaded the site to GoDaddy using the cAdmin panel. I tried looking into the `ftp` option but couldn't get it to work well. 
+
+
