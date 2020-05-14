@@ -1,6 +1,23 @@
 Forecast models
 ===============
 
+To run the actual forecast models:
+
+```r
+# Run the main forecast models for P(coup), P(failed coup attempt), P(any attempt)
+source("run-forecasts.R")
+
+# Run the bottom-up P(any attempt) version created by aggregating the 
+# model-basedP(coup) and P(failed coup attempt) from above; this is the 
+# version that is shown on the website
+source("add-bottom-up-attempt.R")
+```
+
+Note that the model runner script will by default run in parallel using all as many workers as there are cores. 
+
+The forecasts will be in `output/fcasts.rds`. 
+
+The study model (also "full-model" in the output folder) uses all available data and is run over a larger number of hyperparameter samples, with more extensive repeated CV. It's main purposes are to restrict the range of hyperparameter values that the actual forecast models are tuned over, and to provide some estimates of variable importance. It's not really needed to generate the forecasts. 
 
 ## Score archive
 
@@ -14,16 +31,3 @@ Run 10 adds fully imputed V-Dem data with bigger case set as result, additional 
 
 Run 11 adds WDI ICT variables. 
 
-```r
-acc <- read_csv("output/acc-archive.csv")
-
-ggplot(acc, aes(x = roc_auc, y = roc_pr, color = outcome)) + geom_point()
-
-acc %>%
-  pivot_longer(roc_auc:roc_pr, names_to = "stat") %>%
-  ggplot(aes(x = set_idx, y = value, color = outcome)) + 
-  facet_wrap(~ stat, scales = "free_y") + 
-  geom_point()
-  
-ggplot(acc, aes(x = roc_auc, y = roc_pr, color = outcome)) + geom_point()
-```
