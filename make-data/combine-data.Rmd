@@ -20,13 +20,13 @@ plotmiss <- function(x) {
 }
 ```
 
-## Pieces
-
-### Master statelist
+## Master statelist
 
 ```{r}
 states <- state_panel(1950, 2019, partial = "any")
 ```
+
+## Pieces
 
 ### P&T coups
 
@@ -93,7 +93,7 @@ dv_full <- left_join(states, dv) %>%
 states <- left_join(states, dv_full)
 ```
 
-## G&W state age
+### G&W state age
 
 Years since independence
 
@@ -105,7 +105,7 @@ age <- read_csv("input/gwstate-age.csv") %>%
 states <- left_join(states, age, by = c("gwcode", "year"))
 ```
 
-## EPR
+### EPR
 
 Ethnic Power Relations data on ethnic groups in countries.
 
@@ -118,7 +118,7 @@ glimpse(epr)
 states <- left_join(states, epr, by = c("gwcode", "year"))
 ```
 
-## REIGN data
+### REIGN data
 
 ```{r}
 reign <- read_csv("input/reign-cy.csv") %>%
@@ -158,7 +158,7 @@ reign <- reign %>%
 states <- left_join(states, reign)
 ```
 
-## V-Dem
+### V-Dem
 
 ```{r}
 vdem <- read_csv("input/v-dem.csv",
@@ -174,7 +174,7 @@ vdem <- read_csv("input/v-dem.csv",
 states <- left_join(states, vdem)
 ```
 
-## WDI Infant mortality
+### WDI Infant mortality
 
 ```{r}
 wdi_infmort <- read_csv("input/wdi-infmort.csv",
@@ -189,7 +189,7 @@ wdi_infmort <- read_csv("input/wdi-infmort.csv",
 states <- left_join(states, wdi_infmort)
 ```
 
-## WDI ICT
+### WDI ICT
 
 ```{r}
 wdi_ict <- read_csv("input/wdi-ict.csv",
@@ -205,7 +205,7 @@ wdi_ict <- read_csv("input/wdi-ict.csv",
 states <- left_join(states, wdi_ict)
 ```
 
-## Oil prices
+### Oil prices
 
 ```{r}
 oil <- read_csv("input/oil-prices.csv")

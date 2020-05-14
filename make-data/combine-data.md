@@ -1,17 +1,17 @@
 Combine data into states.rds
 ================
 
+  - [Master statelist](#master-statelist)
   - [Pieces](#pieces)
-      - [Master statelist](#master-statelist)
       - [P\&T coups](#pt-coups)
       - [Make lead DV versions](#make-lead-dv-versions)
-  - [G\&W state age](#gw-state-age)
-  - [EPR](#epr)
-  - [REIGN data](#reign-data)
-  - [V-Dem](#v-dem)
-  - [WDI Infant mortality](#wdi-infant-mortality)
-  - [WDI ICT](#wdi-ict)
-  - [Oil prices](#oil-prices)
+      - [G\&W state age](#gw-state-age)
+      - [EPR](#epr)
+      - [REIGN data](#reign-data)
+      - [V-Dem](#v-dem)
+      - [WDI Infant mortality](#wdi-infant-mortality)
+      - [WDI ICT](#wdi-ict)
+      - [Oil prices](#oil-prices)
   - [Summarize and write output](#summarize-and-write-output)
       - [Variables in data](#variables-in-data)
       - [Missing values by column](#missing-values-by-column)
@@ -20,13 +20,13 @@ Combine data into states.rds
       - [Track forecast sets](#track-forecast-sets)
   - [Save](#save)
 
-## Pieces
-
-### Master statelist
+## Master statelist
 
 ``` r
 states <- state_panel(1950, 2019, partial = "any")
 ```
+
+## Pieces
 
 ### P\&T coups
 
@@ -149,7 +149,7 @@ states <- left_join(states, dv_full)
 
     ## Joining, by = c("gwcode", "year")
 
-## G\&W state age
+### G\&W state age
 
 Years since independence
 
@@ -170,7 +170,7 @@ age <- read_csv("input/gwstate-age.csv") %>%
 states <- left_join(states, age, by = c("gwcode", "year"))
 ```
 
-## EPR
+### EPR
 
 Ethnic Power Relations data on ethnic groups in countries.
 
@@ -226,7 +226,7 @@ glimpse(epr)
 states <- left_join(states, epr, by = c("gwcode", "year"))
 ```
 
-## REIGN data
+### REIGN data
 
 ``` r
 reign <- read_csv("input/reign-cy.csv") %>%
@@ -358,7 +358,7 @@ states <- left_join(states, reign)
 
     ## Joining, by = c("gwcode", "year")
 
-## V-Dem
+### V-Dem
 
 ``` r
 vdem <- read_csv("input/v-dem.csv",
@@ -376,7 +376,7 @@ states <- left_join(states, vdem)
 
     ## Joining, by = c("gwcode", "year")
 
-## WDI Infant mortality
+### WDI Infant mortality
 
 ``` r
 wdi_infmort <- read_csv("input/wdi-infmort.csv",
@@ -393,7 +393,7 @@ states <- left_join(states, wdi_infmort)
 
     ## Joining, by = c("gwcode", "year")
 
-## WDI ICT
+### WDI ICT
 
 ``` r
 wdi_ict <- read_csv("input/wdi-ict.csv",
@@ -411,7 +411,7 @@ states <- left_join(states, wdi_ict)
 
     ## Joining, by = c("gwcode", "year")
 
-## Oil prices
+### Oil prices
 
 ``` r
 oil <- read_csv("input/oil-prices.csv")
