@@ -24,7 +24,7 @@ Five-year ahead forecasts (currently covering 2016-2020) for the onset of genoci
 
 ## CoupCast
 
-One-month and one-year ahead forecasts for the risk of coup attempts, by OEF Research.
+One-month and one-year ahead forecasts for the risk of coup attempts, using an approach that draws on the methods we developed for forecasting irregular leadership changes (which include coups; [Beger, Dorff, and Ward 2016](https://www.sciencedirect.com/science/article/abs/pii/S0169207015000485)). By OEF Research.
 
 [oefresearch.org/activities/coup-cast](https://oefresearch.org/activities/coup-cast){target="_blank"}
 
