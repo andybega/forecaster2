@@ -12,6 +12,7 @@ suppressPackageStartupMessages({
   library(tidyverse)
   library(states)
   library(yaml)
+  library(zoo)
 })
 
 # shortcut for plotting missing values when no date column is available
@@ -39,6 +40,40 @@ plotmiss(ptcoups)
 
 states <- left_join(states, ptcoups, by = c("gwcode", "year"))
 ```
+
+
+```{r}
+# The number of coups (attempts) has generally declined over time;
+# add a global moving average to help the models pick up on this
+global <- ptcoups %>%
+  group_by(year) %>%
+  summarize(pt_attempt = sum(pt_attempt),
+            pt_coup    = sum(pt_coup),
+            pt_failed   = sum(pt_failed)) %>%
+  ungroup() %>%
+  arrange(year) %>%
+  mutate(
+    pt_attempt_ma10 = rollapplyr(pt_attempt, width = 10, FUN = mean, 
+                                partial = TRUE),
+    pt_coup_ma10    = rollapplyr(pt_coup, width = 10, FUN = mean, 
+                                partial = TRUE),
+    pt_failed_ma10  = rollapplyr(pt_failed, width = 10, FUN = mean,
+                                partial = TRUE)) %>%
+  select(year, ends_with("ma10"))
+
+global %>%
+  select(year, ends_with("ma10")) %>%
+  pivot_longer(-year) %>%
+  ggplot(aes(x = year, y = value, color = name)) +
+  geom_line() +
+  scale_fill_discrete("Outcome") +
+  labs(title = "Average number of countries that experienced one or more outcomes\nof interest in the past 10 years") +
+  theme_bw() +
+  scale_y_continuous(limits = c(0, 10))
+
+states <- left_join(states, global, by = c("year"))
+```
+
 
 ### Make lead DV versions
 

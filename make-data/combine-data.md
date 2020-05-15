@@ -78,6 +78,42 @@ plotmiss(ptcoups)
 states <- left_join(states, ptcoups, by = c("gwcode", "year"))
 ```
 
+``` r
+# The number of coups (attempts) has generally declined over time;
+# add a global moving average to help the models pick up on this
+global <- ptcoups %>%
+  group_by(year) %>%
+  summarize(pt_attempt = sum(pt_attempt),
+            pt_coup    = sum(pt_coup),
+            pt_failed   = sum(pt_failed)) %>%
+  ungroup() %>%
+  arrange(year) %>%
+  mutate(
+    pt_attempt_ma10 = rollapplyr(pt_attempt, width = 10, FUN = mean, 
+                                partial = TRUE),
+    pt_coup_ma10    = rollapplyr(pt_coup, width = 10, FUN = mean, 
+                                partial = TRUE),
+    pt_failed_ma10  = rollapplyr(pt_failed, width = 10, FUN = mean,
+                                partial = TRUE)) %>%
+  select(year, ends_with("ma10"))
+
+global %>%
+  select(year, ends_with("ma10")) %>%
+  pivot_longer(-year) %>%
+  ggplot(aes(x = year, y = value, color = name)) +
+  geom_line() +
+  scale_fill_discrete("Outcome") +
+  labs(title = "Average number of countries that experienced one or more outcomes\nof interest in the past 10 years") +
+  theme_bw() +
+  scale_y_continuous(limits = c(0, 10))
+```
+
+![](combine-data_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+states <- left_join(states, global, by = c("year"))
+```
+
 ### Make lead DV versions
 
 ``` r
@@ -537,6 +573,7 @@ knitr::kable(var_summary, digits = 2)
 | pt\_attempt                        |       0 |   0.18 | TRUE    |               0.00 |
 | pt\_attempt\_lead1                 |     197 |   0.18 | TRUE    |               0.00 |
 | pt\_attempt\_lead2                 |     394 |   0.18 | TRUE    |               0.00 |
+| pt\_attempt\_ma10                  |       0 |   2.61 | FALSE   |               0.00 |
 | pt\_attempt\_num                   |       0 |   0.23 | TRUE    |               0.00 |
 | pt\_attempt\_num10yrs              |       0 |   1.07 | TRUE    |               0.00 |
 | pt\_attempt\_num5yrs               |       0 |   0.65 | TRUE    |               0.00 |
@@ -544,6 +581,7 @@ knitr::kable(var_summary, digits = 2)
 | pt\_coup                           |       0 |   0.14 | TRUE    |               0.00 |
 | pt\_coup\_lead1                    |     197 |   0.14 | TRUE    |               0.00 |
 | pt\_coup\_lead2                    |     394 |   0.13 | TRUE    |               0.00 |
+| pt\_coup\_ma10                     |       0 |   1.72 | FALSE   |               0.00 |
 | pt\_coup\_num                      |       0 |   0.15 | TRUE    |               0.00 |
 | pt\_coup\_num10yrs                 |       0 |   0.61 | TRUE    |               0.00 |
 | pt\_coup\_num5yrs                  |       0 |   0.38 | TRUE    |               0.00 |
@@ -551,6 +589,7 @@ knitr::kable(var_summary, digits = 2)
 | pt\_failed                         |       0 |   0.13 | TRUE    |               0.00 |
 | pt\_failed\_lead1                  |     197 |   0.13 | TRUE    |               0.00 |
 | pt\_failed\_lead2                  |     394 |   0.13 | TRUE    |               0.00 |
+| pt\_failed\_ma10                   |       0 |   1.32 | FALSE   |               0.00 |
 | pt\_failed\_num                    |       0 |   0.16 | TRUE    |               0.00 |
 | pt\_failed\_num10yrs               |       0 |   0.67 | TRUE    |               0.00 |
 | pt\_failed\_num5yrs                |       0 |   0.43 | TRUE    |               0.00 |
@@ -1083,7 +1122,7 @@ tbl %>%
 | N\_after\_drop           | 8991        |
 | N\_in\_forecast\_sets    | 1687        |
 | Years                    | 1960 - 2019 |
-| Features                 | 258         |
+| Features                 | 261         |
 | Positive\_attempt\_lead1 | 334         |
 | Positive\_coup\_lead1    | 179         |
 | Positive\_failed\_lead1  | 174         |

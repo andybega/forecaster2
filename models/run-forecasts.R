@@ -36,7 +36,7 @@ states <- states %>%
   mutate_at(.vars = vars(ends_with("lead1"), ends_with("lead2")),
             .funs = as.factor) 
 
-non_feat_cols <- c("gwcode", "year", names(states)[str_detect(names(states), "lead[0-9]")])
+non_feat_cols <- c("gwcode", names(states)[str_detect(names(states), "lead[0-9]")])
 
 tasks <- list(
   coup = TaskClassif$new(id = "coup", backend = states, 
@@ -143,10 +143,10 @@ if (length(warn) > 1) {
 # track when I was concurrently running models and changing data
 tbl <- list(
   date = as.character(Sys.Date()),
-  N = nrow(states),
+  N_train = nrow(states),
   N_in_forecast_sets = nrow(states[states$year %in% 2010:2019, ]),
   Years = paste0(range(states[["year"]]), collapse = " - "),
-  Features = as.integer(ncol(states) - 2 - sum(str_detect(names(states), "lead[0-9]"))),
+  Features = as.integer(n_feats),
   Positive_attempt_lead1 = as.integer(
     sum(states[["pt_attempt_lead1"]]=="1", na.rm = TRUE)
   ),
@@ -156,14 +156,14 @@ tbl <- list(
   Positive_failed_lead1 = as.integer(
     sum(states[["pt_failed_lead1"]]=="1", na.rm = TRUE)
   ),
-  Time = as.numeric((Sys.time() - t_start))
+  Time = as.numeric(difftime(Sys.time(), t_start, units = "secs"))
 ) 
 
 tbl %>%
   yaml::as.yaml() %>%
   writeLines("output/forecast-models-last-run.yml")
 
-lgr$info("Forecast models finished, total time: %ss", round((proc.time() - t0)["elapsed"]))
+lgr$info("Forecast models finished, total time: %ss", round(as.numeric(difftime(Sys.time(), t_start, units = "secs"))))
 
 source("score-archive.R")
 source("score.R")
