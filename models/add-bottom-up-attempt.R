@@ -36,7 +36,7 @@ fcasts %>%
 
 #   attempt_gt_coup attempt_gt_failed
 #             <dbl>             <dbl>
-# 1           0.807             0.836
+# 1           0.850             0.889
 
 # Mhm. The attempt forecasts are greater than the coup and failed forecasts 
 # only ~80% of the time. 
@@ -48,7 +48,7 @@ fcasts <- fcasts %>%
 attempt2 <- fcasts %>%
   filter(outcome %in% c("coup", "failed")) %>%
   group_by(gwcode, year, for_year) %>%
-  summarize(outcome = "attempt2", 
+  dplyr::summarize(outcome = "attempt2", 
             observed = factor(max(observed=="1"), levels = c("1", "0")),
             p = sum(p) - prod(p), 
             n = n()) %>%
@@ -66,25 +66,23 @@ fcasts <- fcasts %>%
   bind_rows(attempt2)
 
 # Make sure the truth data is correct
-fcasts %>% filter(outcome=="attempt") %>% count(observed)
-fcasts %>% filter(outcome=="attempt2") %>% count(observed)
+fcasts %>% dplyr::filter(outcome=="attempt") %>% dplyr::count(observed)
+fcasts %>% dplyr::filter(outcome=="attempt2") %>% dplyr::count(observed)
 
 # Compare accuracy of attempt and attemp2
 fcasts %>%
   group_by(outcome) %>%
-  summarize(AUC_ROC = roc_auc_vec(observed, p),
+  dplyr::summarize(AUC_ROC = roc_auc_vec(observed, p),
             AUC_PR  = pr_auc_vec(observed, p),
             pos_rate = mean(observed=="1", na.rm = TRUE),
             mean_p   = mean(p, na.rm = TRUE))
 
 #   outcome  AUC_ROC AUC_PR pos_rate mean_p
 #   <chr>      <dbl>  <dbl>    <dbl>  <dbl>
-# 1 attempt    0.802 0.100   0.0119  0.0256
-# 2 attempt2   0.806 0.0477  0.0119  0.0298
-# 3 coup       0.793 0.0385  0.00659 0.0148
-# 4 failed     0.809 0.0177  0.00593 0.0157
-
-# attempt has much better AUC_PR
+# 1 attempt    0.794 0.0479  0.0119  0.0245
+# 2 attempt2   0.810 0.0474  0.0119  0.0279
+# 3 coup       0.781 0.0435  0.00659 0.0139
+# 4 failed     0.800 0.0209  0.00593 0.0145
 
 # The bottom-up probs tend to be higher; all predictions generally 
 # tend to be too high. 

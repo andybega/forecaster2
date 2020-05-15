@@ -1,0 +1,13 @@
+resolution: >
+    Using the Powell & Thyne coup data at http://www.uky.edu/~clthyn2/coup_data/powell_thyne_coups_final.txt,
+    the outcome for 'p_coup' is any country with 'coup' equal to 2 and year 2018, and for 
+    'p_any_attempt' it is any record with 'coup' equals 1 or 2. 
+forecast_made_on: "2020-05-15"
+variables:
+  Country: country names
+  Year: year for which the forecasts are (2020)
+  GWcode: G&W country codes
+  Coup: Probability of a successfull coup
+  Failed: Probability of a failed coup attempt
+  Attempt: > 
+    Probability of a coup attempt, regardless of success. The predictions are not based on a model, rather they are formed by combining the successfull coup and failed coup attempt forecasts. 

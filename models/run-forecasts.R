@@ -167,3 +167,7 @@ lgr$info("Forecast models finished, total time: %ss", round(as.numeric(difftime(
 
 source("score-archive.R")
 source("score.R")
+
+source("add-bottom-up-attempt.R", echo = TRUE)
+
+

@@ -156,6 +156,6 @@ fcasts <- fcasts %>%
          Failed = failed)  %>% 
   select(Country, Year, GWcode, everything())
 
-write_csv(fcasts, "../../forecasts/coup-2020.csv")
+write_csv(fcasts, "../../forecasts/coups-2020.csv")
 
 
