@@ -144,7 +144,8 @@ tbl <- list(
   ),
   Positive_failed_lead1 = as.integer(
     sum(states[["pt_failed_lead1"]]=="1", na.rm = TRUE)
-  )
+  ),
+  Time = unname(round((proc.time() - t0)["elapsed"]))
 ) 
 
 tbl %>%

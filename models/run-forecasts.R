@@ -2,10 +2,7 @@
 #   Run the test and live forecasts
 #
 
-CV_REPEATS = 2
-CV_FOLDS   = 8
-TUNE_N     = 20
-
+set.seed(5232)
 
 library(mlr3)
 library(mlr3learners)
@@ -24,7 +21,7 @@ library(future.apply)
 library(yaml)
 
 lgr$info("Start forecast models")
-t0 <- proc.time()
+t_start <- Sys.time()
 
 setwd(here::here("models"))
 
@@ -32,8 +29,7 @@ registerDoFuture()
 plan(multiprocess(workers = availableCores()))
 
 states <- readRDS("input/states.rds") %>%
-  as_tibble() %>%
-  select(-ends_with("_imputed"))
+  as_tibble() 
 
 # mlr3 needs DV to be factors
 states <- states %>%
@@ -57,28 +53,18 @@ tasks <- sapply(tasks, function(x) {
   x
 })
 
+# How many feature columns?
+n_feats = length(names(states)[!names(states) %in% non_feat_cols])
 
-learner         = mlr3::lrn("classif.ranger", 
-                            predict_type = "prob",
-                            num.trees = 1000)
-tune_resampling = rsmp("repeated_cv")
-tune_resampling$param_set$values = list(repeats = CV_REPEATS, folds = CV_FOLDS)
-tune_measures   = msr("classif.auc")
-tune_ps = ParamSet$new(list(
-  ParamInt$new("min.node.size", lower = 1, upper = 300),
-  ParamInt$new("mtry", lower = 8, upper = 30)
-))
-tune_terminator = term("evals", n_evals = TUNE_N)
-tuner = mlr3tuning::tnr("random_search")
-
-auto_rf = AutoTuner$new(
-  learner = learner,
-  resampling = tune_resampling,
-  measures = tune_measures,
-  tune_ps = tune_ps,
-  terminator = tune_terminator,
-  tuner = tuner
+learner = mlr3::lrn(
+  "classif.ranger", 
+  predict_type = "prob",
+  num.trees = 1000,
+  min.node.size = 270,
+  mtry = floor(sqrt(n_feats))
 )
+
+auto_rf = learner
 
 # Construct the grid of models we will run
 # For each year, 3 models for the 3 outcomes
@@ -106,15 +92,6 @@ for (i in 1:nrow(model_grid)) {
   auto_rf$train(task_i, row_ids = train_rows)
   fcast_i <- auto_rf$predict(task_i, row_ids = pred_rows)
   
-  # This portion is related to optimizing the tuning process
-  tr <- auto_rf$tuning_instance$archive(unnest = "params") %>%
-    select(task_id, learner_id, resampling_id, iters, classif.auc, num.trees,
-           mtry, min.node.size) %>%
-    mutate(year = yy) %>%
-    select(task_id, year, everything())
-  write_csv(tr, path = tune_i_fn)
-  ## End tuning section
-  
   out_i <- states[pred_rows, c("gwcode", "year")]
   out_i$for_year <- unique(out_i$year) + 1L
   out_i$outcome  <- outcome_i
@@ -124,11 +101,6 @@ for (i in 1:nrow(model_grid)) {
   write_rds(out_i, path = fcast_i_fn)
 }
 
-# Combine tune chunks
-chunk_files <- dir("output/chunks/tuning", full.names = TRUE)
-chunks <- lapply(chunk_files, readr::read_csv)
-tr <- bind_rows(chunks)
-write_csv(tr, "output/tuning-results.csv")
 
 # Combine forecast chunks
 chunk_files <- dir("output/chunks/forecast", full.names = TRUE)
@@ -170,7 +142,7 @@ if (length(warn) > 1) {
 # Track summary stats for the data this was run with; I had trouble keeping
 # track when I was concurrently running models and changing data
 tbl <- list(
-  date = Sys.Date(),
+  date = as.character(Sys.Date()),
   N = nrow(states),
   N_in_forecast_sets = nrow(states[states$year %in% 2010:2019, ]),
   Years = paste0(range(states[["year"]]), collapse = " - "),
@@ -183,7 +155,8 @@ tbl <- list(
   ),
   Positive_failed_lead1 = as.integer(
     sum(states[["pt_failed_lead1"]]=="1", na.rm = TRUE)
-  )
+  ),
+  Time = as.numeric((Sys.time() - t_start))
 ) 
 
 tbl %>%
