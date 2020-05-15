@@ -123,7 +123,7 @@ stopifnot(levels(fcasts$observed)[1]=="1")
 # years
 # https://mlr3book.mlr-org.com/resampling.html
 
-write_csv(fcasts, "output/fcast.csv")
+write_csv(fcasts, "output/fcasts.csv")
 # Write RDS also because CSV will have precision limits
 write_rds(fcasts, "output/fcasts.rds")
 

@@ -13,11 +13,13 @@ source("run-forecasts.R")
 source("add-bottom-up-attempt.R")
 ```
 
+There is an alternative, bottom-up, version of P(any attempt) that is created by aggregating up the P(successful coup) and P(failed coup attempt) forecasts. This is done by `add-bottom-up-attempt.R`, which is called in the `run-forecasts.R` script. 
+
 Note that the model runner script will by default run in parallel using all as many workers as there are cores. 
 
 The forecasts will be in `output/fcasts.rds`. 
 
-The study model (also "full-model" in the output folder) uses all available data and is run over a larger number of hyperparameter samples, with more extensive repeated CV. It's main purposes are to restrict the range of hyperparameter values that the actual forecast models are tuned over, and to provide some estimates of variable importance. It's not really needed to generate the forecasts. 
+Note that for tuning experiments and variable importance, there is supporting model in [/ancillary/study-model](/ancillary/study-model). The study model uses all available data and is run over a larger number of hyperparameter samples, with more extensive repeated CV. It's main purposes are to restrict the range of hyperparameter values that the actual forecast models are tuned over, and to provide some estimates of variable importance. It's not really needed to generate the forecasts. 
 
 ## Score archive
 

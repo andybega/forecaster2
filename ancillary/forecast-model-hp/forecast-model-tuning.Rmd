@@ -1,0 +1,190 @@
+---
+title: "Is there a point in tuning the forecast models?"
+output: github_document
+---
+
+Compiled: `r Sys.Date()`
+
+Is there a point in having self-tuning models for the tests and live forecasts, or can I just use a common set of fixed hyperparameters (HPs) for the models for each outcome? 
+
+As it currently is, for each of the 3 outcomes and 10 years I need test and live forecasts for, I have to run (20 tuning samples * (8 CV folds * 2 CV repeats) + 1 final model) = 321 models, for a grand total of 9,630 fitted models. With fixed HPs I'd only need 30 models, which should save A LOT of time. Right now it takes 2-3 days to run the forecast models, even after reducing the number of columns by taking out, e.g., "..._imputed" variables. 
+
+A bit more on the current setup: there is a study model that is run on the complete data for the purpose of investigating the tuning the random foreast hyperparameter values. This uses more tuning samples, more extensive repeated CV than the self-tuning forecast models. The results are used to restrict the ranges of HPs that the forecast models tune over. And then to make the actual forecasts the self-tuning forecast models iterate over those restricted HP ranges, with less careful resampling and HP sampling. 
+
+What I'm going to do here is analyize the tuning results for the forecast models I ran in late April / early May, and check whether I can just use fixed HPs without a great cost to accuracy. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+```{r}
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(viridis)
+```
+
+This is what the raw tuning results data look like:
+
+```{r}
+tr <- read_csv("input-data/tuning-results.csv") %>%
+  select(-learner_id, -resampling_id)
+
+tr 
+```
+
+The "task_id" column has 3 values for the 3 outcomes; "year" ranges from 2010 to 2019. Each row's "classif.auc" is the average AUC over the 16 ("iters") repeated CV out-of-sample performance samples, with the given HP values in the last 3 columns. 
+
+```{r}
+tr %>%
+  pivot_longer(num.trees:min.node.size) %>%
+  ggplot(., aes(x = value, y = classif.auc, color = factor(year))) +
+  facet_wrap(~task_id + name, scales = "free_x") +
+  geom_point() +
+  geom_smooth(se = FALSE) + 
+  theme_bw() +
+  scale_color_brewer(type = "qual", palette = "Paired") +
+  labs(title = "Forecast models tuning results")
+```
+
+These are all the tune samples, colored by the last year going into a model. Rows correspon to the 3 outcomes I'm modeling, and each column is a hyperparameter. Note that I used a fixed "num.trees" value, so these are completely restricted based on the study model results. 
+
+A couple of impressions:
+
+- the range of AUC values overall is not that great, from 0.806 to 0.835
+- most of this variation in AUC appears to be accross years, not accross tune samples
+- the overall trend of performance vs HP values appears to be similar accross years (comparing the colored lines)
+
+What are alternative fixed values to this tuning? First, here are the optimized vaues for each outcome-year:
+
+```{r}
+optim <- tr %>% 
+  group_by(task_id, year) %>% 
+  arrange(task_id, year, desc(classif.auc)) %>% 
+  top_n(1, classif.auc)
+
+optim %>%
+  pivot_longer(mtry:min.node.size) %>%
+  ggplot(aes(x = value, y = task_id)) +
+  facet_wrap(~ name, scales = "free_x") +
+  geom_point()
+```
+
+Failed is special. For coup and attempt, seems that high "min.node.size" and "mtry" values are good. For failed there is more of a spread. 
+
+Let's take something close to the mean optimum values as the fixed value candidates. 
+
+```{r}
+optim %>%
+  pivot_longer(mtry:min.node.size) %>% 
+  group_by(name, task_id) %>% 
+  summarize(mean = mean(value), median = median(value))
+```
+
+So say 270 accross the board for "min.node.size" (the default is 10 for probability trees in **ranger**, so whatevs, seems bigger values work well here), and then 19 and 26 for failed and the other outcomes, respectively. 
+These combinations may not actually be in the data, so pick whatever is the closest. Since "mtry" and "min.node.size" are on different scales, I'll normalize by their ranges. I also want to do this for both at the same time, not separately. Ranges:
+
+- mtry: `r cat(range(tr$min.node.size))`
+- min.node.size: `r cat(range(tr$mtry))`
+
+I'm going to copy the code into the note here to make it clear what I'm doing with these distance calculations:
+
+```{r, echo = TRUE}
+fixed_hp = tibble(
+  task_id = c("attempt", "coup", "failed"),
+  mtry = c(26, 26, 19),
+  min.node.size = c(270, 270, 270)
+)
+
+distances <- tr %>%
+  select(-iters, -num.trees) %>%
+  group_by(task_id, year) %>%
+  mutate(
+    dist_mtry = case_when(
+      task_id=="failed" ~ abs(mtry - fixed_hp$mtry[fixed_hp$task_id=="failed"]),
+      TRUE ~ abs(mtry - unique(fixed_hp$mtry[fixed_hp$task_id!="failed"]))
+    ),
+    dist_min.node.size = case_when(
+      task_id=="failed" ~ abs(min.node.size - fixed_hp$min.node.size[fixed_hp$task_id=="failed"]),
+      TRUE ~ abs(min.node.size - unique(fixed_hp$min.node.size[fixed_hp$task_id!="failed"]))
+    )) %>%
+  mutate(dist_mtry = dist_mtry / 22,
+         dist_min.node.size = dist_min.node.size / 299,
+         dist = sqrt(dist_mtry^2 + dist_min.node.size^2))
+  
+```
+
+Does this make sense?:
+
+```{r}
+heuristic <- distances %>%
+  group_by(task_id, year) %>%
+  top_n(-1, dist) %>%
+  select(-dist_mtry, -dist_min.node.size)
+
+distances %>%
+  ggplot(aes(x = mtry, y = min.node.size, color = dist)) +
+  facet_wrap(~ task_id) +
+  geom_point() +
+  scale_color_viridis(direction = -1) +
+  geom_point(data = fixed_hp, size = 2, col = "red") +
+  geom_point(data = heuristic, size = 2, col = "blue")
+```
+
+The red points are the fixed HP points I want to get close to. The blue points are what I pick in every year. Yep, makes sense. The distances make sense, the blue points are close to what I want (accounting for scale differences in the x and y axes). Now I can select, for each outcome-year sample, the closest results that I want, and them compare how they stack up in terms of performance. 
+
+```{r}
+tr %>%
+  ggplot(aes(x = classif.auc, y = factor(year))) + 
+  facet_wrap(~ task_id, scales = "free_x") +
+  geom_point() +
+  geom_point(data = heuristic, color = "red") + 
+  theme_bw()
+```
+
+Ok, this seems to work reasonably well. By definition the optimum value is all the way on the right in each row's cloud of points. The red points I pick as fixed are usually pretty close. A bit less well for failed, but oh well. The absolute AUC differences seems to be small anyways. 
+
+However...
+
+What if I just use the rule of thumb for "mtry", square root of the numbero features? There were 258 features in the last model run, so about 16. 
+
+```{r, echo = TRUE}
+fixed_hp = tibble(
+  task_id = c("attempt", "coup", "failed"),
+  mtry = c(16, 16, 16),
+  min.node.size = c(270, 270, 270)
+)
+
+distances <- tr %>%
+  select(-iters, -num.trees) %>%
+  group_by(task_id, year) %>%
+  mutate(
+    dist_mtry = case_when(
+      task_id=="failed" ~ abs(mtry - fixed_hp$mtry[fixed_hp$task_id=="failed"]),
+      TRUE ~ abs(mtry - unique(fixed_hp$mtry[fixed_hp$task_id!="failed"]))
+    ),
+    dist_min.node.size = case_when(
+      task_id=="failed" ~ abs(min.node.size - fixed_hp$min.node.size[fixed_hp$task_id=="failed"]),
+      TRUE ~ abs(min.node.size - unique(fixed_hp$min.node.size[fixed_hp$task_id!="failed"]))
+    )) %>%
+  mutate(dist_mtry = dist_mtry / 22,
+         dist_min.node.size = dist_min.node.size / 299,
+         dist = sqrt(dist_mtry^2 + dist_min.node.size^2))
+
+tr %>%
+  ggplot(aes(x = classif.auc, y = factor(year))) + 
+  facet_wrap(~ task_id, scales = "free_x") +
+  geom_point() +
+  geom_point(data = heuristic, color = "red") + 
+  theme_bw()
+```
+
+That actually works well, too. And it's easier, especially as I'm about to take out unneeded feature columns. 
+
+Conclusion:
+
+- "mtry" fixed to `sqrt(N_features)`
+- "min.node.size" fixed to 270
