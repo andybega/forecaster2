@@ -2,6 +2,7 @@
 .PHONY: build
 build: 
 	Rscript -e "rmarkdown::render_site()"
+	open _site/index.html
 
 .PHONY: clean
 clean: 

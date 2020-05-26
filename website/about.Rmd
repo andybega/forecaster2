@@ -31,7 +31,7 @@ More details are available at the project GitHub repo at https://github.com/andy
 
 ## Accuracy
 
-Although the 2020 forecasts are created using models that use data through 2019, we also conduct test forecasts for 2010 to 2019. Since we already know what the record of coups was for this period, we can calculate fit measures. The table below shows the AUC-ROC and AUC-PR for the test forecasts. 
+Although the 2020 forecasts are created using models that use data through 2019, we also conduct test forecasts for 2010 to 2019. Since we already know what the record of coups was for this period, we can calculate fit measures. The table below shows the areas under the ROC (AUC-ROC) and precision-recall (AUC-PR) curves. The ROC and PR curves quantify, in slightly different ways, the tradeoff between true and false predictions a model makes. Ideal models will have values near 1, meaning that that tradeoff is minimal and the model can identify likely instances of coup (attempts) with very few false positives. 
 
 For the AUC-ROC measure, the basic skill threshold to beat is 0.5. Any model below this value is worse, on average, than a random forecast. For the AUC-PR measure, the skill threshold is equal to the positive rate in the data. This is shown in the "Pos. Rate" column. 
 
@@ -69,6 +69,8 @@ fcasts %>%
 </div>
 
 Another way to visualize performance is with separation plots. These arrange all predictions by their predicted probability, which is shown by the black line, and then mark cases in which an event actually occurred with a red line. In an ideal model, the red lines, which correspond to coup attempts, etc., will be all the way on the right and the black line would be near 0 for the sand-colored area and near 1 for the red colored area of the plot. 
+
+The _y_-axis is on the probability scale and ranges from 0 to 1. The _x_-axis corresponds to all country-year cases in the test forecasts. Within each plot, they are sorted by the predicted risk for that outcome. Note that as a result, the order of cases within each plot does not match that in the other plots. 
 
 <div style = "text-align: center">
 <div style = "max-width: 600px; display: inline-block;">
