@@ -52,4 +52,4 @@ datatable(fcasts, rownames = FALSE,
           options = list(pageLength = 25))
 ```
 
-You can download the forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coup-2020.csv).
+You can download the forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coups-2020.csv).

@@ -91,5 +91,5 @@ leaflet(width = "100%", height = "550px", options = leafletOptions(maxZoom = 5, 
   setView(lng = 0, lat = 20, zoom = 2) 
 ```
 
-You can download the forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coup-2020.csv).
+You can download the forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coups-2020.csv).
 
