@@ -1,5 +1,9 @@
 ---
 title: "Links to other public forecasting projects"
+output: 
+  html_document:
+    includes:
+      in_header: _links_header.html
 ---
 
 There are several projects that produce public forecasts of different forms of political instability and violence:

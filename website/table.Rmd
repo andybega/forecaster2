@@ -1,5 +1,9 @@
 ---
 title: "Table of forecasts"
+output: 
+  html_document:
+    includes:
+      in_header: _table_header.html
 ---
 
 The table below lists all countries for which there are forecasts. The columns correspond to different outcomes:

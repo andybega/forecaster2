@@ -3,6 +3,8 @@ title: "About the forecasts"
 output:
   html_document:
     toc: yes
+    includes:
+      in_header: _about_header.html
 ---
 
 ## How are coups measured?

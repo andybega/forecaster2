@@ -45,7 +45,8 @@ world <- suppressWarnings(cshp(date = as.Date("2016-01-01"))) %>%
 ne_world <- st_read("ne_10m_admin_0_countries") %>%
   select(NAME, ADM0_A3)
 ne_world_simple <- ne_world %>%
-  st_simplify(dTolerance = 0.1, preserveTopology = TRUE) %>%
+  st_transform(crs = "+proj=cea +lon_0=0 +lat_ts=45 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs") %>%
+  st_simplify(dTolerance = 7000, preserveTopology = TRUE) %>%  # prevously was without st_transform and 0.1 tolerance
   st_transform(crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") 
 
 saveRDS(ne_world_simple, "world-base-layer.rds")
@@ -84,7 +85,7 @@ world <- world %>%
 
 world_simple <- world %>%
   st_transform(crs = "+proj=cea +lon_0=0 +lat_ts=45 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs") %>%
-  st_simplify(dTolerance = 5000, preserveTopology = TRUE) %>%
+  st_simplify(dTolerance = 7000, preserveTopology = TRUE) %>%  # was 5000
   st_transform(crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0") 
 
 
