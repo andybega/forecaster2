@@ -11,7 +11,7 @@ navbar:
       href: about.html
     - text: "Other forecasting projects"
       href: links.html
-    - text: "Back to PH"
+    - text: "Predictive Heuristics"
       href: https://www.predictiveheuristics.com
   right:
     - icon: fa-github-square fa-lg
