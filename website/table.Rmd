@@ -12,7 +12,7 @@ The table below lists all countries for which there are forecasts. The columns c
 - Coup: a successful coup that results in overthrow of the government.
 - Failed: a failed coup attempt that does not result in overthrow of the government.
 
-The risk values shown are percentages that can theoretically can range from 0% to 100%. These were created from raw risk probabilities that range from 0 to 1. 
+The risk values shown are percentages that can theoretically can range from 0% to 100%. These are created from the underlying raw probabilities which range from 0 to 1. 
 
 The respective "Rank" columns give a country's rank on each outcome. The country with the highest risk is ranked 1, and higher rank values correspond to lower risk. 
 
@@ -53,7 +53,9 @@ fcasts <- fcasts %>%
 datatable(fcasts, rownames = FALSE, 
           colnames = c("Attempt Rank" = 3, "Coup Rank" = 5, "Failed Rank" = 7),
           extensions = "Responsive",
-          options = list(pageLength = 25))
+          options = list(pageLength = 25),
+          # set element ID, otherwise it will change on git each time
+          elementId = "htmlwidget-forecast-table")
 ```
 
 You can download the forecasts [here (CSV)](https://raw.githubusercontent.com/andybega/forecaster2/master/forecasts/coups-2020.csv).
