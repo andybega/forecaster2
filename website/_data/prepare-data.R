@@ -29,7 +29,8 @@ fcasts$iso_a3[fcasts$gwcode==816] <- "VNM"
 fcasts <- fcasts %>% 
   mutate(p = 100*p) %>%
   tidyr::pivot_wider(names_from = "outcome", values_from = "p") %>%
-  dplyr::select(iso_a3, attempt, coup, failed)
+  dplyr::select(iso_a3, attempt2, coup, failed) %>%
+  dplyr::rename(attempt = attempt2)
 
 # base map data is from chshapes
 world <- suppressWarnings(cshp(date = as.Date("2016-01-01"))) %>%
