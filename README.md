@@ -1,7 +1,7 @@
 Coup forecasts
 ==============
 
-Code and data to create the coup forecasts at https://github.com/andybega/forecaster2.
+Code and data to create the coup forecasts at https://www.predictiveheuristics.com/forecasts.
 
 This repo is organized around tasks:
 
